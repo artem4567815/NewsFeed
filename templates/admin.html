@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PrivatePage</title>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="#" id="create-link">Создать</a>
+        <a href="#" id="moderate-link">Модерация</a>
+    </nav>
+
+    <div class="content">
+        <div id="create-section" class="hidden">
+            <h2>Выберите, что вы хотите создать:</h2>
+            <select id="create-type">
+                <option value="" selected>Выберите тип</option>
+                <option value="wallpaper">Стенгазета</option>
+                <option value="post">Пост</option>
+            </select>
+            <div id="wallpaper-form" class="form-section hidden">
+                <h3>Создать стенгазету</h3>
+                <form>
+                    <label for="wallpaper-title">Заголовок:</label>
+                    <input type="text" id="wallpaper-title" placeholder="Введите заголовок">
+                    <label for="wallpaper-description">Описание:</label>
+                    <textarea id="wallpaper-description" placeholder="Введите описание"></textarea>
+                    <button type="submit">Создать стенгазету</button>
+                </form>
+            </div>
+            <div id="post-form" class="form-section hidden">
+                <h3>Создать пост</h3>
+                <form>
+                    <label for="post-title">Заголовок:</label>
+                    <input type="text" id="post-title" placeholder="Введите заголовок">
+                    <label for="post-content">Контент:</label>
+                    <textarea id="post-content" placeholder="Введите контент"></textarea>
+                    <button type="submit">Создать пост</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="moderate-section" class="hidden">
+            <h2>Модерация</h2>
+            <p>Секция для модерации пока пустая.</p>
+        </div>
+    </div>
+
+    <script>
+        const createLink = document.getElementById('create-link');
+        const moderateLink = document.getElementById('moderate-link');
+        const createSection = document.getElementById('create-section');
+        const moderateSection = document.getElementById('moderate-section');
+        const createType = document.getElementById('create-type');
+        const wallpaperForm = document.getElementById('wallpaper-form');
+        const postForm = document.getElementById('post-form');
+
+        createLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            createSection.classList.remove('hidden');
+            moderateSection.classList.add('hidden');
+        });
+
+        moderateLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            createSection.classList.add('hidden');
+            moderateSection.classList.remove('hidden');
+        });
+
+        createType.addEventListener('change', () => {
+            const value = createType.value;
+            wallpaperForm.classList.add('hidden');
+            postForm.classList.add('hidden');
+
+            if (value === 'wallpaper') {
+                wallpaperForm.classList.remove('hidden');
+            } else if (value === 'post') {
+                postForm.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
+</body>
+</html>

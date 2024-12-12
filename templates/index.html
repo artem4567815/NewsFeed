@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Школьные новости</title>
+</head>
+<body>
+<header>
+    <nav>
+        <div class="nav-menu">
+            <a href="/routes/events" class="arrow-button"><b><em>Основные события</em></b></a>
+            <a href="/routes/wall" class="arrow-button"><b><em>Стенгазета</em></b></a>
+            <a href="/routes/team_search" class="arrow-button" id="toggle-menu"><b><em>Поиск команды</em></b></a>
+        </div>
+    </nav>
+</header>
+<main>
+    {% if page_type == 'events' %}
+        <div class="news-scroll">
+            <div class="item">
+                {% for news_item in news %}
+                    <img class="news-img" src="{{ url_for('static', filename=news_item.image_url) }}" alt="News image">
+                {% endfor %}
+            </div>
+        </div>
+    {% elif page_type == 'wall' %}
+            <h1>Cтенгазетa</h1>
+    {% elif page_type == 'team_search' %}
+        <h1>Поиск команд</h1>
+    {% endif %}
+</main>
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>
