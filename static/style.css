@@ -3,14 +3,14 @@ body {
     margin: 0;
     padding: 0;
     /*background: url('static/images/2.avif') no-repeat center center fixed;*/
-    background-color: rgb(89, 109, 128);
+    background-color: rgba(250, 175, 62, 0.49);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 header {
-    background-color: #343a40;
+    background-color: black;
     color: #000000;
     padding: 5px 0 5px 0;
 }
@@ -81,11 +81,8 @@ main {
     padding: 10px;
 }
 
-.item{
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-}
-
 .news-img {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100%;
     border-radius: 8px;

@@ -2,13 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PrivatePage</title>
-</head>
-<body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
@@ -27,25 +20,11 @@
                 <option value="wallpaper">Стенгазета</option>
                 <option value="post">Пост</option>
             </select>
-            <div id="wallpaper-form" class="form-section hidden">
-                <h3>Создать стенгазету</h3>
-                <form>
-                    <label for="wallpaper-title">Заголовок:</label>
-                    <input type="text" id="wallpaper-title" placeholder="Введите заголовок">
-                    <label for="wallpaper-description">Описание:</label>
-                    <textarea id="wallpaper-description" placeholder="Введите описание"></textarea>
-                    <button type="submit">Создать стенгазету</button>
-                </form>
-            </div>
-            <div id="post-form" class="form-section hidden">
-                <h3>Создать пост</h3>
-                <form>
-                    <label for="post-title">Заголовок:</label>
-                    <input type="text" id="post-title" placeholder="Введите заголовок">
-                    <label for="post-content">Контент:</label>
-                    <textarea id="post-content" placeholder="Введите контент"></textarea>
-                    <button type="submit">Создать пост</button>
-                </form>
+
+            <div class="hidden" id="create-post">
+                {% block content %}
+                    {% include 'canvas.html' %}
+                {% endblock %}
             </div>
         </div>
 
@@ -63,6 +42,7 @@
         const createType = document.getElementById('create-type');
         const wallpaperForm = document.getElementById('wallpaper-form');
         const postForm = document.getElementById('post-form');
+        const createPost = document.getElementById('create-post');
 
         createLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -78,18 +58,20 @@
 
         createType.addEventListener('change', () => {
             const value = createType.value;
-            wallpaperForm.classList.add('hidden');
-            postForm.classList.add('hidden');
+
+            let route = '';
 
             if (value === 'wallpaper') {
-                wallpaperForm.classList.remove('hidden');
+                route = '/admin/wallpaper';
             } else if (value === 'post') {
-                postForm.classList.remove('hidden');
+                // route = '/admin/post';
+                createPost.classList.remove('hidden');
+            }
+
+            if (route) {
+                window.location.href = route;
             }
         });
     </script>
-</body>
-</html>
-
 </body>
 </html>

@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, jsonify
 from config import ADMIN_PASSWORD_HASH, ADMIN_USERNAME
 from werkzeug.security import generate_password_hash, check_password_hash
-# from flask_login import login_user, login_required, logout_user
 from manage import *
+from methods import *
 
 admin_routes = Blueprint('admin', __name__)
 
@@ -30,3 +30,28 @@ def logout():
 @login_required
 def home():
     return render_template("admin.html")
+
+@admin_routes.route("/post")
+@login_required
+def posts():
+    return render_template("canvas.html")
+
+
+@admin_routes.route('/save-image', methods=['POST'])
+@login_required
+def save_image():
+    if request.method == "POST":
+        data = request.get_json()
+        title = data.get('title')
+        short_description = data.get('shortDescription')
+        full_description = data.get('fullDescription')
+        file = ""
+
+        if data:
+            image = data.get('dataURL')
+            file = save_file(image)
+
+        add_to_database2(title, short_description, full_description, file)
+
+        return jsonify({"message": "OK"}), 200
+    return jsonify({"message": "ERROR"}), 404
