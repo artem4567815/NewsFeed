@@ -53,48 +53,22 @@
                 <a href="/routes/team_search" class="filter-button">Поиск команды</a>
             </div>
             <div class="news-table">
-                <div class="news">
-                    <div class="text-block">
-                        <p class="news-nickname text">
-                            Школа 1561 К.11
-                        </p>
-                        <p class="news-title text">
-                            <b>Рождество · Сегодня</b>
-                        </p>
-                        <p class="new-decription text">
-                            Всем привет! Наша школа отмечает Рождество, Приглашаем всех на этот уютный и прекрасный праздник
-                        </p>
+                {% for new in news %}
+                    <div class="news">
+                        <div class="text-block">
+                            <p class="news-nickname text">
+                                Школа 1561 К.11
+                            </p>
+                            <p class="news-title text">
+                                <b>{{ new.title }} · Сегодня</b>
+                            </p>
+                            <p class="new-decription text">
+                                {{ new.short_content }}
+                            </p>
+                        </div>
+                        <img src="{{ url_for('static', filename=new.image_url) }}" alt="" class="news-image">
                     </div>
-                    <img src="https://www.maastrichtuniversity.nl/sites/default/files/2023-03/dubai.jpg" alt="" class="news-image">
-                </div>
-                <div class="news">
-                    <div class="text-block">
-                        <p class="news-nickname text">
-                            Школа 1561 К.11
-                        </p>
-                        <p class="news-title text">
-                            <b>Рождество · Сегодня</b>
-                        </p>
-                        <p class="new-decription text">
-                            Всем привет! Наша школа отмечает Рождество, Приглашаем всех на этот уютный и прекрасный праздник
-                        </p>
-                    </div>
-                    <img src="https://www.maastrichtuniversity.nl/sites/default/files/2023-03/dubai.jpg" alt="" class="news-image">
-                </div>
-                <div class="news">
-                    <div class="text-block">
-                        <p class="news-nickname text">
-                            Школа 1561 К.11
-                        </p>
-                        <p class="news-title text">
-                            <b>Рождество · Сегодня</b>
-                        </p>
-                        <p class="new-decription text">
-                            Всем привет! Наша школа отмечает Рождество, Приглашаем всех на этот уютный и прекрасный праздник
-                        </p>
-                    </div>
-                    <img src="https://www.maastrichtuniversity.nl/sites/default/files/2023-03/dubai.jpg" alt="" class="news-image">
-                </div>
+                {% endfor %}
             </div>
             <div class="timeline">
                 
