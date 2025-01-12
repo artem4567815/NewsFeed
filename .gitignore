@@ -3,3 +3,4 @@ migrations
 objects
 .idea
 __pycache__
+static/images

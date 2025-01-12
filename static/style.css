@@ -119,8 +119,6 @@ a {text-decoration: none;}
     grid-template-areas: "filter timeline"
                          "news-table timeline";
     justify-content: space-around;
-   
-    
 }
 
 .filter {
@@ -130,8 +128,6 @@ a {text-decoration: none;}
     display: flex;
     margin-left:1vw;
     border-bottom: 3px solid rgba(119, 119, 119, 0.356);
-    
-
 }
 
 .filter-button {
@@ -145,7 +141,48 @@ a {text-decoration: none;}
     width:70vw;
     grid-area: news-table;
     margin-left:1vw;
-    
+}
+
+.news {
+    padding: 20px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.281);
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 15px;
+    align-items: center; 
+}
+
+.text {
+    margin-bottom: 10px;
+}
+
+.text-block {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    word-wrap: break-word;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.news-nickname, .new-decription {
+    font-size: 1.2em;
+    color: rgb(124, 124, 124);
+}
+
+.news-title {
+    font-size: 1.35em;
+}
+
+.news-image {
+    width:20em;
+    height: fit-content;
+    border-radius: 12px;
+    border: 1px solid black;
 }
 
 .timeline {
@@ -183,7 +220,6 @@ a {text-decoration: none;}
 }
 
 .line-2 {
-
     width: 3px;
     height: 10px;
     background-color: rgba(128, 128, 128, 0.356);
@@ -199,46 +235,4 @@ a {text-decoration: none;}
 
 .time-passed {
     color: #4F7396;
-}
-    
-.news {
-    padding: 20px;
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.281);
-    margin-top: 50px;
-    display: flex;
-    justify-content: space-between;
-    border-radius: 15px;
-    align-items: center; 
-}
-
-.text-block {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-    word-wrap: break-word;
-}
-
-.news-image {
-    width:20em;
-    height: fit-content;
-    border-radius: 12px;
-    border: 1px solid black;
-}
-
-p {
-    margin: 0;
-    padding: 0;
-}
-
-.text {
-    margin-bottom: 10px;
-}
-
-.news-nickname, .new-decription {
-    font-size: 1.2em;
-    color: rgb(124, 124, 124);
-}
-
-.news-title {
-    font-size: 1.35em;
 }
