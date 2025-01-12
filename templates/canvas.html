@@ -84,6 +84,17 @@
                     <label for="fullDescription">Полное описание</label>
                     <textarea id="fullDescription" name="fullDescription" rows="5" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="date-range">Введите диапазон дат:</label>
+                    <input 
+                      type="text" 
+                      id="date-range" 
+                      placeholder="от дд.мм.гггг до дд.мм.гггг" 
+                      pattern="от \d{2}\.\d{2}\.\d{4} до \d{2}\.\d{2}\.\d{4}" 
+                      required
+                      style="width: 300px;"
+                    />
+                </div>
 
                 <h3>Редактор канваса</h3>
                 <button type="button" id="addTextBtn"><b>+</b> Добавить текст</button>
@@ -168,6 +179,14 @@
             const title = document.getElementById('title').value;
             const shortDescription = document.getElementById('shortDescription').value;
             const fullDescription = document.getElementById('fullDescription').value;
+            const input = document.getElementById("date-range").value;
+            const regex = /^от \d{2}\.\d{2}\.\d{4} до \d{2}\.\d{2}\.\d{4}$/;
+
+            if (!regex.test(input)) {
+                e.preventDefault();
+                alert("Введите диапазон дат в формате: от дд.мм.гггг до дд.мм.гггг");
+            }
+
             const dataURL = canvas.toDataURL({
                 format: 'png',
                 quality: 1.0,
@@ -176,10 +195,10 @@
                 title,
                 shortDescription,
                 fullDescription,
-                dataURL
+                dataURL,
+                input
             };
 
-            // Здесь отправляем данные на сервер
             const response = await fetch('/admin/save-image', {
                 method: 'POST',
                 headers: {

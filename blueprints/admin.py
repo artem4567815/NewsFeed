@@ -45,13 +45,14 @@ def save_image():
         title = data.get('title')
         short_description = data.get('shortDescription')
         full_description = data.get('fullDescription')
+        interval = data.get('input')
         file = ""
 
         if data:
             image = data.get('dataURL')
             file = save_file(image)
 
-        add_to_database2(title, short_description, full_description, file)
+        add_to_database2(title, short_description, full_description, file, interval)
 
         return jsonify({"message": "OK"}), 200
     return jsonify({"message": "ERROR"}), 404
