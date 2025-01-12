@@ -71,24 +71,26 @@
                 {% endfor %}
             </div>
             <div class="timeline">
-                <div class="time-block">
-                    <div class="marks">
-                        <div class="cube"></div>
-                        <div class="line-1"></div>
-                        <div class="line-2"></div>
+                {% for new in news %}
+                    <div class="time-block">
+                        <div class="marks">
+                            <div class="cube"></div>
+                            <div class="line-1"></div>
+                            <div class="line-2"></div>
+                        </div>
+                        <div class="time-text text">
+                            <p class="time-name text">
+                                <b>{{ new.title }}</b>
+                            </p>
+                            <p class="time-valid text">
+                                {{ new.date_interval }}
+                            </p>
+                            <p class="time-passed">
+                                {{ new.created_at }}
+                            </p>
+                        </div>
                     </div>
-                    <div class="time-text text">
-                        <p class="time-name text">
-                            <b>Конкурс “Лучший рисунок”</b>
-                        </p>
-                        <p class="time-valid text">
-                            от 06.01.2025 до 07.01.2025
-                        </p>
-                        <p class="time-passed">
-                            2 часа назад
-                        </p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </main>
         <script src="{{ url_for('static', filename='index.js') }}"></script>
