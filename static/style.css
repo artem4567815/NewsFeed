@@ -23,7 +23,7 @@ a {text-decoration: none;}
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 3vw;
+    margin-bottom: 40px;
 }
 
 .nav{
@@ -115,10 +115,10 @@ a {text-decoration: none;}
 }
 
 .news-main {
-    margin: 0 2vw;
     display: grid;
-    grid-template-areas: "filter filtertimeline"
-                        "news-table timeline";
+    grid-template-areas: "filter timeline"
+                         "news-table timeline";
+    justify-content: space-around;
    
     
 }
@@ -130,7 +130,6 @@ a {text-decoration: none;}
     display: flex;
     margin-left:1vw;
     border-bottom: 3px solid rgba(119, 119, 119, 0.356);
-    margin-right: 4vw;
     
 
 }
@@ -150,17 +149,66 @@ a {text-decoration: none;}
 }
 
 .timeline {
-    width: 1fr;
     grid-area: timeline;
     grid-row: span 2;
-    overflow: hidden
+    overflow: hidden;
 }
 
-.news {
+.time-block {
+    display: flex;
+    justify-self: start;
+
+}
+
+.marks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 15px;
+   
+}
+
+.cube {
+    width: 20px;
+    height: 20px;
+    border: 3px solid black;
+    border-radius: 5px;
+}
+
+.line-1 {
+    margin: 5px 0;
+    width: 3px;
+    height: 45px;
+    background-color: rgba(128, 128, 128, 0.356);
+}
+
+.line-2 {
+
+    width: 3px;
+    height: 10px;
+    background-color: rgba(128, 128, 128, 0.356);
+}
+
+.time-name {
+    font-size: 1.15em;
+}
+
+.time-valid{
+    font-size: 1.05em;
+}
+
+.time-passed {
+    color: #4F7396;
+}
     
-    margin-top: 2vw;
+.news {
+    padding: 20px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.281);
+    margin-top: 50px;
     display: flex;
     justify-content: space-between;
+    border-radius: 15px;
+    align-items: center; 
 }
 
 .text-block {
@@ -173,7 +221,6 @@ a {text-decoration: none;}
 .news-image {
     width:20em;
     height: fit-content;
-    margin-right: 3vw;
     border-radius: 12px;
     border: 1px solid black;
 }
