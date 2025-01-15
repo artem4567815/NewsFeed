@@ -62,6 +62,8 @@ a {text-decoration: none;}
     color: white;
     padding: 10px 15px;
     margin-right: 10px;
+    max-height: 25px;
+    margin-top: 4px;
 }
 
 .settings {
@@ -84,6 +86,9 @@ a {text-decoration: none;}
 .button-search {
     display: flex;
     align-items: center;
+    background: #f0f2f5;
+    border-radius: 12px;
+    margin-right: 5px;
 }
 
 .loupe {
@@ -92,11 +97,9 @@ a {text-decoration: none;}
     justify-content: center;
     flex-direction: row;
     gap: 0px;
-    border-radius: 12px 0 0 12px;
     padding: 0px 0px 0px 16px;
     width: 45px;
     height: auto;
-    background: #f0f2f5;
 }
 
 .search {
@@ -108,7 +111,7 @@ a {text-decoration: none;}
     gap: 0px;
     border-radius: 0 12px 12px 0;
     padding: 10px 16px 10px 8px;
-    width: 500px;
+    width:440px;
     height: 45px;
     background: #f0f2f5;
     justify-self: end;
@@ -135,6 +138,10 @@ a {text-decoration: none;}
     border-bottom: 5px solid rgba(119, 119, 119, 0.644);
     margin-right: 3vw;
     padding-bottom: 1vw;;
+}
+
+.active {
+    border-bottom: 5px solid black;
 }
 
 .news-table {
@@ -235,4 +242,15 @@ p {
 
 .time-passed {
     color: #4F7396;
+}
+
+.highlight {
+    background-color: yellow;
+}
+
+.arrow-button {
+    padding: 5px 5px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
 }

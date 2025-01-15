@@ -9,14 +9,14 @@
     <body>
         <header class="menu">
             <div class="nav">
-                <a href=http://127.0.0.1:5000/routes/events?school class="menu-button title"><b>School News</b></a>
+                <a href="/routes/events" class="menu-button title"><b>School News</b></a>
                 <div class="center">
-                    <a href=http://127.0.0.1:5000/ class="menu-button school">Выбор школы</a>
+                    <a href="/" class="menu-button school">Выбор школы</a>
                     <a href=# class="menu-button">Поиск по дате</a>
                 </div>
             </div>
             <div class="end">
-                <a href=# class="menu-create">Создание</a>
+                <a href="/routes/login" class="menu-create">Вход</a>
                 <div class="settings">
                     <svg class="menu-image" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_269_119)">
@@ -30,7 +30,7 @@
                         </defs>
                     </svg>
                 </div>
-                <form class="button-search" action="" method="get">
+                <div class="button-search">
                     <svg class="loupe" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_271_276)">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M21.5306 20.4694L16.8366 15.7762C19.6629 12.383 19.3204 7.36693 16.0591 4.38935C12.7978 1.41176 7.77134 1.526 4.64867 4.64867C1.526 7.77134 1.41176 12.7978 4.38935 16.0591C7.36693 19.3204 12.383 19.6629 15.7762 16.8366L20.4694 21.5306C20.7624 21.8237 21.2376 21.8237 21.5306 21.5306C21.8237 21.2376 21.8237 20.7624 21.5306 20.4694ZM3.75 10.5C3.75 6.77208 6.77208 3.75 10.5 3.75C14.2279 3.75 17.25 6.77208 17.25 10.5C17.25 14.2279 14.2279 17.25 10.5 17.25C6.77379 17.2459 3.75413 14.2262 3.75 10.5Z" fill="#637587"/>
@@ -41,8 +41,11 @@
                         </clipPath>
                         </defs>
                     </svg>
-                    <input class="search" name="s" placeholder="Искать здесь..." type="search">
-                </form>
+                    <input class="search" name="s" id="search-bar" placeholder="Искать здесь..." type="search" oninput="rewritwText()">
+                    <div class="line-1"></div>
+                    <button id="prevButton" class="arrow-button"><img src="{{ url_for('static', filename='images/up.png') }}" alt="" width="25px" height="25px"></button>
+                    <button id="nextButton" class="arrow-button"><img src="{{ url_for('static', filename='images/up.png') }}" style="transform: rotate(180deg);" alt="" width="25px" height="25px" ></button>
+                </div>
             </div>
         </header>
  
@@ -53,11 +56,15 @@
                 <a href="/routes/team_search" class="filter-button">Поиск команды</a>
             </div>
             <div class="news-table">
-                {% for new in news %}
-                    <div class="news">
+                {% for new in news|sort(reverse=True, attribute="created_at") %}
+                    <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
                         <div class="text-block">
                             <p class="news-nickname text">
-                                Школа 1561 К.11
+                                {% if new.users.is_admin %}
+                                    Школа {{ new.users.school }} {{ new.users.corpus}}
+                                {% else %}
+                                    {{ new.users.name }} Школа {{ new.users.school }} {{ new.users.corpus}}
+                                {% endif %}
                             </p>
                             <p class="news-title text">
                                 <b>{{ new.title }} · </b><b class="time" data-created-at="{{ new.created_at }}"></b>
@@ -71,7 +78,7 @@
                 {% endfor %}
             </div>
             <div class="timeline">
-                {% for new in news %}
+                {% for new in news|sort(reverse=True, attribute="created_at") %}
                     <div class="time-block">
                         <div class="marks">
                             <div class="cube"></div>
