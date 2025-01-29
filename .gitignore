@@ -4,3 +4,5 @@ objects
 .idea
 __pycache__
 static/images
+*.DS_Store
+test.py

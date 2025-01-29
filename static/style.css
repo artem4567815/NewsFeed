@@ -254,3 +254,10 @@ p {
     border: none;
     cursor: pointer;
 }
+
+.news_link{
+    color: black;
+}
+a:visited{
+    color: black;
+}

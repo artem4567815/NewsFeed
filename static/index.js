@@ -10,6 +10,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function getWord(count, forms) {
+    const mod100 = count % 100;
+    const mod10 = count % 10;
+
+    if (mod100 >= 11 && mod100 <= 19) {
+        return forms[2];
+    }
+
+    if (mod10 === 1) {
+        return forms[0];
+    }
+
+    if (mod10 >= 2 && mod10 <= 4) {
+        return forms[1];
+    }
+
+    return forms[2];
+}
+
+const units = {
+    seconds: ['секунда', 'секунды', 'секунд'],
+    minutes: ['минута', 'минуты', 'минут'],
+    hours: ['час', 'часа', 'часов'],
+    days: ['день', 'дня', 'дней'],
+};
+
 
 function updateTimeAgo() {
     const timeElements = document.querySelectorAll('.time-passed');
@@ -23,20 +49,21 @@ function updateTimeAgo() {
 function calculateTimeAgo(createdAt) {
     const now = new Date();
     const diff = now - createdAt;
+    const now_days = now.getDate();
 
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    console.log(diff)
+    const dif_days = now_days - createdAt.getDate();
+    console.log(units["seconds"]);
     if (seconds < 60) {
-        return `${seconds} секунд назад`;
+        return `${seconds} ${getWord(seconds, units["seconds"])} назад`;
     } else if (minutes < 60) {
-        return `${minutes} минут назад`;
+        return `${minutes} ${getWord(minutes, units["minutes"])} назад`;
     } else if (hours < 24) {
-        return `${hours} часов назад`;
+        return `${hours} ${getWord(hours, units["hours"])} назад`;
     } else {
-        return `${days + 1} дня назад`;
+        return `${dif_days} ${getWord(dif_days, units["days"])} назад`;
     }
 }
 
@@ -65,10 +92,10 @@ function calculateTime(createdAt) {
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    
+    const dif_days = now.getDate() - createdAt.getDate();
     if (days < 1) {
         return `Сегодня`;
-    } else if (days >= 1 && days < 2) {
+    } else if (dif_days == 1) {
         return `Вчера`;
     } else{
         return `${day}.${month}.${year}`;

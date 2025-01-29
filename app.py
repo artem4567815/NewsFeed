@@ -1,4 +1,3 @@
-from manage import *
 from blueprints import *
 
 app.register_blueprint(main_routes, url_prefix='/routes')

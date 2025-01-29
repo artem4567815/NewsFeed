@@ -8,7 +8,10 @@ def get_all_users():
     return Users.query.all()   
 
 def find_user_by_name(name):
-    return Users.query.filter(name=name).first()    
+    return Users.query.filter(Users.name == name).first()
+
+def find_news_by_title(title):
+    return News.query.filter(News.title == title).first()    
 
 def get_latest_file(directory):
     files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]

@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, flash, redirect, session
-from methods import get_all_news
+from flask import Blueprint, render_template, request, flash, redirect, session, jsonify
+from methods import get_all_news, find_news_by_title
 from manage import *
 from models import Credentials
 from werkzeug.security import check_password_hash
@@ -43,6 +43,14 @@ def logout():
 def events():
     news_list = get_all_news()
     return render_template("index.html", news=news_list, page_type="events")
+
+@main_routes.route("/title/<title>")
+def detailed_news(title):
+    news = find_news_by_title(title)
+    if not news:
+        return jsonify({"Message": "Error"}), 404
+    
+    return render_template("detailed_news.html", news=news)
 
 @main_routes.route("/wall")
 def wall():
