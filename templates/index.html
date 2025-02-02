@@ -84,23 +84,25 @@
             <div class="timeline">
                 {% for new in news|sort(reverse=True, attribute="created_at") %}
                     {% if new.type == page_type %}
-                        <div class="time-block">
-                            <div class="marks">
-                                <div class="cube"></div>
-                                <div class="line-1"></div>
-                                <div class="line-2"></div>
+                        <a href="/routes/title/{{ new.id }}" class="timeline-link">
+                            <div class="time-block">
+                                <div class="marks">
+                                    <div class="cube"></div>
+                                    <div class="line-1"></div>
+                                    <div class="line-2"></div>
+                                </div>
+                                <div class="time-text text">
+                                    <p class="time-name text">
+                                        <b>{{ new.title }}</b>
+                                    </p>
+                                    <p class="time-valid text">
+                                        {{ new.date_interval }}
+                                    </p>
+                                    <p class="time-passed" id="time-passed" data-created-at="{{ new.created_at }}">
+                                    </p>
+                                </div>
                             </div>
-                            <div class="time-text text">
-                                <p class="time-name text">
-                                    <b>{{ new.title }}</b>
-                                </p>
-                                <p class="time-valid text">
-                                    {{ new.date_interval }}
-                                </p>
-                                <p class="time-passed" id="time-passed" data-created-at="{{ new.created_at }}">
-                                </p>
-                            </div>
-                        </div>
+                        </a>
                     {% endif %}
                 {% endfor %}
             </div>

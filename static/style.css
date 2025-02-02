@@ -268,6 +268,9 @@ p {
 a:visited{
     color: black;
 }
+a{
+    color: black;
+}
 
  .timeline-link:hover .marks .line-1, .timeline-link:hover .marks .line-2, .timeline-link:hover .marks .cube{
     background-color: rgba(72, 182, 105, 0.411);
