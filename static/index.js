@@ -219,3 +219,11 @@ function scrollToPost(index) {
     }
 }
 
+const cards = document.querySelectorAll(".news");
+VanillaTilt.init(cards, {
+    max:2,
+    gkare: true,
+    'max-glare':0.3,
+});
+
+

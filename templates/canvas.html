@@ -12,21 +12,12 @@
             align-items: center;
             height: 100%;
             margin: 0;
-            background-color: #f9f9f9;
+            background-color: #f9f9f977;
             flex-direction: column;
         }
 
         canvas {
             border: 1px solid #ccc;
-        }
-
-        .form-container {
-            width: 80%;
-            max-width: 800px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
@@ -51,13 +42,14 @@
             font-size: 16px;
             cursor: pointer;
             border: none;
-            border-radius: 4px;
-            background-color: #4CAF50;
+            border-radius: 8px;
+            background-color: #1c1c29c4;
             color: white;
+            transition: 0.8s;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #232341;
         }
 
         .button-container {
@@ -100,7 +92,7 @@
                 <button type="button" id="addTextBtn"><b>+</b> Добавить текст</button>
                 <input type="file" id="uploadFile" accept="image/*" style="display: none;">
                 <button type="button" id="addImageBtn">Добавить изображение</button>
-                <canvas id="canvas" width="800" height="300"></canvas>
+                <canvas id="canvas" width="960" height="540"></canvas>
 
                 <div class="button-container">
                     <button type="submit" id="savePostBtn">Сохранить пост</button>
