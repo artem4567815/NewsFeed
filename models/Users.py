@@ -9,5 +9,5 @@ class Users(db.Model):
     is_admin = db.Column(db.Boolean, nullable=False)
 
     credentials = db.relationship('Credentials', backref='user', uselist=False)
-    news = db.relationship('News', backref='users')
+    news = db.relationship('News', backref='user')
 

@@ -16,28 +16,3 @@ def home():
 @admin_required
 def posts():
     return render_template("canvas.html")
-
-
-@admin_routes.route('/save-image', methods=['POST'])
-@login_required
-@admin_required
-def save_image():
-    if request.method == "POST":
-        data = request.get_json()
-        title = data.get('title')
-        short_description = data.get('shortDescription')
-        full_description = data.get('fullDescription')
-        interval = data.get('input')
-        file = ""
-        user_id = session.get("user_id")
-        if data:
-            image = data.get('dataURL')
-            file = save_file(image)
-
-        if not user_id:
-            return jsonify({"message": "ERROR"}), 404
-        
-        add_to_database2(title, short_description, full_description, file, interval, user_id)
-
-        return jsonify({"message": "OK"}), 200
-    return jsonify({"message": "ERROR"}), 404

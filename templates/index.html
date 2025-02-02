@@ -48,7 +48,7 @@
                 </div>
             </div>
         </header>
- 
+
         <main class="news-main">
             <div class="filter">
                 <a href="/routes/events" class="filter-button">Новости</a>
@@ -57,47 +57,51 @@
             </div>
             <div class="news-table">
                 {% for new in news|sort(reverse=True, attribute="created_at") %}
-                    <a href="/routes/title/{{ new.title }}" class="news_link">
-                        <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
-                            <div class="text-block">
-                                <p class="news-nickname text">
-                                    {% if new.users.is_admin %}
-                                        Школа {{ new.users.school }} {{ new.users.corpus}}
-                                    {% else %}
-                                        {{ new.users.name }} Школа {{ new.users.school }} {{ new.users.corpus}}
-                                    {% endif %}
-                                </p>
-                                <p class="news-title text">
-                                    <b>{{ new.title }} · </b><b class="time" data-created-at="{{ new.created_at }}"></b>
-                                </p>
-                                <p class="new-decription text">
-                                    {{ new.short_content }}
-                                </p>
+                    {% if new.type == page_type %}
+                        <a href="/routes/title/{{ new.id }}" class="news_link">
+                            <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
+                                <div class="text-block">
+                                    <p class="news-nickname text">
+                                        {% if new.user.is_admin %}
+                                            Школа {{ new.user.school }} {{ new.user.corpus}}
+                                        {% else %}
+                                            {{ new.user.name }} Школа {{ new.user.school }} {{ new.user.corpus}}
+                                        {% endif %}
+                                    </p>
+                                    <p class="news-title text">
+                                        <b>{{ new.title }} · </b><b class="time" data-created-at="{{ new.created_at }}"></b>
+                                    </p>
+                                    <p class="new-decription text">
+                                        {{ new.short_content }}
+                                    </p>
+                                </div>
+                                <img src="{{ url_for('static', filename=new.image_url) }}" alt="" class="news-image">
                             </div>
-                            <img src="{{ url_for('static', filename=new.image_url) }}" alt="" class="news-image">
-                        </div>
-                    </a>
+                        </a>
+                    {% endif %}
                 {% endfor %}
             </div>
             <div class="timeline">
                 {% for new in news|sort(reverse=True, attribute="created_at") %}
-                    <div class="time-block">
-                        <div class="marks">
-                            <div class="cube"></div>
-                            <div class="line-1"></div>
-                            <div class="line-2"></div>
+                    {% if new.type == page_type %}
+                        <div class="time-block">
+                            <div class="marks">
+                                <div class="cube"></div>
+                                <div class="line-1"></div>
+                                <div class="line-2"></div>
+                            </div>
+                            <div class="time-text text">
+                                <p class="time-name text">
+                                    <b>{{ new.title }}</b>
+                                </p>
+                                <p class="time-valid text">
+                                    {{ new.date_interval }}
+                                </p>
+                                <p class="time-passed" id="time-passed" data-created-at="{{ new.created_at }}">
+                                </p>
+                            </div>
                         </div>
-                        <div class="time-text text">
-                            <p class="time-name text">
-                                <b>{{ new.title }}</b>
-                            </p>
-                            <p class="time-valid text">
-                                {{ new.date_interval }}
-                            </p>
-                            <p class="time-passed" id="time-passed" data-created-at="{{ new.created_at }}">
-                            </p>
-                        </div>
-                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </main>

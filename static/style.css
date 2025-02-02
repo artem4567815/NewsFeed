@@ -261,3 +261,55 @@ p {
 a:visited{
     color: black;
 }
+
+/*-----------------------------------------*/
+
+.wallpapers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 100px 20px 20px;
+    align-items: center;
+}
+.wallpaper {
+    width: 80%;
+    height: 150px;
+    background: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+.profile-menu {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    text-align: center;
+}
+.profile-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #333;
+    cursor: pointer;
+}
+.menuImg {
+    display: none;
+    position: absolute;
+    bottom: 80px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+.menu button {
+    display: block;
+    width: 100%;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}

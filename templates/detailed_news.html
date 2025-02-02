@@ -36,7 +36,7 @@
         <main class="news-main">
             <div class="news-table">
                 <img src="{{ url_for('static', filename=news.image_url) }}" alt="" class="news-image"> <br>
-                {{ news.title }} | {{ news.users.name }} <br>
+                {{ news.title }} | {{ news.user.name }} <br>
                 {{ news.content}} <br>
             </div>
         </main>

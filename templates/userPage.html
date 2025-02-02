@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="menu">
+            <div class="nav">
+                <a href="/routes/events" class="menu-button title"><b>School News</b></a>
+            </div>
+            <div class="end">
+                <a href="/users/create" class="menu-create">Создать</a>
+                <div class="settings">
+                </div>
+            </div>
+        </header>
+    <div class="wallpapers" id="wallpapers">
+        {% for new in walls|sort(reverse=True, attribute="created_at") %}
+            <a href="/routes/title/{{ new.title }}" class="news_link">
+                <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
+                    <div class="text-block">
+                        <p class="news-nickname text">
+                            {% if new.user.is_admin %}
+                                Школа {{ new.user.school }} {{ new.user.corpus}}
+                            {% else %}
+                                {{ new.user.name }} Школа {{ new.user.school }} {{ new.user.corpus}}
+                            {% endif %}
+                        </p>
+                        <p class="news-title text">
+                            <b>{{ new.title }} · </b><b class="time" data-created-at="{{ new.created_at }}"></b>
+                        </p>
+                        <p class="new-decription text">
+                            {{ new.short_content }}
+                        </p>
+                    </div>
+                    <img src="{{ url_for('static', filename=new.image_url) }}" alt="" class="news-image">
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    <div class="profile-menu">
+        <img src="https://via.placeholder.com/70" class="profile-img" id="profile-img">
+        <div class="menuImg" id="menu">
+            <button onclick="logout()">Выйти</button>
+            <button onclick="editProfile()">Изменить профиль</button>
+        </div>
+    </div>
+    <script>
+        document.getElementById('profile-img').addEventListener('click', function() {
+            let menu = document.getElementById('menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+        function logout() {
+            alert('Выход из системы');
+        }
+        function editProfile() {
+            alert('Изменение профиля');
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, flash, session,
 from werkzeug.security import generate_password_hash
 from models import db, Users, Credentials
 from manage import *
-from methods import user_required
+from methods import user_required, find_news_by_user_id
 
 user_routes = Blueprint('users', __name__)
 
@@ -39,5 +39,14 @@ def register():
 @login_required
 @user_required
 def dashboard():
-    return jsonify({"MESSAGE": "OK"}), 200
+    walls = find_news_by_user_id(session['_user_id'])
+    return render_template('userPage.html', walls=walls)
+
+
+@user_routes.route("/create")
+@login_required
+@user_required
+def create():
+    return render_template("canvas.html")
+
 
