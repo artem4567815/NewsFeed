@@ -9,10 +9,8 @@ DB_PORT = os.environ.get('DB_PORT')
 DB_LOGIN = os.environ.get('DB_LOGIN')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 APP_SECRET = os.environ.get('APP_SECRET')
+SERVER_PORT = os.getenv('SERVER_PORT', 8080)
 
 PORT = 1234
 
 DEBUG = True
-
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
-ADMIN_PASSWORD_HASH = os.environ.get('ADMIN_PASSWORD_HASH')

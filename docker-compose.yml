@@ -1,0 +1,35 @@
+version: '1.0'
+
+services:
+  db:
+    image: postgres:17
+    container_name: my_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: projects
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: my_app
+    depends_on:
+      - db
+    environment:
+      SERVER_PORT: 8080
+      DB_LOGIN: postgres
+      DB_PASSWORD: password
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: projects
+    ports:
+      - "8080:8080"
+    command:  ["sh", "/usr/src/app/start.sh"]
+
+
+volumes:
+  pg_data:

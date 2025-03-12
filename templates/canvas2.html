@@ -66,19 +66,19 @@
             <form id="postForm">
                 <div class="form-group">
                     <label for="title">Название</label>
-                    <input type="text" id="title" name="title" required>
+                    <input type="text" id="title" name="title">
                 </div>
                 <div class="form-group">
                     <label for="shortDescription">Краткое описание</label>
-                    <textarea id="shortDescription" name="shortDescription" rows="3" required></textarea>
+                    <textarea id="shortDescription" name="shortDescription" rows="3"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="fullDescription">Полное описание</label>
-                    <textarea id="fullDescription" name="fullDescription" rows="5" required></textarea>
+                    <textarea id="fullDescription" name="fullDescription" rows="5"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="type">Тип</label>
-                    <input type="text" id="type" name="type" required>
+                    <input type="text" id="type" name="type">
                 </div>
                 <div class="form-group">
                     <label for="date-range">Введите диапазон дат:</label>
@@ -86,8 +86,7 @@
                       type="text" 
                       id="date-range" 
                       placeholder="от дд.мм.гггг до дд.мм.гггг" 
-                      pattern="от \d{2}\.\d{2}\.\d{4} до \d{2}\.\d{2}\.\d{4}" 
-                      required
+                      pattern="от \d{2}\.\d{2}\.\d{4} до \d{2}\.\d{2}\.\d{4}"
                       style="width: 300px;"
                     />
                 </div>
@@ -184,10 +183,8 @@
                 alert("Введите диапазон дат в формате: от дд.мм.гггг до дд.мм.гггг");
             }
 
-            const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1.0,
-            });
+            const dataURL = canvas.toJSON();
+
             const data = {
                 title,
                 shortDescription,
@@ -197,7 +194,7 @@
                 type
             };
 
-            const response = await fetch('/posts/save-image', {
+            const response = await fetch('/admin/post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -206,7 +203,8 @@
             });
 
             if (response.ok) {
-                window.location.href = "/posts/news";
+                localStorage.setItem("newspaperLayout", JSON.stringify(data));
+                window.location.href = "/admin/post2";
             } else {
                 alert('Ошибка сохранения поста.');
             }

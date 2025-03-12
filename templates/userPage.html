@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль пользователя</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
 </head>
 <body>
     <header class="menu">
             <div class="nav">
-                <a href="/routes/events" class="menu-button title"><b>School News</b></a>
+                <a href="/posts/news" class="menu-button title"><b>School News</b></a>
             </div>
             <div class="end">
-                <a href="/users/create" class="menu-create">Создать</a>
+                <a href="/user/create" class="menu-create">Создать</a>
                 <div class="settings">
                 </div>
             </div>
         </header>
     <div class="wallpapers" id="wallpapers">
         {% for new in walls|sort(reverse=True, attribute="created_at") %}
-            <a href="/routes/title/{{ new.title }}" class="news_link">
+            <a href="/posts/news/{{ new.title }}" class="news_link">
                 <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
                     <div class="text-block">
                         <p class="news-nickname text">

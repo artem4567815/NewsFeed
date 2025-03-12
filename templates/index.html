@@ -3,20 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='/css/style.css') }}">
         <title>Школьные новости</title>
     </head>
     <body>
         <header class="menu">
             <div class="nav">
-                <a href="/routes/events" class="menu-button title"><b>School News</b></a>
+                <a href="/posts/news" class="menu-button title"><b>School News</b></a>
                 <div class="center">
                     <a href="/" class="menu-button school">Выбор школы</a>
                     <a href=# class="menu-button">Поиск по дате</a>
                 </div>
             </div>
             <div class="end">
-                <a href="/routes/login" class="menu-create">Вход</a>
+                <p class="menu-create">{% if not session["_user_id"]%} <a href="/auth/login" > Вход </a> {% else %} <a href="/user/HomePage"> Профиль </a> {% endif %}</p>
+
                 <div class="settings">
                     <svg class="menu-image" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clip-path="url(#clip0_269_119)">
@@ -51,14 +52,14 @@
 
         <main class="news-main">
             <div class="filter">
-                <a href="/routes/events" class="filter-button">Новости</a>
-                <a href="/routes/wall" class="filter-button">Стенгазеты</a>
-                <a href="/routes/team_search" class="filter-button">Поиск команды</a>
+                <a href="/posts/news" class="filter-button">Новости</a>
+                <a href="/posts/wall" class="filter-button">Стенгазеты</a>
+                <a href="/posts/team_search" class="filter-button">Поиск команды</a>
             </div>
             <div class="news-table">
                 {% for new in news|sort(reverse=True, attribute="created_at") %}
                     {% if new.type == page_type %}
-                        <a href="/routes/title/{{ new.id }}" class="news_link">
+                        <a href="/posts/news/{{ new.id }}" class="news_link">
                             <div class="news" title="{{ new.title }}" short_description="{{ new.short_content }}">
                                 <div class="text-block">
                                     <p class="news-nickname text">
@@ -84,7 +85,7 @@
             <div class="timeline">
                 {% for new in news|sort(reverse=True, attribute="created_at") %}
                     {% if new.type == page_type %}
-                        <a href="/routes/title/{{ new.id }}" class="timeline-link">
+                        <a href="/posts/news/{{ new.id }}" class="timeline-link">
                             <div class="time-block">
                                 <div class="marks">
                                     <div class="cube"></div>
@@ -109,6 +110,6 @@
         </a>
         </main>
         <script src="..\static\vanilla-tilt.min.js"></script>
-        <script src="{{ url_for('static', filename='index.js') }}"></script>
+        <script src="{{ url_for('static', filename='/js/index.js') }}"></script>
     </body>
 </html>
