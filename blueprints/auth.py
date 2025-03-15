@@ -1,83 +1,58 @@
-from flask import Blueprint, render_template, request
-from flask_login import login_user, logout_user
+from flask import Blueprint, request
+from flask_jwt_extended import create_access_token, jwt_required
 from manage import *
 from methods import *
-from werkzeug.security import check_password_hash
-
+import datetime
+from schemas import *
+from flask_pydantic import validate
 
 auth = Blueprint('auth', __name__)
 
-def read_login_form():
-    name = request.form.get('name')
-    surname = request.form.get('surname')
-    school = request.form.get('school')
-    corpus = request.form.get('school')
-    login_field = request.form.get('login')
-    password = request.form.get('password')
 
-    return name, surname, school, corpus, login_field, password
-
-
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route('/login', methods=['POST'])
 @safe
 def login():
-    if request.method == 'POST':
-        login_field = request.form.get('username')
-        password = request.form.get('password')
+    login_field = request.json.get('username')
+    password = request.json.get('password')
+    user = find_user_by_login(login_field)
 
-        user = find_user_by_login(login_field)
-        if not user or not check_password_hash(user.password_hash, password):
-            flash('Неверный логин или пароль.', 'error')
-            return redirect('/auth/login')
+    if not user or not check_password_hash(user.password_hash, password):
+        return jsonify({'message': 'Неверный логин или пароль'}), 401
 
-        login_user(User(user))
-        flash('Вы успешно вошли!', 'success')
-
-        if user.is_admin: return redirect('/admin/HomePage')
-        else: return redirect('/posts/news')
-
-    return render_template('login.html')
+    access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(days=30),
+                                       additional_claims={"user_id": user.id, "is_admin": user.is_admin})
+    return jsonify({'access_token': access_token, 'is_admin': user.is_admin}), 200
 
 
-@auth.route('/logout')
+@auth.route('/logout', methods=['POST'])
 @safe
+@jwt_required()
 def logout():
-    logout_user()
-    flash('Вы вышли из системы.', 'success')
-    return redirect('/auth/login')
+    return jsonify({'message': 'Вы вышли из системы'}), 200
 
 
-@auth.route('/user/register', methods=['GET', 'POST'])
+@auth.route('/user/register', methods=['POST'])
 @safe
-def register_user():
-    if request.method == 'POST':
-        name, surname, school, corpus, login_field, password = read_login_form()
+@validate()
+def register_user(body: UserRegisterRequest):
+    if find_user_by_login(body.login):
+        return jsonify({'message': 'Этот логин уже занят'}), 400
 
-        if find_user_by_login(login_field):
-            flash('Этот логин уже занят. Попробуйте другой.', 'error')
-            return redirect('/auth/user/register')
+    hashed_password = generate_password_hash(body.password)
+    create_user(body.name, body.surname, body.school, body.corpus, False, body.login, hashed_password)
 
-        create_user(name, surname, school, corpus, False, login_field, password)
-        flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
+    return jsonify({'message': 'Регистрация успешна'}), 201
 
-        return redirect('/auth/login')
 
-    return render_template('register.html')
-
-@auth.route('/admin/register', methods=['GET', 'POST'])
+@auth.route('/admin/register', methods=['POST'])
 @safe
-def register_admin():
-    if request.method == 'POST':
-        name, surname, school, corpus, login_field, password = read_login_form()
+@validate()
+def register_admin(body: UserRegisterRequest):
+    if find_user_by_login(body.login):
+        return jsonify({'message': 'Этот логин уже занят'}), 400
 
-        if find_user_by_login(login_field):
-            flash('Этот логин уже занят. Попробуйте другой.', 'error')
-            return redirect('/auth/admin/register')
+    hashed_password = generate_password_hash(body.password)
+    create_user(body.name, body.surname, body.school, body.corpus, True, body.login, hashed_password)
 
-        create_user(name, surname, school, corpus, True, login_field, password)
+    return jsonify({'message': 'Регистрация успешна'}), 201
 
-        flash('Регистрация прошла успешно! Теперь вы можете войти.', 'success')
-
-        return redirect('/auth/login')
-
-    return render_template('register_admin.html')

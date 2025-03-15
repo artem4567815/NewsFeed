@@ -1,27 +1,19 @@
 from functools import wraps
 from flask import redirect, flash, jsonify
-from flask_login import current_user
 from werkzeug.exceptions import *
+from flask_jwt_extended import get_jwt_identity, get_jwt
 
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_admin:
-            flash('У вас нет доступа к этой странице.', 'error')
-            return redirect('/users/HomePage')
-        return f(*args, **kwargs)
-    return decorated_function
+def check_jwt_access(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_user = get_jwt()
+        if current_user["is_admin"]:
+            return func(*args, **kwargs)
+        raise Forbidden("cannot access admin")
 
-
-def user_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.is_admin:
-            flash('У вас нет доступа к этой странице.', 'error')
-            return redirect('/admin/HomePage')
-        return f(*args, **kwargs)
-    return decorated_function
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 
 def safe(func):

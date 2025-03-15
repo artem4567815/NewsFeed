@@ -14,3 +14,5 @@ SERVER_PORT = os.getenv('SERVER_PORT', 8080)
 PORT = 1234
 
 DEBUG = True
+
+UPLOADFLOADER = 'images'

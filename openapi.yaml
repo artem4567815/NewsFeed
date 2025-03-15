@@ -1,0 +1,345 @@
+openapi: 3.0.0
+
+info:
+  title: School News API
+  description: API для создания новостной ленты со школьными событиями
+  version: 1.0.0
+  
+tags:
+  - name: Общее
+    description: Общие endpoint
+  - name: Пользователи
+    description: Эндпоинты для работы с пользователями
+  - name: Админы
+    description: Эндпоинты для работы с админами
+
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Общее
+      summary: Вход пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login:
+                  type: string
+                  example: "hello"
+                password:
+                  type: string
+                  example: "1234"
+      responses:
+        200:
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token, is_admin]
+                properties:
+                  access_token: 
+                    type: string
+                    example:  "jwt-token-here"
+                  is_admin:
+                    type: boolean
+                    example: True
+                
+        401:
+          description: Неверные данные
+          content:
+            application/json:
+              example:
+                message: "Неверные учетные данные"
+    
+  /auth/logout:
+    post:
+      tags:
+        - Общее
+      summary: Выход пользователя
+      responses:
+        200:
+          description: Успешный выход
+          content:
+            application/json:
+              example:
+                message: "Вы вышли из системы"
+        401:
+          description: Ошибка
+          content:
+            application/json:
+              example:
+                message: "Пользователь не авторизирован"
+  
+  /posts/news:
+    get:
+      tags:
+        - Общее
+      summary: Получение списка новостей
+      responses:
+        200:
+          description: Список новостей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, title, short_description, full_description, type, start_date, end_date, image]
+                  properties:
+                    news_id:
+                      type: integer
+                      example: "6bab3f80-f5de-4cf7-ae57-948707e9b73f"
+                    title:
+                      type: string
+                      example: "veru cool news"
+                    short_description:
+                      type: string
+                      example: "short"
+                    full_description:
+                      type: string
+                      example: "long"
+                    type:
+                      type: string
+                      example: "news"
+                    start_date:
+                      type: string
+                      format: date
+                    end_date:
+                      type: string
+                      format: date
+                    image:
+                      type: string
+                      format: base64
+                      example: "base64..."
+  
+  /posts/news/{news_id}:
+    get:
+      tags:
+        - Общее
+      summary: Получение списка новостей
+      parameters:
+        - name: news_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "e5834cc8-752f-4794-b14f-c69cb4eb7fc5"
+      responses:
+        200:
+          description: Детали новости
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, title, type, start_date, end_date, image]
+                properties:
+                  id:
+                    type: integer
+                    example: "e5834cc8-752f-4794-b14f-c69cb4eb7fc5"
+                  title:
+                    type: string
+                  short_description:
+                    type: string
+                  full_description:
+                    type: string
+                  type:
+                    type: string
+                  start_date:
+                    type: string
+                    format: date
+                  end_date:
+                    type: string
+                    format: date
+                  image:
+                    type: string
+                    format: base64
+                
+  /auth/user/register:
+    post:
+      tags:
+        - Пользователи
+      summary: Регистрация пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Vaysa"
+                surname:
+                  type: string
+                  example: "Petrovich"
+                school:
+                  type: string
+                  example: "1561"
+                corpus:
+                  type: string
+                  example: "11"
+                login:
+                  type: string
+                  example: "123"
+                password:
+                  type: string
+                  example: "hard_password"
+              required: [name, school, corpus, login, password]
+      responses:
+        201:
+          description: Успешная регистарция
+          content:
+            application/json:
+              example:
+                message: 'Регистрация успешна'
+                
+        400:
+          description: Неверные данные
+          content:
+            application/json:
+              example:
+                message: "Этот логин уже занят"
+  
+  /user/HomePage:
+    get:
+      tags:
+        - Пользователи
+      summary: Получение стенгазет пользователя
+      responses:
+        200:
+          description: Список стенгазет пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, title, short_description, full_description, type, start_date, end_date, image]
+                  properties:
+                    news_id:
+                      type: integer
+                      example: "7ffae2a2-9a51-457c-a5f7-74e1a5d1aa01"
+                    title:
+                      type: string
+                      example: "news"
+                    short_description:
+                      type: string
+                      example: "asd"
+                    full_description:
+                      type: string
+                      example: "asasad"
+                    type:
+                      type: string
+                      example: "wall"
+                    start_date:
+                      type: string
+                      format: date
+                    end_date:
+                      type: string
+                      format: date
+                    image:
+                      type: string
+                      format: base64
+                      example: "base64..."
+
+  /auth/admin/register:
+    post:
+      tags:
+        - Админы
+      summary: Регистрация админа
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "admin"
+                surname:
+                  type: string
+                  example: "adminovich"
+                school:
+                  type: string
+                  example: "1561"
+                corpus:
+                  type: string
+                  example: "11"
+                login:
+                  type: string
+                  example: "admin"
+                password:
+                  type: string
+                  example: "admin-hard-password"
+              required: [name, school, corpus, login, password]
+      responses:
+        201:
+          description: Успешная регистарция
+          content:
+            application/json:
+              example:
+                message: 'Регистрация успешна'
+                
+        400:
+          description: Неверные данные
+          content:
+            application/json:
+              example:
+                message: "Этот логин уже занят"
+  
+  /create/news:
+    post:
+      tags:
+        - Админы
+      summary: Создание новости
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "cool news"
+                short_description:
+                  type: string
+                  example: "asd"
+                full_description:
+                  type: string
+                  example: "asdfghj"
+                type:
+                  type: string
+                  example: "news"
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                image:
+                  type: string
+                  format: base64
+                  example: "base64..."
+              required: [title, short_description, full_description, type, start_date, end_date, image]
+      responses:
+        201:
+          description: Новость создана
+          content:
+            application/json:
+              example:
+                message: "ok"
+        401:
+          description: Ошибка валидации
+          content:
+            application/json:
+              example:
+                message: "пользователь не авторизован"
+  

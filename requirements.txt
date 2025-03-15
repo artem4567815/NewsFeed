@@ -7,3 +7,4 @@ alembic~=1.13.3
 SQLAlchemy~=2.0.35
 flask_sqlalchemy
 psycopg2-binary
+flask_jwt_extended

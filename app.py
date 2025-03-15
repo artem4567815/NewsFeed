@@ -1,4 +1,6 @@
 from blueprints import *
+from flask import send_from_directory
+from config import UPLOADFLOADER
 
 app.register_blueprint(admin_routes, url_prefix='/admin')
 app.register_blueprint(user_routes, url_prefix='/user')
@@ -15,6 +17,11 @@ def index():
 @safe
 def logs():
     return render_template('logs.html', logs=session['_flashes'])
+
+
+@app.route('/images/<filename>')
+def serve_image(filename):
+    return send_from_directory(UPLOADFLOADER, filename)
 
 
 if __name__ == "__main__":
