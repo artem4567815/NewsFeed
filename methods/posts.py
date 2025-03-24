@@ -5,6 +5,10 @@ def get_all_news():
     return News.query.all()
 
 
+def get_news_for_category(category):
+    return News.query.filter_by(type=category).all()
+
+
 def find_news_by_id(post_id):
     return News.query.filter(News.news_id == post_id).first()
 
@@ -19,3 +23,5 @@ def create_news(title, short_content, full_content, image_url, interval, user_id
 
     db.session.add(new_record)
     db.session.commit()
+
+    return new_record

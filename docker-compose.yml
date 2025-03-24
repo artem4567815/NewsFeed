@@ -1,5 +1,13 @@
 version: '1.0'
 
+networks:
+  flask-net:
+    driver: bridge
+
+volumes:
+  app-data:
+  pg_data:
+
 services:
   db:
     image: postgres:17
@@ -9,14 +17,20 @@ services:
       POSTGRES_DB: projects
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+    networks:
+      - flask-net
 
   app:
-    build: .
-    container_name: my_app
+    image: arttyu/newsfeed:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_school_news
+    restart: "always"
     depends_on:
       - db
     environment:
@@ -28,8 +42,9 @@ services:
       DB_DATABASE: projects
     ports:
       - "8080:8080"
+    volumes:
+      - app-data:/app
+    networks:
+      - flask-net
     command:  ["sh", "/usr/src/app/start.sh"]
 
-
-volumes:
-  pg_data:

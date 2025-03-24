@@ -17,3 +17,5 @@ def create_user(name, surname, school, corpus, is_admin, login, password):
     print(is_admin)
     db.session.add(new_user)
     db.session.commit()
+
+    return new_user

@@ -1,22 +1,28 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 from methods import *
 from flask_pydantic import validate
 from schemas import *
+from manage import r
+from datetime import timedelta
+import json
+from config import USER_LIST_KEY
 
 posts = Blueprint('posts', __name__)
 
 
-@posts.route("/news", methods=["GET"])
-@safe
-def all_news():
-    news_list = get_all_news()
-    news_list = [news.as_dict() for news in news_list]
-    return jsonify(news_list), 200
+@posts.route("", methods=["GET"])
+@safe("blueprints/posts.py | category_posts")
+def category_posts():
+    query = request.args.get("type", "news")
+    posts_list = get_news_for_category(query)
+    posts_list = [news.as_dict() for news in posts_list]
+    print(posts_list)
+    return jsonify(posts_list), 200
 
 
-@posts.route("/news/<int:post_id>", methods=["GET"])
-@safe
+@posts.route("/post/<int:post_id>", methods=["GET"])
+@safe("blueprints/posts.py | detailed_news")
 def detailed_news(post_id):
     news = find_news_by_id(post_id)
     if not news:
@@ -24,29 +30,15 @@ def detailed_news(post_id):
     return jsonify(news.as_dict()), 200
 
 
-# @posts.route("/wall")
-# @safe
-# def wall():
-#     news_list = get_all_news()
-#     return render_template("index.html", news=news_list, page_type="wall", session=session)
-#
-
-# @posts.route("/team_search")
-# @safe
-# def team_search():
-#     news_list = get_all_news()
-#     return render_template("index.html", news=news_list, page_type="team_search", session=session)
-
-
-@posts.route('/create/news', methods=['POST'])
-@safe
+@posts.route('/create/wallpapers', methods=['POST'])
+@safe("blueprints/posts.py | save_wallpapers")
 @jwt_required()
-@check_jwt_access
 @validate()
-def save_image(body: CreateNewsRequest):
-    file = save_base64_image(body.dataURL)
+def save_wallpapers(body: CreateNewsRequest):
     user_id = get_jwt_identity()
-    create_news(body.title, body.short_description, body.full_description, file, body.input, user_id, body.type)
+    key = f"user:{user_id}"
 
-    return jsonify({"message": "ok"}), 200
+    r.setex(key, timedelta(days=30), json.dumps(dict(body)))
+    r.sadd(USER_LIST_KEY, user_id)
 
+    return jsonify({"message": "Data saved successfully"}), 201

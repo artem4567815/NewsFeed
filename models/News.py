@@ -14,19 +14,26 @@ class News(db.Model):
 
     image_url = db.Column(db.String(500), nullable=True)
 
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=True)
     type = db.Column(db.String(100), nullable=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
     def as_dict(self):
         return {
-            "id": self.news_id,
+            "news_id": self.news_id,
             "title": self.title,
             "short_content": self.short_content,
             "full_content": self.full_content,
             "start_date": self.start_date,
             "end_date": self.end_date,
             "image_url": self.image_url,
-            "type": self.type
+            "type": self.type,
+            "author": {
+                "id": self.user_id,
+                "name": self.user.name,
+                "surname": self.user.surname,
+                "avatar_url": "string"
+            },
+            "created_at": self.created_at
         }

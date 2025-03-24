@@ -1,345 +1,870 @@
 openapi: 3.0.0
-
 info:
-  title: School News API
-  description: API для создания новостной ленты со школьными событиями
+  title: School News Feed API
   version: 1.0.0
-  
-tags:
-  - name: Общее
-    description: Общие endpoint
-  - name: Пользователи
-    description: Эндпоинты для работы с пользователями
-  - name: Админы
-    description: Эндпоинты для работы с админами
+  description: API for managing school news and wall newspapers.
+servers:
+  - url: https://edufeed.ru
+    description: Production server
+  - url: http://127.0.0.1:8080
+    description: Testing server
 
+tags:
+  - name: Authentication
+    description: Endpoints for user authentication and authorization.
+  - name: User
+    description: Endpoints related to user profiles and personal actions.
+  - name: Posts
+    description: Endpoints for managing posts and wall newspapers.
+  - name: Admin
+    description: Endpoints for administrative actions, including moderation and content management.
+  - name: Killer Features
+    description: Additional features to enhance user experience.
 
 paths:
   /auth/login:
     post:
       tags:
-        - Общее
-      summary: Вход пользователя
+        - Authentication
+      summary: Login to the system
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [login, password]
-              properties:
-                login:
-                  type: string
-                  example: "hello"
-                password:
-                  type: string
-                  example: "1234"
+              $ref: '#/components/schemas/LoginRequest'
       responses:
-        200:
-          description: Успешный вход
+        '200':
+          description: Successfully logged in
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc123; HttpOnly; Path=/; Secure; SameSite=Strict
           content:
             application/json:
               schema:
-                type: object
-                required: [access_token, is_admin]
-                properties:
-                  access_token: 
-                    type: string
-                    example:  "jwt-token-here"
-                  is_admin:
-                    type: boolean
-                    example: True
-                
-        401:
-          description: Неверные данные
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid input
           content:
             application/json:
-              example:
-                message: "Неверные учетные данные"
-    
-  /auth/logout:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized (invalid credentials)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
     post:
       tags:
-        - Общее
-      summary: Выход пользователя
+        - Authentication
+      summary: Refresh access token
+      description: |
+        Refresh the access token using the refresh token stored in an HTTP-only cookie.
+        The refresh token is automatically sent by the browser if the cookie is valid.
       responses:
-        200:
-          description: Успешный выход
-          content:
-            application/json:
-              example:
-                message: "Вы вышли из системы"
-        401:
-          description: Ошибка
-          content:
-            application/json:
-              example:
-                message: "Пользователь не авторизирован"
-  
-  /posts/news:
-    get:
-      tags:
-        - Общее
-      summary: Получение списка новостей
-      responses:
-        200:
-          description: Список новостей
+        '200':
+          description: Token refreshed successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=def456; HttpOnly; Path=/; Secure; SameSite=Strict
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required: [id, title, short_description, full_description, type, start_date, end_date, image]
-                  properties:
-                    news_id:
-                      type: integer
-                      example: "6bab3f80-f5de-4cf7-ae57-948707e9b73f"
-                    title:
-                      type: string
-                      example: "veru cool news"
-                    short_description:
-                      type: string
-                      example: "short"
-                    full_description:
-                      type: string
-                      example: "long"
-                    type:
-                      type: string
-                      example: "news"
-                    start_date:
-                      type: string
-                      format: date
-                    end_date:
-                      type: string
-                      format: date
-                    image:
-                      type: string
-                      format: base64
-                      example: "base64..."
-  
-  /posts/news/{news_id}:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Unauthorized (invalid or expired refresh token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register/client:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientRegistration'
+      responses:
+        '201':
+          description: Client registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register/admin:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRegistration'
+      responses:
+        '201':
+          description: Admin registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/profile:
     get:
       tags:
-        - Общее
-      summary: Получение списка новостей
+        - User
+      summary: Get user profile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - User
+      summary: Update user profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Get posts
+      security:
+        - BearerAuth: []
       parameters:
-        - name: news_id
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [news, team_search, wall_newspaper]
+      responses:
+        '200':
+          description: Posts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsResponse'
+        '400':
+          description: Invalid type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /posts/create/wallpapers:
+    post:
+      tags:
+        - Posts
+      summary: Create a new wallpapers
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreation'
+      responses:
+        '201':
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /posts/{postId}:
+    patch:
+      tags:
+        - Posts
+      summary: Update a post or wall newspaper
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
           in: path
           required: true
           schema:
             type: string
-            example: "e5834cc8-752f-4794-b14f-c69cb4eb7fc5"
-      responses:
-        200:
-          description: Детали новости
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [id, title, type, start_date, end_date, image]
-                properties:
-                  id:
-                    type: integer
-                    example: "e5834cc8-752f-4794-b14f-c69cb4eb7fc5"
-                  title:
-                    type: string
-                  short_description:
-                    type: string
-                  full_description:
-                    type: string
-                  type:
-                    type: string
-                  start_date:
-                    type: string
-                    format: date
-                  end_date:
-                    type: string
-                    format: date
-                  image:
-                    type: string
-                    format: base64
-                
-  /auth/user/register:
-    post:
-      tags:
-        - Пользователи
-      summary: Регистрация пользователя
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "Vaysa"
-                surname:
-                  type: string
-                  example: "Petrovich"
-                school:
-                  type: string
-                  example: "1561"
-                corpus:
-                  type: string
-                  example: "11"
-                login:
-                  type: string
-                  example: "123"
-                password:
-                  type: string
-                  example: "hard_password"
-              required: [name, school, corpus, login, password]
+              $ref: '#/components/schemas/PostUpdate'
       responses:
-        201:
-          description: Успешная регистарция
+        '200':
+          description: Post updated successfully
           content:
             application/json:
-              example:
-                message: 'Регистрация успешна'
-                
-        400:
-          description: Неверные данные
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Invalid input
           content:
             application/json:
-              example:
-                message: "Этот логин уже занят"
-  
-  /user/HomePage:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (admin does not have permission to update this post)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Post deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden (user does not have permission to delete this post)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/{postId}/comments:
+    post:
+      tags:
+        - Killer Features
+      summary: Add a comment to a post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreation'
+      responses:
+        '201':
+          description: Comment added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/{postId}/like:
+    post:
+      tags:
+        - Killer Features
+      summary: Like a post
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Post liked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikeResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/moderation:
     get:
       tags:
-        - Пользователи
-      summary: Получение стенгазет пользователя
+        - Admin
+      summary: Get wall newspapers for moderation
+      security:
+        - BearerAuth: []
       responses:
-        200:
-          description: Список стенгазет пользователя
+        '200':
+          description: Wall newspapers retrieved successfully
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required: [id, title, short_description, full_description, type, start_date, end_date, image]
-                  properties:
-                    news_id:
-                      type: integer
-                      example: "7ffae2a2-9a51-457c-a5f7-74e1a5d1aa01"
-                    title:
-                      type: string
-                      example: "news"
-                    short_description:
-                      type: string
-                      example: "asd"
-                    full_description:
-                      type: string
-                      example: "asasad"
-                    type:
-                      type: string
-                      example: "wall"
-                    start_date:
-                      type: string
-                      format: date
-                    end_date:
-                      type: string
-                      format: date
-                    image:
-                      type: string
-                      format: base64
-                      example: "base64..."
+                $ref: '#/components/schemas/WallNewspapersResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /auth/admin/register:
+  /admin/create/post:
     post:
       tags:
-        - Админы
-      summary: Регистрация админа
+        - Admin
+      summary: Create a new post or wall newspaper as admin
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "admin"
-                surname:
-                  type: string
-                  example: "adminovich"
-                school:
-                  type: string
-                  example: "1561"
-                corpus:
-                  type: string
-                  example: "11"
-                login:
-                  type: string
-                  example: "admin"
-                password:
-                  type: string
-                  example: "admin-hard-password"
-              required: [name, school, corpus, login, password]
+              $ref: '#/components/schemas/AdminPostCreation'
       responses:
-        201:
-          description: Успешная регистарция
+        '201':
+          description: Post created successfully
           content:
             application/json:
-              example:
-                message: 'Регистрация успешна'
-                
-        400:
-          description: Неверные данные
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Invalid input
           content:
             application/json:
-              example:
-                message: "Этот логин уже занят"
-  
-  /create/news:
-    post:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications:
+    get:
       tags:
-        - Админы
-      summary: Создание новости
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  example: "cool news"
-                short_description:
-                  type: string
-                  example: "asd"
-                full_description:
-                  type: string
-                  example: "asdfghj"
-                type:
-                  type: string
-                  example: "news"
-                start_date:
-                  type: string
-                  format: date
-                end_date:
-                  type: string
-                  format: date
-                image:
-                  type: string
-                  format: base64
-                  example: "base64..."
-              required: [title, short_description, full_description, type, start_date, end_date, image]
+        - Killer Features
+      summary: Get user notifications
+      security:
+        - BearerAuth: []
       responses:
-        201:
-          description: Новость создана
+        '200':
+          description: Notifications retrieved successfully
           content:
             application/json:
-              example:
-                message: "ok"
-        401:
-          description: Ошибка валидации
+              schema:
+                $ref: '#/components/schemas/NotificationsResponse'
+        '401':
+          description: Unauthorized
           content:
             application/json:
-              example:
-                message: "пользователь не авторизован"
-  
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search:
+    get:
+      tags:
+        - Killer Features
+      summary: Search posts and wall newspapers
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [news, team_search, wall_newspaper]
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /statistics:
+    get:
+      tags:
+        - Killer Features
+      summary: Get platform statistics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+
+    ClientRegistration:
+      type: object
+      required:
+        - name
+        - surname
+        - school
+        - building
+        - login
+        - password
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        school:
+          type: string
+        building:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+          minLength: 8
+
+    AdminRegistration:
+      type: object
+      required:
+        - name
+        - surname
+        - school
+        - building
+        - login
+        - password
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        school:
+          type: string
+        building:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+          minLength: 8
+
+    RegisterResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        school:
+          type: string
+        building:
+          type: string
+        login:
+          type: string
+
+    ProfileResponse:
+      type: object
+      properties:
+        client_id:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        school:
+          type: string
+        building:
+          type: string
+        login:
+          type: string
+        avatar_url:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        avatar_url:
+          type: string
+          
+    Post:
+      type: object
+      properties:
+        post_id:
+          type: string
+        type:
+          type: string
+          enum: [news, team_search, wall_newspaper]
+        content:
+          type: string
+        short_content:
+          type: string
+        created_at:
+          type: integer
+        start_date:
+          type: integer
+        end_date:
+          type: integer  
+        author:
+          $ref: '#/components/schemas/Author'
+        likes:
+          type: integer
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        avatar_url:
+          type: string
+
+    PostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+
+    PostCreation:
+      type: object
+      required:
+        - type
+        - title
+        - content
+        - short_content
+        - end_date
+        - post_img
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+          enum: [news, team_search, wall_newspaper]
+        content:
+          type: string
+        short_content:
+          type: string
+        start_date:
+          type: integer
+        end_date:
+          type: integer
+        post_img:
+          type: string
+        post_img_detail:
+          type: string
+
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    WallNewspapersResponse:
+      type: object
+      properties:
+        wall_newspapers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WallNewspaper'
+
+    WallNewspaper:
+      type: object
+      properties:
+        post_id:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        image_url:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+
+    AdminPostCreation:
+      type: object
+      required:
+        - type
+        - title
+        - content
+        - short_content
+        - end_date
+        - post_img
+      properties:
+        title:
+          type: string
+        type:
+          type: string
+          enum: [news, wall_newspaper]
+        content:
+          type: string
+        short_content:
+          type: string
+        start_date:
+          type: integer
+        end_date:
+          type: integer
+        post_img:
+          type: string
+        post_img_detail:
+          type: string
+
+    PostUpdate:
+      type: object
+      properties:
+        content:
+          type: string
+        title:
+          type: string 
+        short_content:
+          type: string
+        end_datr:
+          type: integer
+
+    NotificationsResponse:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    CommentCreation:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    LikeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+
+    StatisticsResponse:
+      type: object
+      properties:
+        total_posts:
+          type: integer
+        total_users:
+          type: integer
+        total_wall_newspapers:
+          type: integer
+        most_active_user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            post_count:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string

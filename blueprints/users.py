@@ -6,7 +6,7 @@ user_routes = Blueprint('user', __name__)
 
 
 @user_routes.route('/HomePage')
-@safe
+@safe("blueprints/users.py | dashboard")
 @jwt_required()
 def dashboard():
     user_id = get_jwt_identity()
