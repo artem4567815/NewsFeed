@@ -1,10 +1,9 @@
 <template> 
     <div ref="card" class="transition-transform bg-white duration-300 ease-out flex-col md:flex-row  p-5 shadow-xl mt-11 flex w-90/100 justify-between rounded-2xl items-center">
         <div class="flex flex-col items-center text-pretty mb-5 md:mb-0">
-            <p class="text-xl text-gray-600">{{ news.title }}</p>
-            <p class="text-2xl my-3 font-bold">Название новости · 13.10.28</p>
-            <p class="text-xl text-gray-600">Краткое описание esrfuhiheiufrsdhiuerfhiuerfh
-              uierfhuierfshuerfserfshersfuhruefshuiresfuhierfshuiresfuihoersfuhiновости Lorem50</p>
+            <p class="text-xl text-gray-600">{{ post.author.name }}</p>
+            <p class="text-2xl my-3 font-bold">{{ post.title }} · 13.10.28</p>
+            <p class="text-xl text-gray-600">{{ post.short_content }}</p>
         </div>
         <img src="https://avatars.mds.yandex.net/get-mpic/5234525/img_id5188673678753414396.jpeg/orig" alt="картинка" class="aspect-16/9 max-h-120 md:max-w-6/12 rounded-lg"/>
     </div>
@@ -17,7 +16,7 @@ import VanillaTilt from "vanilla-tilt";
 export default {
   name: "post-main",
   props: {
-    news: Object
+    post: Object
   },
   setup() {
     const card = ref(null);

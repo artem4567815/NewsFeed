@@ -10,8 +10,8 @@
         <div class="mr-12 pb-4 border-b-5 border-gray-400">Стенгазеты</div>
         <div class="mr-12 pb-4 border-b-5 border-gray-400">Поиск команды</div>
       </div>
-      <div v-for="post in posts" :key="index">
-        <p>{{post.title}}</p>
+      <div v-for="post in posts" :key="post.news_id">
+        <post-main :post="post" @click="$router.push('/post/id')" class="justify-self-center"></post-main>
       </div>
 
 <!--      <post-main @click="$router.push('/post/id')" class="justify-self-center"></post-main>-->
@@ -72,12 +72,15 @@ export default {
 
         if (!NewsResponse.ok) throw new Error('Ошибка при загрузке новостей');
         posts.value = await NewsResponse.json();
-        console.log(posts.value[0].title)
+        console.log(posts)
       } catch (error) {
         console.error('Ошибка загрузки новостей:', error);
       }
     });
+    return {
+      posts
     }
+    },
   }
 </script>
 
