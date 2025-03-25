@@ -13,15 +13,9 @@
       <div v-for="post in posts" :key="post.news_id">
         <post-main :post="post" @click="$router.push('/post/id')" class="justify-self-center"></post-main>
       </div>
-
-<!--      <post-main @click="$router.push('/post/id')" class="justify-self-center"></post-main>-->
-<!--      <post-main @click="$router.push('/post/id')" class="justify-self-center"></post-main>-->
-<!--      <post-main @click="$router.push('/post/id')" class="justify-self-center"></post-main>-->
-<!--      <post-main @click="$router.push('/post/id')" class="justify-self-center"></post-main>-->
-
     </div>
 <!--     <div class="hidden xl:flex items-center flex-col">-->
-<!--      <timeline-main v-for="i in 8" :key="i" @click="$router.push('/post/id')" class="hover:cursor-pointer"></timeline-main>-->
+<!--      <timeline-main v-for="timeline in posts" :key="post.news_id" @click="$router.push('/post/id')" class="hover:cursor-pointer"></timeline-main>-->
 <!--    </div>-->
   </div>
 

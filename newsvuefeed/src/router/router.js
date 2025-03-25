@@ -1,6 +1,11 @@
 import {createRouter, createWebHistory} from "vue-router";
 import mainView from "@/pages/mainView.vue";
 import detailedNews from "@/pages/detailedNews.vue";
+import profile from "@/pages/profile.vue";
+import createPage from "@/pages/createPage.vue";
+import createCover from "@/pages/createCover.vue";
+
+
 
 
 const routes = [
@@ -11,6 +16,18 @@ const routes = [
     {
         path: '/Post/:id',
         component: detailedNews
+    },
+    {
+        path: '/Profile',
+        component: profile
+    },
+    {
+        path: '/Profile/Create',
+        component: createPage
+    },
+    {
+        path: '/Profile/Create/Cover',
+        component: createCover
     },
 ]
 

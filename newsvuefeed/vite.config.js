@@ -6,6 +6,9 @@ import { fileURLToPath, URL } from 'url';
 // https://vite.dev/config/
 export default defineConfig({
   define: {
+    optimizeDeps: {
+      include: ['fabric']
+    },
     'process.env': process.env,
   },
   plugins: [vue(),tailwindcss()],
