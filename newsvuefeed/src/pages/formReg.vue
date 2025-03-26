@@ -1,6 +1,6 @@
 <template>
-  <div @click.stop="hideModal()" class="z-10 fixed inset-0 flex items-center justify-center bg-black/50">
-    <div @click.stop class="flex bg-white w-11/12 sm:w-9/12 md:w-7/12 lg:w-6/12 xl:w-4/12 rounded-xl flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="z-10 fixed inset-0 flex items-center justify-center bg-black/50">
+    <div class="flex bg-white w-11/12 sm:w-9/12 md:w-7/12 lg:w-6/12 xl:w-4/12 rounded-xl flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         <div class="text-3xl justify-self-center font-bold">EduFeed</div>
         <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Регистрация</h2>
@@ -72,7 +72,7 @@
 
         <p class="mt-10 text-center text-sm/6 text-gray-500">
           Есть аккаунт?
-          <button @click="showModalAuth()" class="font-semibold text-indigo-600 hover:text-indigo-500">Войти</button>
+          <button @click="$router.push('/auth')" class="font-semibold text-indigo-600 hover:text-indigo-500">Войти</button>
         </p>
       </div>
     </div>
@@ -80,8 +80,6 @@
 </template>
 
 <script>
-import emitter from '@/main'
-
 export default {
   data() {
     return {
@@ -100,12 +98,6 @@ export default {
   },
   name: 'form-reg',
   methods: {
-    hideModal() {
-      emitter.emit('hideModal')
-    },
-    showModalAuth() {
-      emitter.emit('ShowModalAuth')
-    },
     async submitForm() {
       this.isLoading = true;
       this.errorMessage = "";
@@ -120,7 +112,7 @@ export default {
         });
 
         const data = await response.json();
-
+        console.log(data)
         if (!response.ok) {
           if (data.message) {
             throw new Error(data.message);
@@ -130,8 +122,51 @@ export default {
         }
 
         console.log('Registration successful:', data);
-        this.hideModal();
 
+        const auth = {
+          username: this.register.name,
+          password: this.register.password,
+        }
+        try {
+          const response = await fetch('http://127.0.0.1:8080/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(auth)
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            if (data.message) {
+              throw new Error(data.message);
+            } else {
+              throw new Error(`Ошибка авторизации: ${response.status}`);
+            }
+          }
+
+          console.log('Login successful:', data);
+
+          if (data.access_token) {
+            localStorage.setItem('authToken', data.access_token);
+          }
+          console.log(localStorage.getItem('authToken'));
+
+
+          // this.hideModal();
+
+          // this.$store.commit('setAuth', true);
+
+          // или this.$router.push('/dashboard');
+
+        } catch (error) {
+          console.error('Login error:', error);
+          this.errorMessage = error.message || 'Произошла ошибка при входе. Пожалуйста, проверьте данные и попробуйте еще раз.';
+        } finally {
+          this.isLoading = false;
+        }
+        this.$router.push('/');
 
       } catch (error) {
         console.error('Registration error:', error);

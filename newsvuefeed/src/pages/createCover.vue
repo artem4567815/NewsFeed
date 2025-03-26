@@ -84,6 +84,12 @@ export default {
       return this.currentTool === 'text';
     }
   },
+  beforeMount() {
+    let token = localStorage.getItem('adminAuthToken');
+    if (!token || token === 'undefined') {
+      this.$router.push('/auth');
+    }
+  },
   mounted() {
     this.initCanvas();
     window.addEventListener('resize', this.handleResize);

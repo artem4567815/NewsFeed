@@ -16,7 +16,7 @@
           <div>
             <label for="emailAuth" class="block text-sm/6 font-medium text-gray-900">Почта</label>
             <div class="mt-2">
-              <input type="email" v-model="auth.email" name="emailAuth" id="emailAuth" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+              <input type="email" v-model="auth.username" name="emailAuth" id="emailAuth" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
             </div>
           </div>
 
@@ -42,7 +42,7 @@
 
         <p class="mt-10 text-center text-sm/6 text-gray-500">
           Нет аккаунта?
-          <button @click="ShowModalReg()" class="font-semibold text-indigo-600 hover:text-indigo-500">Зарегистрироваться</button>
+          <button @click="$router.push('/registration')" class="font-semibold text-indigo-600 hover:text-indigo-500">Зарегистрироваться</button>
         </p>
       </div>
     </div>
@@ -50,13 +50,12 @@
 </template>
 
 <script>
-import emitter from '@/main'
 
 export default {
   data() {
     return {
       auth: {
-        email: "",
+        username: "",
         password: ""
       },
       isLoading: false,
@@ -65,12 +64,6 @@ export default {
   },
   name: 'form-auth',
   methods: {
-    hideModal() {
-      emitter.emit('hideModal')
-    },
-    ShowModalReg() {
-      emitter.emit('ShowModalReg')
-    },
     async submitForm() {
       this.isLoading = true;
       this.errorMessage = "";
@@ -96,15 +89,15 @@ export default {
 
         console.log('Login successful:', data);
 
-        // if (data.token) {
-        //   localStorage.setItem('authToken', data.token);
-        // }
+        if (data.access_token) {
+          localStorage.setItem('authToken', data.access_token);
+        }
 
         // this.hideModal();
 
         // this.$store.commit('setAuth', true);
 
-        // или this.$router.push('/dashboard');
+        this.$router.push('/');
 
       } catch (error) {
         console.error('Login error:', error);

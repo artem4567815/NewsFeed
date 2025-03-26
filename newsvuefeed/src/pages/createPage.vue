@@ -71,6 +71,12 @@ export default {
       }
     }
   },
+  beforeMount() {
+    let token = localStorage.getItem('adminAuthToken');
+    if (!token || token === 'undefined') {
+      this.$router.push('/auth');
+    }
+  },
   methods: {
     convertToTimestamp(dateString, time = "00:00:00") {
       if (!dateString) return null;
@@ -92,22 +98,16 @@ export default {
 
     async submitForm() {
       try {
-        const formData = new FormData();
-        const postData = {
-          ...this.postNew,
-          start_date: this.convertToTimestamp(this.postNew.start_date),
-          end_date: this.convertToTimestamp(this.postNew.end_date, "23:59:59")
-        };
-
-        Object.entries(postData).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            formData.append(key, value);
-          }
-        });
-
+        this.postNew.start_date = 795683520000;
+        this.postNew.end_date = this.convertToTimestamp(this.postNew.end_date);
+        console.log(this.postNew.post_img)
         const response = await fetch('http://127.0.0.1:8080/admin/create/post', {
           method: 'POST',
-          body: formData
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("adminAuthToken")}`,
+          },
+          body: JSON.stringify(this.postNew)
         });
 
         const data = await response.json();
@@ -118,10 +118,15 @@ export default {
       }
     },
 
+
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.postNew.post_img = file;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.postNew.post_img = reader.result;
+        };
       }
     }
   },
@@ -153,7 +158,7 @@ export default {
       triggerFileInput
     };
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

@@ -4,6 +4,10 @@ import detailedNews from "@/pages/detailedNews.vue";
 import profile from "@/pages/profile.vue";
 import createPage from "@/pages/createPage.vue";
 import createCover from "@/pages/createCover.vue";
+import formAuth from "@/pages/formAuth.vue";
+import formReg from "@/pages/formReg.vue";
+import formRegAdmin from "@/pages/formRegAdmin.vue";
+
 
 
 
@@ -28,6 +32,18 @@ const routes = [
     {
         path: '/Profile/Create/Cover',
         component: createCover
+    },
+    {
+        path: '/auth',
+        component: formAuth
+    },
+    {
+        path: '/registration',
+        component: formReg
+    },
+    {
+        path: '/registration/admin',
+        component: formRegAdmin
     },
 ]
 

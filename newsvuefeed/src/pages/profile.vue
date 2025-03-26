@@ -17,6 +17,12 @@
 <script>
 export default {
 
+  beforeMount() {
+    let token = localStorage.getItem('authToken');
+    if (!token || token === 'undefined') {
+      this.$router.push('/auth');
+    }
+  },
 }
 </script>
 

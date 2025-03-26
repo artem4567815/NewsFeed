@@ -9,8 +9,8 @@
     </div>
 
     <div class="flex justify-center items-center">
-      <button v-show="!authed && $route.path !== '/profile'" @click="openAuth()" class="bg hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in-out rounded-2xl text-white px-3 py-2 mr-5"  >Вход</button>
-      <button v-show="authed && $route.path !== '/profile'" class="hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in-out rounded-2xl text-white px-3 py-2 mr-5" >Профиль</button>
+      <button v-show="!token || token === 'undefined' " @click="$router.push('/auth')" class="bg hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in-out rounded-2xl text-white px-3 py-2 mr-5"  >Вход</button>
+      <button v-show="$route.path !== '/profile' && token && token !== 'undefined'" @click="$router.push('/profile')" class="hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in-out rounded-2xl text-white px-3 py-2 mr-5" >Профиль</button>
       <button @click="$router.push('/Profile/Create')" v-show="$route.path === '/profile'" class="hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in-out rounded-2xl text-white px-3 py-2 mr-5" >Создать пост</button>
 
 
@@ -28,8 +28,6 @@
       </div>
     </div>
   </header>
-  <form-auth v-show="showModal === 'auth'" ></form-auth>
-  <form-reg v-show="showModal === 'reg'"></form-reg>
 </template>
 
 <script setup>
@@ -38,33 +36,15 @@ import { Settings, Search } from 'lucide-vue-next';
 
 <script>
 
-import emitter from '@/main'
 export default {
-  data () {
+  data() {
     return {
       authed: false,
       showModal: "",
-
+      token: localStorage.getItem('authToken'),
     }
   },
-  name: 'header-main',
-  methods: {
-    openAuth() {
-      emitter.emit("ShowModalAuth");
-    },
-
-  },
-  mounted() {
-    emitter.on("ShowModalAuth", () => {
-      this.showModal = "auth";
-    });
-    emitter.on("hideModal", () => {
-      this.showModal = "";
-    });
-    emitter.on("ShowModalReg", () => {
-      this.showModal = "reg";
-    });
-  },
+  name: 'header-main'
 }
 </script>
 
