@@ -28,7 +28,8 @@
       </div>
     </div>
   </header>
-
+  <form-auth v-show="showModal === 'auth'" ></form-auth>
+  <form-reg v-show="showModal === 'reg'"></form-reg>
 </template>
 
 <script setup>
@@ -36,19 +37,34 @@ import { Settings, Search } from 'lucide-vue-next';
 </script>
 
 <script>
+
 import emitter from '@/main'
 export default {
   data () {
     return {
-      authed: false
+      authed: false,
+      showModal: "",
+
     }
   },
   name: 'header-main',
   methods: {
     openAuth() {
       emitter.emit("ShowModalAuth");
-    }
-  }
+    },
+
+  },
+  mounted() {
+    emitter.on("ShowModalAuth", () => {
+      this.showModal = "auth";
+    });
+    emitter.on("hideModal", () => {
+      this.showModal = "";
+    });
+    emitter.on("ShowModalReg", () => {
+      this.showModal = "reg";
+    });
+  },
 }
 </script>
 

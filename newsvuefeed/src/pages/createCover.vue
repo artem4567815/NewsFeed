@@ -337,7 +337,6 @@ export default {
           originX: 'center',
           originY: 'center',
           selectable: true,
-          editable: true,
           hasControls: true,
           cornerSize: 20,
           borderColor: 'red'
@@ -370,8 +369,6 @@ export default {
 
         const url = URL.createObjectURL(file);
         await this.addImageToCanvas(url);
-        URL.revokeObjectURL(url);
-        this.$refs.fileInput.value = '';
 
         // Переключаем инструмент обратно на выбор
         this.currentTool = 'select';
@@ -404,9 +401,6 @@ export default {
     currentTool(newVal) {
       if (!this.canvas) return;
       this.canvas.selection = newVal === 'select';
-      this.canvas.forEachObject(obj => {
-        obj.selectable = newVal === 'select';
-      });
       this.canvas.requestRenderAll();
     }
   }

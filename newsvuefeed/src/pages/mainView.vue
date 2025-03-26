@@ -1,6 +1,5 @@
 <template>
-  <form-auth v-show="showModal === 'auth'" ></form-auth>
-  <form-reg v-show="showModal === 'reg'"></form-reg>
+
   <header-main></header-main>
 
   <div class="grid grid-flow-col xl:grid-cols-5">
@@ -29,28 +28,7 @@ import emitter from '@/main'
 
 
 export default {
-  data() {
-    return {
-    showModal: "",
-    }
-  },
-  methods: {
-    show() {
-      console.log(q)
-      this.showModal = true
-    }
-  },
-  mounted() {
-    emitter.on("ShowModalAuth", () => {
-      this.showModal = "auth";
-    });
-    emitter.on("hideModal", () => {
-      this.showModal = "";
-    });
-    emitter.on("ShowModalReg", () => {
-      this.showModal = "reg";
-    });
-  },
+
   setup() {
     const posts = ref([]);
 
