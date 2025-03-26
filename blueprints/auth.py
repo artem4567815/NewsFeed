@@ -19,8 +19,8 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({'message': 'Неверный логин или пароль'}), 401
 
-    access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(days=30),
-                                       additional_claims={"user_id": user.id, "is_admin": user.is_admin})
+    access_token = create_access_token(identity=user.user_id, expires_delta=datetime.timedelta(days=30),
+                                       additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
 
     return jsonify({'access_token': access_token, 'is_admin': user.is_admin}), 200
 
@@ -29,12 +29,10 @@ def login():
 @safe("blueprints/auth.py | register_user")
 @validate()
 def register_user(body: UserRegisterRequest):
-    print(body)
     if find_user_by_login(body.login):
         return jsonify({'message': 'Этот логин уже занят'}), 400
 
-    hashed_password = generate_password_hash(body.password)
-    new_user = create_user(body.name, body.surname, body.school, body.building, False, body.login, hashed_password)
+    new_user = create_user(body.name, body.surname, body.school, body.building, False, body.login, body.password)
 
     return jsonify(new_user.as_dict()), 201
 
@@ -46,8 +44,7 @@ def register_admin(body: UserRegisterRequest):
     if find_user_by_login(body.login):
         return jsonify({'message': 'Этот логин уже занят'}), 400
 
-    hashed_password = generate_password_hash(body.password)
-    new_user = create_user(body.name, body.surname, body.school, body.corpus, True, body.login, hashed_password)
+    new_user = create_user(body.name, body.surname, body.school, body.building, True, body.login, body.password)
 
     return jsonify(new_user.as_dict()), 201
 
