@@ -29,11 +29,12 @@ def login():
 @safe("blueprints/auth.py | register_user")
 @validate()
 def register_user(body: UserRegisterRequest):
+    print(body)
     if find_user_by_login(body.login):
         return jsonify({'message': 'Этот логин уже занят'}), 400
 
     hashed_password = generate_password_hash(body.password)
-    new_user = create_user(body.name, body.surname, body.school, body.corpus, False, body.login, hashed_password)
+    new_user = create_user(body.name, body.surname, body.school, body.building, False, body.login, hashed_password)
 
     return jsonify(new_user.as_dict()), 201
 

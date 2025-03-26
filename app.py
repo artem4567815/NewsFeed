@@ -1,8 +1,7 @@
 from blueprints import *
 from flask import send_from_directory
 from config import UPLOADFLOADER
-from manage import app
-from logger import Logger
+from manage import app, logger
 
 app.register_blueprint(admin_routes, url_prefix='/admin')
 app.register_blueprint(user_routes, url_prefix='/user')
@@ -16,7 +15,6 @@ def serve_image(filename):
 
 
 if __name__ == "__main__":
-    logger = Logger()
     logger.log("info", "app.py | server is starting on port:8080")
     app.run(debug=False, port=8080, host='0.0.0.0')
 
