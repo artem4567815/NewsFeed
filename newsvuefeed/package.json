@@ -13,6 +13,7 @@
     "bootstrap": "^5.3.3",
     "fabric": "^6.6.1",
     "html-to-image": "^1.11.13",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "lucide-vue-next": "^0.482.0",
     "mitt": "^3.0.1",

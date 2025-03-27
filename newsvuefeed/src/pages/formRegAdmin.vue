@@ -149,9 +149,9 @@ export default {
           console.log('Login successful:', data);
 
           if (data.access_token) {
-            localStorage.setItem('adminAuthToken', data.access_token);
+            localStorage.setItem('authToken', data.access_token);
           }
-          console.log(localStorage.getItem('adminAuthToken'));
+          console.log(localStorage.getItem('authToken'));
 
 
           // this.hideModal();

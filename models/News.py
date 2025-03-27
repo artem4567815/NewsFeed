@@ -16,6 +16,7 @@ class News(db.Model):
 
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=True)
     type = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.String(100), nullable=False, default='draft')
 
     user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
@@ -29,6 +30,7 @@ class News(db.Model):
             "end_date": self.end_date,
             "image_url": self.image_url,
             "type": self.type,
+            "status": self.status,
             "author": {
                 "id": self.user_id,
                 "name": self.user.name,

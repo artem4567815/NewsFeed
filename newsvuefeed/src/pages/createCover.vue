@@ -65,6 +65,7 @@
 
 <script>
 import * as fabric from 'fabric';
+import { jwtDecode } from "jwt-decode";
 
 export default {
   data() {
@@ -76,7 +77,14 @@ export default {
       isDrawing: false,
       startPos: { x: 0, y: 0 },
       freehandPath: null,
-      tempShape: null
+      tempShape: null,
+      drawingOptions: {
+        color: '#000000', // Цвет карандаша
+        lineWidth: 5,     // Толщина линии
+        shadowColor: '#888888', // Цвет тени
+        shadowWidth: 0,   // Ширина тени
+        shadowOffset: 0,  // Смещение тени
+      },
     }
   },
   computed: {
@@ -85,8 +93,9 @@ export default {
     }
   },
   beforeMount() {
-    let token = localStorage.getItem('adminAuthToken');
-    if (!token || token === 'undefined') {
+    let token = localStorage.getItem('authToken');
+    const decoded = jwtDecode(token);
+    if (!token || !decoded['is_admin']) {
       this.$router.push('/auth');
     }
   },
@@ -94,7 +103,6 @@ export default {
     this.initCanvas();
     window.addEventListener('resize', this.handleResize);
 
-    // Test image load after initialization
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize);
@@ -117,291 +125,63 @@ export default {
 
       this.canvas = new fabric.Canvas(canvasEl, {
         backgroundColor: 'white',
-        selection: true,
-        preserveObjectStacking: true
+        selection: true
       });
 
       // Убираем backstoreOnly, так как размеры уже установлены
       this.canvas.setDimensions({ width, height });
       this.setupEventListeners();
     },
-
-    handleResize() {
-      const container = this.$refs.canvas.parentElement;
-      const canvasEl = this.$refs.canvas;
-
-      // Пересчитываем размеры
-      const width = container.clientWidth;
-      const height = Math.floor(width * 9 / 16);
-
-      // Обновляем физические размеры
-      canvasEl.width = width;
-      canvasEl.height = height;
-
-      // Обновляем размеры в Fabric
-      this.canvas.setDimensions({ width, height });
-      this.canvas.requestRenderAll();
-    },
-
-    setupEventListeners() {
-      this.canvas.on('mouse:down', (options) => {
-        if (this.currentTool === 'select') return;
-        if (this.currentTool === 'text') {
-          const pointer = this.canvas.getPointer(options.e);
-          this.addTextAtPosition(pointer.x, pointer.y);
-          return;
-        }
-
-        this.isDrawing = true;
-        const pointer = this.canvas.getPointer(options.e);
-        this.startPos = {x: pointer.x, y: pointer.y};
-
-        if (['pencil', 'brush', 'eraser'].includes(this.currentTool)) {
-          this.startFreehand(pointer.x, pointer.y);
-        }
-      });
-
-      this.canvas.on('mouse:move', (options) => {
-        if (!this.isDrawing || this.currentTool === 'select') return;
-
-        const pointer = this.canvas.getPointer(options.e);
-
-        switch (this.currentTool) {
-          case 'pencil':
-          case 'brush':
-          case 'eraser':
-            this.continueFreehand(pointer.x, pointer.y);
-            break;
-          case 'line':
-            this.drawTempLine(pointer.x, pointer.y);
-            break;
-          case 'rectangle':
-            this.drawTempRect(pointer.x, pointer.y);
-            break;
-          case 'circle':
-            this.drawTempCircle(pointer.x, pointer.y);
-            break;
-        }
-      });
-
-      this.canvas.on('mouse:up', () => {
-        if (!this.isDrawing) return;
-        this.finalizeDrawing();
+    setupDrawingOptions() {
+      const brush = this.canvas.freeDrawingBrush;
+      console.log(this.drawingOptions.color)
+      brush.color = "#000000";
+      brush.width = this.drawingOptions.lineWidth;
+      brush.shadow = new fabric.Shadow({
+        blur: this.drawingOptions.shadowWidth,
+        offsetX: this.drawingOptions.shadowOffset,
+        offsetY: this.drawingOptions.shadowOffset,
+        affectStroke: true,
+        color: this.drawingOptions.shadowColor,
       });
     },
 
-    startFreehand(x, y) {
-      this.freehandPath = new fabric.Path(`M ${x} ${y}`, {
-        stroke: this.currentTool === 'eraser' ? 'white' : this.currentColor,
-        strokeWidth: this.brushSize,
-        fill: null,
-        selectable: false
-      });
-      this.canvas.add(this.freehandPath);
+    // Слушатели для изменения параметров рисования
+    changeDrawingColor(color) {
+      this.drawingOptions.color = color;
+      this.canvas.freeDrawingBrush.color = color;
     },
 
-    continueFreehand(x, y) {
-      if (!this.freehandPath) return;
-      this.freehandPath.path.push(['L', x, y]);
-      this.freehandPath.set({dirty: true});
-      this.canvas.requestRenderAll();
+    changeDrawingLineWidth(width) {
+      this.drawingOptions.lineWidth = width;
+      this.canvas.freeDrawingBrush.width = width;
     },
 
-    drawTempLine(x, y) {
-      if (this.tempShape) this.canvas.remove(this.tempShape);
-
-      this.tempShape = new fabric.Line([
-        this.startPos.x, this.startPos.y,
-        x, y
-      ], {
-        stroke: this.currentColor,
-        strokeWidth: this.brushSize,
-        selectable: false
-      });
-
-      this.canvas.add(this.tempShape);
+    changeDrawingShadowColor(color) {
+      this.drawingOptions.shadowColor = color;
+      this.canvas.freeDrawingBrush.shadow.color = color;
     },
 
-    drawTempRect(x, y) {
-      if (this.tempShape) this.canvas.remove(this.tempShape);
-
-      const width = x - this.startPos.x;
-      const height = y - this.startPos.y;
-
-      this.tempShape = new fabric.Rect({
-        left: this.startPos.x,
-        top: this.startPos.y,
-        width: width,
-        height: height,
-        stroke: this.currentColor,
-        strokeWidth: this.brushSize,
-        fill: 'transparent',
-        selectable: false
-      });
-
-      this.canvas.add(this.tempShape);
+    changeDrawingShadowWidth(width) {
+      this.drawingOptions.shadowWidth = width;
+      this.canvas.freeDrawingBrush.shadow.blur = width;
     },
 
-    drawTempCircle(x, y) {
-      if (this.tempShape) this.canvas.remove(this.tempShape);
-
-      const radius = Math.sqrt(
-          Math.pow(x - this.startPos.x, 2) +
-          Math.pow(y - this.startPos.y, 2)
-      );
-
-      this.tempShape = new fabric.Circle({
-        left: this.startPos.x,
-        top: this.startPos.y,
-        radius: radius,
-        stroke: this.currentColor,
-        strokeWidth: this.brushSize,
-        fill: 'transparent',
-        selectable: false
-      });
-
-      this.canvas.add(this.tempShape);
+    changeDrawingShadowOffset(offset) {
+      this.drawingOptions.shadowOffset = offset;
+      this.canvas.freeDrawingBrush.shadow.offsetX = offset;
+      this.canvas.freeDrawingBrush.shadow.offsetY = offset;
     },
 
-    finalizeDrawing() {
-      if (!this.isDrawing) return;
-      this.isDrawing = false;
-
-      switch (this.currentTool) {
-        case 'pencil':
-        case 'brush':
-        case 'eraser':
-          if (this.freehandPath) {
-            this.freehandPath.set({selectable: true});
-            this.freehandPath = null;
-          }
-          break;
-        case 'line':
-        case 'rectangle':
-        case 'circle':
-          if (this.tempShape) {
-            this.tempShape.set({selectable: true});
-            this.tempShape = null;
-          }
-          break;
-      }
-
-      this.canvas.requestRenderAll();
-    },
-
-    addText() {
-      this.addTextAtPosition(100, 100);
-    },
-
-    addTextAtPosition(x, y) {
-      const text = new fabric.Textbox('Click to edit', {
-        left: x,
-        top: y,
-        fontSize: 20,
-        fill: this.currentColor,
-        width: 200,
-        editable: true,
-        hasControls: true
-      });
-
-      this.canvas.add(text);
-      this.canvas.setActiveObject(text);
-      text.enterEditing();
-    },
-
-    triggerFileInput() {
-      this.$refs.fileInput.click();
-    },
-
-
-    readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (!reader.result.startsWith('data:image')) {
-            reject(new Error('Invalid image format'));
-            return;
-          }
-          resolve(reader.result);
-        };
-        reader.onerror = () => reject(new Error('File reading failed'));
-        reader.readAsDataURL(file);
-      });
-    },
-
-    async addImageToCanvas(imageData) {
-      try {
-        const img = await fabric.Image.fromURL(imageData, {
-          crossOrigin: 'Anonymous',
-          enableRetinaScaling: false
-        });
-
-        // Настройки изображения
-        img.set({
-          left: this.canvas.width / 2,
-          top: this.canvas.height / 2,
-          originX: 'center',
-          originY: 'center',
-          selectable: true,
-          hasControls: true,
-          cornerSize: 20,
-          borderColor: 'red'
-        });
-
-        // Автомасштабирование
-        const scale = Math.min(
-            this.canvas.width * 0.8 / img.width,
-            this.canvas.height * 0.8 / img.height,
-            1
-        );
-
-        img.scale(scale);
-
-        this.canvas.add(img);
-        this.canvas.setActiveObject(img);
-        this.canvas.requestRenderAll();
-
-        return img;
-      } catch (error) {
-        console.error('Ошибка загрузки изображения:', error);
-        throw error;
+    toggleDrawingMode() {
+      this.canvas.isDrawingMode = !this.canvas.isDrawingMode;
+      // Выводим актуальный текст для кнопки
+      if (this.canvas.isDrawingMode) {
+        console.log('Включен режим рисования');
+      } else {
+        console.log('Выключен режим рисования');
       }
     },
-
-    async handleImageUpload(e) {
-      try {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const url = URL.createObjectURL(file);
-        await this.addImageToCanvas(url);
-
-        // Переключаем инструмент обратно на выбор
-        this.currentTool = 'select';
-      } catch (error) {
-        console.error('Ошибка загрузки:', error);
-        alert('Не удалось загрузить изображение');
-      }
-    },
-
-
-    clearCanvas() {
-      if (!this.canvas) return;
-      this.canvas.clear();
-      this.canvas.backgroundColor = 'white';
-      this.canvas.renderAll();
-    },
-
-    downloadImage() {
-      if (!this.canvas) return;
-      const link = document.createElement('a');
-      link.download = 'vue-paint.png';
-      link.href = this.canvas.toDataURL({
-        format: 'png',
-        quality: 1
-      });
-      link.click();
-    }
   },
   watch: {
     currentTool(newVal) {

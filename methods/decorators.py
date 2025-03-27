@@ -71,6 +71,7 @@ def check_jwt_access(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         current_user = get_jwt()
+        print(current_user)
         if current_user["is_admin"]:
             return func(*args, **kwargs)
         raise Forbidden("cannot access admin")

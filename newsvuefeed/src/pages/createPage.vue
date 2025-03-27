@@ -54,6 +54,7 @@
 <script>
 import { ref, onMounted } from "vue";
 import VanillaTilt from "vanilla-tilt";
+import { jwtDecode } from "jwt-decode";
 
 export default {
   name: "post-main",
@@ -72,8 +73,9 @@ export default {
     }
   },
   beforeMount() {
-    let token = localStorage.getItem('adminAuthToken');
-    if (!token || token === 'undefined') {
+    let token = localStorage.getItem('authToken');
+    const decoded = jwtDecode(token);
+    if (!token || !decoded['is_admin']) {
       this.$router.push('/auth');
     }
   },
@@ -105,7 +107,7 @@ export default {
           method: 'POST',
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("adminAuthToken")}`,
+            "Authorization": `Bearer ${localStorage.getItem("authToken")}`,
           },
           body: JSON.stringify(this.postNew)
         });

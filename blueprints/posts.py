@@ -17,7 +17,6 @@ def category_posts():
     query = request.args.get("type", "news")
     posts_list = get_news_for_category(query)
     posts_list = [news.as_dict() for news in posts_list]
-    print(posts_list)
     return jsonify(posts_list), 200
 
 
@@ -35,10 +34,10 @@ def detailed_news(post_id):
 @jwt_required()
 @validate()
 def save_wallpapers(body: CreateNewsRequest):
+    file = save_base64_image(body.post_img)
     user_id = get_jwt_identity()
-    key = f"user:{user_id}"
 
-    r.setex(key, timedelta(days=30), json.dumps(dict(body)))
-    r.sadd(USER_LIST_KEY, user_id)
+    news = create_news(body.title, body.short_content, body.content, file, body.start_date, body.end_date,
+                       user_id, body.type, "draft")
 
-    return jsonify({"message": "Data saved successfully"}), 201
+    return jsonify(news.as_dict()), 200
