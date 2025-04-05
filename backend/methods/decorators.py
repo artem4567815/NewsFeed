@@ -1,10 +1,8 @@
 from functools import wraps
 import jwt
-from flask import redirect, flash, jsonify
+from flask import jsonify
 from werkzeug.exceptions import *
-from flask_jwt_extended import get_jwt_identity, get_jwt
-from logger import Logger
-from jwt.exceptions import InvalidSignatureError, ExpiredSignatureError, InvalidTokenError
+from flask_jwt_extended import get_jwt
 from flask_jwt_extended.exceptions import JWTDecodeError
 from flask_pydantic import ValidationError
 from manage import logger

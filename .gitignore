@@ -1,9 +1,8 @@
-migrations
-.env
-objects
-.idea
-__pycache__
-static/images
+backend/migrations
+backend/.env
+*.idea
+*__pycache__
+backend/static/images
 *.DS_Store
-test.py
-images/*
+backend/test.py
+backend/images/*

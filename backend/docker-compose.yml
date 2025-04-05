@@ -27,7 +27,7 @@ services:
   app:
     image: arttyu/newsfeed:latest
     build:
-      context: .
+      context: backend
       dockerfile: Dockerfile
     container_name: app_school_news
     restart: "always"

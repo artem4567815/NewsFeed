@@ -1,4 +1,4 @@
-from blueprints import *
+from backend.blueprints import *
 from flask import send_from_directory
 from config import UPLOADFLOADER
 from manage import app, logger
@@ -16,5 +16,5 @@ def serve_image(filename):
 
 if __name__ == "__main__":
     logger.log("info", "app.py | server is starting on port:8080")
-    app.run(debug=False, port=8080, host='0.0.0.0')
+    app.run(debug=False, port=8081, host='0.0.0.0')
 
