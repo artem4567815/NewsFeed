@@ -97,6 +97,17 @@ export default {
 
       return date.getTime();
     },
+    async refreshToken() {
+      const response = await fetch('http://localhost:5000/auth/refresh', {
+          method: 'POST',
+          credentials: 'include'
+      });
+      if (response.status === 401) {
+        return "Not Auth"
+      }
+      const data = await response.json();
+      localStorage.setItem('access', data.access);
+    },
 
     async submitForm() {
       try {
@@ -111,6 +122,14 @@ export default {
           },
           body: JSON.stringify(this.postNew)
         });
+
+        if (response.status === 401) {
+            let ans = await refreshToken();
+            if (ans === "Not Auth"){
+              return "User not auth"
+            }
+            return submitForm();
+        }
 
         const data = await response.json();
         console.log('Post created:', data);

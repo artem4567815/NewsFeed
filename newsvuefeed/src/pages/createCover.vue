@@ -6,7 +6,7 @@
     <div class="bg-white rounded-lg shadow-md p-4 mb-4 flex flex-wrap gap-4 items-center">
       <div class="flex items-center gap-2">
         <label class="font-medium">Tool:</label>
-        <select v-model="currentTool" class="border rounded px-2 py-1">
+        <select v-model="currentTool" class="border rounded px-2 py-1" @change="changeTool">
           <option value="select">Select/Move</option>
           <option value="pencil">Pencil</option>
           <option value="brush">Brush</option>
@@ -23,7 +23,7 @@
         <input type="color" v-model="currentColor" class="w-8 h-8 cursor-pointer">
       </div>
 
-      <div class="flex items-center gap-2" v-if="!isTextTool">
+      <div class="flex items-center gap-2">
         <label class="font-medium">Size:</label>
         <input type="range" v-model="brushSize" min="1" max="50" class="w-24">
         <span>{{ brushSize }}px</span>
@@ -55,139 +55,261 @@
 
     <!-- Canvas Container -->
     <div class="bg-white rounded-lg shadow-md p-4 relative">
-      <canvas
-          ref="canvas"
-          class="border border-gray-300 w-full touch-none"
-      ></canvas>
+      <canvas id="canvas" width="960" height="540"></canvas>
     </div>
   </div>
 </template>
 
 <script>
-import * as fabric from 'fabric';
-import { jwtDecode } from "jwt-decode";
-
 export default {
   data() {
     return {
       currentTool: 'select',
       currentColor: '#000000',
       brushSize: 5,
-      canvas: null,
+      lastPosX: 0,
+      lastPosY: 0,
+      line: null,
+      circle: null,
+      rectangle: null,
       isDrawing: false,
-      startPos: { x: 0, y: 0 },
-      freehandPath: null,
-      tempShape: null,
-      drawingOptions: {
-        color: '#000000', // Цвет карандаша
-        lineWidth: 5,     // Толщина линии
-        shadowColor: '#888888', // Цвет тени
-        shadowWidth: 0,   // Ширина тени
-        shadowOffset: 0,  // Смещение тени
-      },
+      canvasConfig: {
+        width: 960,
+        height: 540,
+        backgroundColor: 'white'
+      }
     }
   },
   computed: {
-    isTextTool() {
-      return this.currentTool === 'text';
-    }
-  },
-  beforeMount() {
-    let token = localStorage.getItem('authToken');
-    const decoded = jwtDecode(token);
-    if (!token || !decoded['is_admin']) {
-      this.$router.push('/auth');
+    isDrawingTool() {
+      return ['pencil', 'brush', 'eraser'].includes(this.currentTool);
+    },
+    isShapeTool() {
+      return ['line', 'rectangle', 'circle'].includes(this.currentTool);
     }
   },
   mounted() {
     this.initCanvas();
-    window.addEventListener('resize', this.handleResize);
-
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize);
-    if (this.canvas) {
-      this.canvas.dispose();
-    }
+    this.setupEventListeners();
   },
   methods: {
     initCanvas() {
-      const container = this.$refs.canvas.parentElement;
-      const canvasEl = this.$refs.canvas;
-
-      // Получаем реальные размеры контейнера
-      const width = container.clientWidth;
-      const height = Math.floor(width * 9 / 16);
-
-      // Устанавливаем физические размеры canvas
-      canvasEl.width = width;
-      canvasEl.height = height;
-
-      this.canvas = new fabric.Canvas(canvasEl, {
-        backgroundColor: 'white',
-        selection: true
+      this.canvas = new fabric.Canvas('canvas', {
+        width: this.canvasConfig.width,
+        height: this.canvasConfig.height,
+        fireRightClick: true, 
+        fireMiddleClick: true, 
+        stopContextMenu: true,
+        preserveObjectStacking: true,
+        isDrawingMode: false
       });
 
-      // Убираем backstoreOnly, так как размеры уже установлены
-      this.canvas.setDimensions({ width, height });
-      this.setupEventListeners();
-    },
-    setupDrawingOptions() {
-      const brush = this.canvas.freeDrawingBrush;
-      console.log(this.drawingOptions.color)
-      brush.color = "#000000";
-      brush.width = this.drawingOptions.lineWidth;
-      brush.shadow = new fabric.Shadow({
-        blur: this.drawingOptions.shadowWidth,
-        offsetX: this.drawingOptions.shadowOffset,
-        offsetY: this.drawingOptions.shadowOffset,
-        affectStroke: true,
-        color: this.drawingOptions.shadowColor,
-      });
+      this.canvas.setBackgroundColor(this.canvasConfig.backgroundColor, this.canvas.renderAll.bind(this.canvas));
+      this.changeTool();
     },
 
-    // Слушатели для изменения параметров рисования
-    changeDrawingColor(color) {
-      this.drawingOptions.color = color;
-      this.canvas.freeDrawingBrush.color = color;
-    },
-
-    changeDrawingLineWidth(width) {
-      this.drawingOptions.lineWidth = width;
-      this.canvas.freeDrawingBrush.width = width;
-    },
-
-    changeDrawingShadowColor(color) {
-      this.drawingOptions.shadowColor = color;
-      this.canvas.freeDrawingBrush.shadow.color = color;
-    },
-
-    changeDrawingShadowWidth(width) {
-      this.drawingOptions.shadowWidth = width;
-      this.canvas.freeDrawingBrush.shadow.blur = width;
-    },
-
-    changeDrawingShadowOffset(offset) {
-      this.drawingOptions.shadowOffset = offset;
-      this.canvas.freeDrawingBrush.shadow.offsetX = offset;
-      this.canvas.freeDrawingBrush.shadow.offsetY = offset;
-    },
-
-    toggleDrawingMode() {
-      this.canvas.isDrawingMode = !this.canvas.isDrawingMode;
-      // Выводим актуальный текст для кнопки
-      if (this.canvas.isDrawingMode) {
-        console.log('Включен режим рисования');
-      } else {
-        console.log('Выключен режим рисования');
+    changeTool() {
+      this.canvas.isDrawingMode = this.isDrawingTool;
+      this.canvas.selection = this.currentTool === 'select';
+      
+      if (this.isDrawingTool) {
+        if (this.currentTool === 'eraser') {
+          this.canvas.freeDrawingBrush = new fabric.EraserBrush(this.canvas);
+          this.canvas.freeDrawingBrush.width = this.brushSize;
+        } else {
+          this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
+          this.canvas.freeDrawingBrush.color = this.currentColor;
+          this.canvas.freeDrawingBrush.width = this.brushSize;
+          
+          if (this.currentTool === 'brush') {
+            this.canvas.freeDrawingBrush.decimate = 2;
+          }
+        }
       }
     },
+
+    setupEventListeners() {
+      this.canvas.on('mouse:down', this.handleMouseDown);
+      this.canvas.on('mouse:move', this.handleMouseMove);
+      this.canvas.on('mouse:up', this.handleMouseUp);
+    },
+
+    handleMouseDown(e) {
+      if (this.isShapeTool) {
+        const pointer = this.canvas.getPointer(e.e);
+        this.lastPosX = pointer.x;
+        this.lastPosY = pointer.y;
+        this.createShape(pointer);
+      }
+    },
+
+    createShape(pointer) {
+      this.isDrawing = true;
+      const shapeConfig = {
+        stroke: this.currentColor,
+        strokeWidth: this.brushSize,
+        fill: this.currentTool === 'text' ? this.currentColor : 'transparent',
+        selectable: true,
+        hasControls: true,
+        hasBorders: true
+      };
+
+      switch (this.currentTool) {
+        case 'line':
+          this.line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], shapeConfig);
+          this.canvas.add(this.line);
+          break;
+        case 'rectangle':
+          this.rectangle = new fabric.Rect({
+            left: pointer.x,
+            top: pointer.y,
+            width: 0,
+            height: 0,
+            ...shapeConfig
+          });
+          this.canvas.add(this.rectangle);
+          break;
+        case 'circle':
+          this.circle = new fabric.Circle({
+            left: pointer.x,
+            top: pointer.y,
+            radius: 0,
+            ...shapeConfig
+          });
+          this.canvas.add(this.circle);
+          break;
+      }
+    },
+
+    handleMouseMove(e) {
+      if (!this.isDrawing || !this.isShapeTool) return;
+
+      const pointer = this.canvas.getPointer(e.e);
+      this.updateShape(pointer);
+    },
+
+    updateShape(pointer) {
+      switch (this.currentTool) {
+        case 'line':
+          this.line.set({ x2: pointer.x, y2: pointer.y });
+          break;
+        case 'rectangle':
+          this.updateRectangle(pointer);
+          break;
+        case 'circle':
+          this.updateCircle(pointer);
+          break;
+      }
+      this.canvas.renderAll();
+    },
+
+    updateRectangle(pointer) {
+      const width = pointer.x - this.lastPosX;
+      const height = pointer.y - this.lastPosY;
+      this.rectangle.set({
+        width: Math.abs(width),
+        height: Math.abs(height),
+        left: width > 0 ? this.lastPosX : pointer.x,
+        top: height > 0 ? this.lastPosY : pointer.y
+      });
+    },
+
+    updateCircle(pointer) {
+      const radius = Math.sqrt(
+        Math.pow(pointer.x - this.lastPosX, 2) + 
+        Math.pow(pointer.y - this.lastPosY, 2)
+      ) / 2;
+      this.circle.set({ 
+        radius,
+        left: this.lastPosX,
+        top: this.lastPosY
+      });
+    },
+
+    handleMouseUp() {
+      this.isDrawing = false;
+    },
+
+    addText() {
+      const text = new fabric.Textbox('Введите текст', {
+        left: 100,
+        top: 100,
+        fontSize: 20,
+        fill: this.currentColor,
+        borderColor: 'blue',
+        editable: true,
+        padding: 10,
+        hasControls: true
+      });
+
+      this.canvas.add(text);
+      text.enterEditing();
+      text.selectAll();
+    },
+
+    clearCanvas() {
+      this.canvas.clear();
+      this.canvas.setBackgroundColor(this.canvasConfig.backgroundColor);
+      this.canvas.renderAll();
+    },
+
+    downloadImage() {
+      const dataURL = this.canvas.toDataURL({
+        format: 'png',
+        quality: 1
+      });
+      const link = document.createElement('a');
+      link.download = 'canvas-image.png';
+      link.href = dataURL;
+      link.click();
+    },
+
+    triggerFileInput() {
+      this.$refs.fileInput.click();
+    },
+
+    handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        fabric.Image.fromURL(event.target.result, (img) => {
+          const canvasWidth = this.canvas.width;
+          const canvasHeight = this.canvas.height;
+          const maxWidth = canvasWidth * 0.8;
+          const maxHeight = canvasHeight * 0.8;
+          
+          const scale = Math.min(
+            maxWidth / img.width,
+            maxHeight / img.height
+          );
+          
+          img.set({
+            left: (canvasWidth - img.width * scale) / 2,
+            top: (canvasHeight - img.height * scale) / 2,
+            scaleX: scale,
+            scaleY: scale,
+            selectable: true,
+            hasControls: true
+          });
+          
+          this.canvas.add(img);
+          this.canvas.setActiveObject(img);
+        });
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
   },
   watch: {
-    currentTool(newVal) {
-      if (!this.canvas) return;
-      this.canvas.selection = newVal === 'select';
-      this.canvas.requestRenderAll();
+    currentColor() {
+      this.changeTool();
+    },
+    brushSize() {
+      if (this.isDrawingTool) {
+        this.canvas.freeDrawingBrush.width = this.brushSize;
+      }
     }
   }
 }
@@ -198,5 +320,6 @@ canvas {
   width: 100% !important;
   height: auto !important;
   aspect-ratio: 16/9;
+  border: 1px solid #ddd;
 }
 </style>

@@ -16,11 +16,11 @@ def login():
     login_field = request.json.get('username')
     password = request.json.get('password')
     user = find_user_by_login(login_field)
-    print(user.user_id)
+
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({'message': 'Неверный логин или пароль'}), 401
 
-    access_token = create_access_token(identity=user.user_id, expires_delta=datetime.timedelta(days=30),
+    access_token = create_access_token(identity=user.user_id,
                                        additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
 
     refresh_token = create_refresh_token(identity=user.user_id, additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
@@ -37,7 +37,7 @@ def login():
 def refresh():
     identity = get_jwt_identity()
     add = get_jwt()
-    new_access_token = create_access_token(identity=identity, expires_delta=datetime.timedelta(days=30),
+    new_access_token = create_access_token(identity=identity,
                                            additional_claims=add)
 
     return jsonify({"access_token": new_access_token})
