@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from methods import *
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_pydantic import validate
 from schemas import *
 from models import News

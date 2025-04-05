@@ -1,11 +1,9 @@
 from flask import Blueprint, request, make_response
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from methods import *
-import datetime
 from schemas import *
 from flask_pydantic import validate
-from werkzeug.security import generate_password_hash, check_password_hash
-from config import APP_SECRET
+from werkzeug.security import check_password_hash
 
 auth = Blueprint('auth', __name__)
 

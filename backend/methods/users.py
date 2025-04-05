@@ -9,6 +9,7 @@ def get_all_users():
 def find_user_by_login(login):
     return Users.query.filter(Users.login == login).first()
 
+
 def find_user_by_user_id(user_id):
     return Users.query.filter(Users.user_id == user_id).first()
 

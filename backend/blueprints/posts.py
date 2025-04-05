@@ -1,12 +1,9 @@
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from methods import *
 from flask_pydantic import validate
 from schemas import *
-from manage import r
-from datetime import timedelta
-import json
-from config import USER_LIST_KEY
+
 
 posts = Blueprint('posts', __name__)
 
