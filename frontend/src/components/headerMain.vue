@@ -15,7 +15,7 @@
 
 
       <div class="mb-0 flex items-center ">
-        <div class="hover:cursor-pointer bg-gray-200 ring-4 ring-black/0 hover:bg-gray-300 hover:ring-gray-200  transition ease-in-out rounded-2xl p-3 mr-12">
+        <div class="hover:cursor-pointer bg-gray-200 ring-4 ring-black/0 hover:bg-gray-300 hover:ring-gray-200  transition ease-in-out rounded-2xl p-3 sm:mr-12">
           <Settings/>
         </div>
 
