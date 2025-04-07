@@ -1,10 +1,10 @@
 <template>
-  <div class="group cursor-pointer relative pl-6">
+  <div class="group cursor-pointer  relative pl-6">
     <!-- Вертикальная линия -->
     <div class="absolute left-2.5 top-0 bottom-0 w-px bg-blue-100"></div>
 
     <!-- Точка времени -->
-    <div class="absolute left-0 top-2">
+    <div class="absolute left-0 top-12">
       <div class="relative">
         <!-- Внешний круг -->
         <div class="w-5 h-5 rounded-full bg-white border-2 border-blue-200 group-hover:border-blue-400 transition-colors duration-300"></div>
@@ -28,13 +28,12 @@
         <CalendarDays  class="w-4 h-4 mr-1.5 mb-1"/>
         <span>{{ startDate }}</span>
       </div>
-    </div>
-
-    <div class=" ml-4 mt-2 flex items-center">
-        <span class="text-sm font-medium text-gray-500 bg-white/80  px-2 py-0.5 rounded-full shadow-sm">
+      <span class="text-sm font-medium text-gray-500 bg-white/80  rounded-full ">
           {{ timePassed }}
         </span>
     </div>
+
+
     <!-- Отступ между элементами -->
     <div class="h-2"></div>
   </div>

@@ -3,24 +3,20 @@
       ref="card"
       class=" bg-white rounded-2xl shadow-lg overflow-hidden w-95/100 transition-transform duration-300 ease-out cursor-pointer"
   >
-    <div class="flex flex-col md:flex-row h-full">
+    <div class="flex flex-col lg:flex-row h-full">
       <!-- Изображение -->
-      <div class="md:w-[500px] relative overflow-hidden">
+      <div class="lg:w-[500px] relative overflow-hidden">
         <img
-            src="https://picsum.photos/800/450"
+            src="https://loremflickr.com/800/450"
             alt="Изображение новости"
-            class="w-full aspect-16/9 md:h-full object-cover"
+            class="w-full aspect-16/9 lg:h-full object-cover"
         />
       </div>
 
       <!-- Контент -->
-      <div class="flex-1 p-6 md:p-8 flex flex-col min-h-[350px] relative">
+      <div class="flex-1 p-2 md:p-4 flex flex-col min-h-[350px] relative">
         <!-- Категория -->
-        <div class="absolute top-4 right-4">
-          <span class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium shadow-sm">
-            Технологии
-          </span>
-        </div>
+
 
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
@@ -35,6 +31,7 @@
             </span>
           </div>
 
+
           <!-- Заголовок -->
           <h2 class="text-2xl font-bold text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200">
             Важное событие в мире технологий и инноваций
@@ -45,6 +42,23 @@
             Краткое описание новости, которое дает представление о содержании статьи. Здесь может быть несколько строк текста, которые будут обрезаны при необходимости. Дополнительная информация о событии и его значимости.
           </p>
         </div>
+          <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
+            <div class="bg-blue-600/20 text-blue-600  ring-blue-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+              Технологии
+            </div>
+              <div class="bg-green-600/20 text-green-600  ring-green-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+                автобусы
+              </div>
+              <div class="bg-orange-600/20 text-orange-600  ring-orange-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+                Технологии
+              </div>
+              <div class="bg-violet-600/20 text-violet-600  ring-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+                dbedbe
+              </div>
+
+          </div>
+
+
 
         <!-- Нижняя часть -->
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -121,4 +135,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.timeline-scroll::-webkit-scrollbar {
+  margin-top: 4px;
+  width: 4px;
+}
+
+.timeline-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Стилизация скроллбара таймлайна в зеленой теме */
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: #a7d6f3;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: #6ee7b7;
+}
 </style>

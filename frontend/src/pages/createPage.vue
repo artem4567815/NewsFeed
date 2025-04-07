@@ -57,7 +57,6 @@ import VanillaTilt from "vanilla-tilt";
 import { jwtDecode } from "jwt-decode";
 
 export default {
-  name: "post-main",
   data() {
     return {
       postNew: {
