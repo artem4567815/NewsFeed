@@ -1,8 +1,8 @@
 <template>
-  <div @click.stop="hideModal()" class="z-10 fixed inset-0 flex items-center justify-center bg-black/50">
+  <div @click.stop="hideModal()" class="-z-10 fixed inset-0 flex items-center justify-center bg-black/50">
     <div @click.stop class="flex bg-white rounded-xl w-11/12 sm:w-9/12 md:w-7/12 lg:w-6/12 xl:w-4/12 flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <div class="text-3xl justify-self-center font-bold">EduFeed</div>
+        <div class="text-3xl   justify-self-center hover:cursor-pointer font-semibold">Edu<span class="text-blue-500">Feed</span></div>
         <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Войти в аккаунт</h2>
       </div>
 

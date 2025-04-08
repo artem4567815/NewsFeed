@@ -1,32 +1,28 @@
 <template>
   <div class="min-h-screen bg-pattern">
-    <header-main></header-main>
-
     <div class="relative flex justify-center">
-      <div class="flex w-full max-w-[2000px]">
+      <div class="flex flex-col 2xl:flex-row w-full max-w-screen-3xl mx-auto">
         <!-- Основной контейнер -->
-        <div class="flex-1 p-2 sm:p-8 2xl:max-w-[calc(100%-280px)]">
+        <div class="flex-1 w-full max-w-screen-2xl px-2 sm:px-8 mx-auto">
           <!-- Заголовок -->
-
-          <div class="bg-blue-100/40 backdrop-blur-sm rounded-2xl p-0 sm:p-3 text-center flex flex-col justify-center items-center shadow-sm  mb-12">
-            <div class="text-2xl my-3  text-center font-semibold">Edu<span class="text-blue-500">Feed</span></div>
-
-            <h2 class="lg:text-[2.5rem]  text-[1.5rem] font-bold text-[#1F2937] mb-4 leading-tight">Добро пожаловать в мир школьных новостей</h2>
-            <p class="text-lg sm:text-xl mb-5 text-gray-600">Будьте в курсе последних событий и обновлений из школьной жизни</p>
+          <div class="bg-blue-100/40 mt-8 backdrop-blur-sm rounded-2xl p-3 text-center flex flex-col justify-center items-center shadow-sm mb-12">
+            <div class="text-2xl my-3 font-semibold">Edu<span class="text-blue-500">Feed</span></div>
+            <h2 class="text-2xl sm:text-[2rem] font-bold text-[#1F2937] mb-4 leading-tight">
+              Добро пожаловать в мир школьных новостей
+            </h2>
+            <p class="text-base sm:text-lg mb-5 text-gray-600">
+              Будьте в курсе последних событий и обновлений из школьной жизни
+            </p>
           </div>
 
-
-
           <!-- Основной контент -->
-          <div class="space-y-10 flex flex-col items-center">
+          <div class="space-y-10 w-full lg:w-95/100 justify-self-center flex flex-col items-center">
             <post-main
                 v-for="post in 5"
                 :key="post.id"
-                :title="post.title"
-                :description="post.description"
-                :date="post.date"
+                :post="post"
                 @click="$router.push(`/post/${post.id}`)"
-                class="transform hover:scale-[1.02] transition-transform duration-300"
+                class="transform hover:scale-[1.02] transition-transform duration-300 w-full"
             />
           </div>
 
@@ -47,26 +43,26 @@
         </div>
 
         <!-- Таймлайн (правая колонка) -->
-        <div class="hidden 2xl:block  backdrop-blur-[2px] min-h-screen py-8 px-4">
+        <div class="hidden 2xl:block backdrop-blur-[2px] min-h-screen py-8 px-4">
           <div class="top-8">
             <filter-panel class="mb-6" @update:filters="onFilterUpdate" />
-            <div class="bg-white rounded-2xl p-4  border border-gray-200 shadow-sm">
-            <div class="flex bg- items-center  justify-between mb-8">
-              <div>
-                <h2 class="text-lg font-bold text-gray-900 mb-1">История событий</h2>
-                <p class="text-sm text-gray-500">Хронология новостей</p>
+            <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
+              <div class="flex items-center justify-between mb-8">
+                <div>
+                  <h2 class="text-lg font-bold text-gray-900 mb-1">История событий</h2>
+                  <p class="text-sm text-gray-500">Хронология новостей</p>
+                </div>
               </div>
-            </div>
-            <div class=" max-h-[calc(100vh-180px)]   overflow-y-auto pr-4 timeline-scroll">
-              <timeline-main
-                  v-for="(item, index) in timelineItems"
-                  :key="index"
-                  :title="item.title"
-                  :start-date="item.date"
-                  :time-passed="item.timePassed"
-                  @click="$router.push('/post/id')"
-              ></timeline-main>
-            </div>
+              <div class="max-h-[calc(100vh-180px)] overflow-y-auto pr-4 timeline-scroll">
+                <timeline-main
+                    v-for="(item, index) in timelineItems"
+                    :key="index"
+                    :title="item.title"
+                    :start-date="item.date"
+                    :time-passed="item.timePassed"
+                    @click="$router.push('/post/id')"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -76,6 +72,7 @@
     <footer-main></footer-main>
   </div>
 </template>
+
 
 <script setup>
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'

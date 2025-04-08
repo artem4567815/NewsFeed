@@ -16,8 +16,6 @@
       <!-- Контент -->
       <div class="flex-1 p-2 md:p-4 flex flex-col min-h-[350px] relative">
         <!-- Категория -->
-
-
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
           <div class="flex items-center space-x-4 mb-4">
@@ -43,16 +41,16 @@
           </p>
         </div>
           <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
-            <div class="bg-blue-600/20 text-blue-600  ring-blue-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+            <div class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
               Технологии
             </div>
-              <div class="bg-green-600/20 text-green-600  ring-green-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+              <div class="bg-green-600/20 text-green-600  border-green-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
                 автобусы
               </div>
-              <div class="bg-orange-600/20 text-orange-600  ring-orange-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+              <div class="bg-orange-600/20 text-orange-600 border-orange-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
                 Технологии
               </div>
-              <div class="bg-violet-600/20 text-violet-600  ring-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+              <div class="bg-violet-600/20 text-violet-600 border-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
                 dbedbe
               </div>
 

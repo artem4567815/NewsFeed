@@ -1,5 +1,4 @@
 <template>
-  <header-main></header-main>
   <div class="grid grid-flow-col xl:grid-cols-5">
     <div class="flex flex-col items-center col-span-4">
       <div class="w-10/12 h-10 flex border-b-3 border-gray-300">

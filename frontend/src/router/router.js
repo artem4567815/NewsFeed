@@ -26,11 +26,11 @@ const routes = [
         component: profile
     },
     {
-        path: '/Profile/Create',
+        path: '/Create',
         component: createPage
     },
     {
-        path: '/Profile/Create/Cover',
+        path: '/Create/Cover',
         component: createCover
     },
     {

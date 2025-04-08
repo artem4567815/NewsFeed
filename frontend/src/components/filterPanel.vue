@@ -71,12 +71,7 @@
     </div>
 
     <!-- Кнопка -->
-    <button
-        @click="applyFilters"
-        class="w-full mt-2  text-sm font-medium py-2  hover:cursor-pointer bg-blue-500 ring-4 hover:ring-blue-700/30 hover:bg-blue-600 transition ease-in rounded-2xl text-white"
-    >
-      Применить фильтры
-    </button>
+    <blue-button @click="applyFilters" class="justify-self-center">Применить фильтры</blue-button>
   </div>
 </template>
 
