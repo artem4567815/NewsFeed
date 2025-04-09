@@ -225,3 +225,150 @@ stages:
         school: "1561"
         building: "11"
         login: "testuser3"
+
+  - name: 16 - Register client with valid data and base64 avatar
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User5"
+        surname: "User5"
+        school: "1561"
+        building: "11"
+        login: "User5"
+        password: "Test12345"
+        avatar_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User5"
+        surname: "User5"
+        school: "1561"
+        building: "11"
+        login: "User5"
+        avatar_url: !re_match "^http://.*$"
+    save:
+      json:
+        client_id: user_id
+        client_login: login
+
+  - name: 17 - Register client with invalid base64 avatar
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User6"
+        surname: "User6"
+        school: "1561"
+        building: "11"
+        login: "User6"
+        password: "Test12345"
+        avatar_url: "data:image/png;base64,invalid_base64_string"
+    response:
+      status_code: 400
+      json:
+        error: "Invalid input"
+        message: "Invalid avatar format"
+
+  - name: 18 - Register client with empty avatar
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User7"
+        surname: "User7"
+        school: "1561"
+        building: "11"
+        login: "User7"
+        password: "Test12345"
+        avatar_url: ""
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User7"
+        surname: "User7"
+        school: "1561"
+        building: "11"
+        login: "User7"
+
+  - name: 19 - Register client with wrong image format
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "Admin5"
+        surname: "Admin5"
+        school: "1561"
+        building: "11"
+        login: "admin5"
+        password: "Test12345"
+        avatar_url: "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    response:
+      status_code: 400
+      json:
+        error: "Invalid input"
+        message: "Unsupported image format"
+
+  - name: 20 - Register client with malicious base64
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "Admin6"
+        surname: "Admin6"
+        school: "1561"
+        building: "11"
+        login: "admin6"
+        password: "Test12345"
+        avatar_url: "data:image/png;base64,<script>alert('xss')</script>"
+    response:
+      status_code: 400
+      json:
+        error: "Invalid input"
+        message: "Invalid avatar format"
+
+  - name: 21 - Register client with valid base64 but wrong mime type
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "Admin7"
+        surname: "Admin7"
+        school: "1561"
+        building: "11"
+        login: "admin7"
+        password: "Test12345"
+        avatar_url: "data:application/json;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    response:
+      status_code: 400
+      json:
+        error: "Invalid input"
+        message: "Unsupported image format"
+
+  - name: 22 - Register client with valid base64 and verify avatar URL format
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "client"
+        surname: "client"
+        school: "1561"
+        building: "11"
+        login: "client"
+        password: "Test12345"
+        avatar_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "client"
+        surname: "client"
+        school: "1561"
+        building: "11"
+        login: "client"
+        avatar_url: !re_match "^http://.*$"
+    save:
+      json:
+        avatar_url: avatar_url

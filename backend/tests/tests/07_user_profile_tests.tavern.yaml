@@ -12,6 +12,7 @@ stages:
         building: "11"
         login: "testuser"
         password: "Test12345"
+        avatar_url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
     response:
       status_code: 201
       json:
@@ -21,6 +22,7 @@ stages:
         school: "1561"
         building: "11"
         login: "testuser"
+        avatar_url: !anything
 
   - name: 2 - Login test user
     request:

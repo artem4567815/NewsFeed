@@ -679,6 +679,9 @@ components:
         password:
           type: string
           minLength: 8
+        avatar_url:
+          type: string
+          example: "data:image/png;base64..."
 
     AdminRegistration:
       type: object
@@ -703,6 +706,9 @@ components:
         password:
           type: string
           minLength: 8
+        avatar_url:
+          type: string
+          example: "data:image/png;base64..."
 
     RegisterResponse:
       type: object
@@ -719,6 +725,9 @@ components:
           type: string
         login:
           type: string
+        avatar_url:
+          type: string
+          example: "http://..."
 
     ProfileResponse:
       type: object
