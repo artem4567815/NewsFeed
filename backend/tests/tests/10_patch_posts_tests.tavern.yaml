@@ -1,0 +1,379 @@
+test_name: Patch posts tests
+
+stages:
+  - name: 1 - Register test admin
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        avatar_img: "image"
+    save:
+      json:
+        author_id: user_id
+        author_login: login
+        author_img: avatar_img
+
+  - name: 2 - Register test client
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        avatar_img: "image"
+    save:
+      json:
+        author_client_id: user_id
+        author_client_login: login
+        author_client_img: avatar_img
+
+  - name: 3 - Login admin
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "admin"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token"
+      json:
+        access_token: access_token
+
+  - name: 4 - Login client
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token_user"
+      json:
+        access_token_client: access_token
+
+  - name: 5 - Create news post as admin
+    request:
+      url: "{url}/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test News Post"
+        type: "news"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test News Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "news"
+        status: "published"
+        author:
+          id: "{author_id}"
+          login: "{author_login}"
+          avatar_url: "{author_img}"
+        created_at: !anything
+    save:
+      json:
+        news_post_id: post_id
+
+  - name: 6 - Create wallpaper post as client
+    request:
+      url: "{url}/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+          avatar_url: "{author_client_img}"
+        created_at: !anything
+    save:
+      json:
+        wallpaper_post_id: post_id
+
+  - name: 7 - Update news post title as admin
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Updated News Title"
+    response:
+      status_code: 200
+      json:
+        post_id: "{news_post_id}"
+        title: "Updated News Title"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "news"
+        status: "published"
+        author:
+          id: "{author_id}"
+          login: "{author_login}"
+          avatar_url: "{author_img}"
+        created_at: !anything
+
+  - name: 8 - Update wallpaper post as client
+    request:
+      url: "{url}/posts/{wallpaper_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Updated Wallpaper Title"
+        content: "Updated content"
+        short_content: "Updated short content"
+    response:
+      status_code: 200
+      json:
+        post_id: "{wallpaper_post_id}"
+        title: "Updated Wallpaper Title"
+        short_content: "Updated short content"
+        full_content: "Updated content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+          avatar_url: "{author_client_img}"
+        created_at: !anything
+
+  - name: 9 - Update news post as client (should fail)
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Unauthorized Update"
+    response:
+      status_code: 403
+
+  - name: 10 - Update non-existent post
+    request:
+      url: "{url}/posts/00000000-0000-0000-0000-000000000000"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Non-existent Post"
+    response:
+      status_code: 404
+
+  - name: 11 - Update post without auth
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      json:
+        title: "Unauthorized Update"
+    response:
+      status_code: 401
+
+  - name: 12 - Update post with invalid token
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer invalid_token"
+      json:
+        title: "Invalid Token Update"
+    response:
+      status_code: 401
+
+  - name: 13 - Update post with empty title
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: ""
+    response:
+      status_code: 400
+
+  - name: 14 - Update post with empty short_content
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        short_content: ""
+    response:
+      status_code: 400
+
+  - name: 15 - Update post with empty content
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        content: ""
+    response:
+      status_code: 400
+
+  - name: 16 - Update post with very long title
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglong"
+    response:
+      status_code: 400
+
+  - name: 17 - Update post with invalid dates
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        start_date: 1749381304
+        end_date: 1744110904
+    response:
+      status_code: 400
+
+  - name: 18 - Update post with past end date
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        end_date: 1644110904
+    response:
+      status_code: 400
+
+  - name: 19 - Update post with past start date
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        start_date: 1644110904
+    response:
+      status_code: 400
+
+  - name: 20 - Update post with invalid img
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        image_url: "invalid image"
+    response:
+      status_code: 400
+
+  - name: 21 - Update post with invalid type
+    request:
+      url: "{url}/posts/{news_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        type: "invalid_type"
+    response:
+      status_code: 400
+
+  - name: 22 - Update wallpaper posts for other owner
+    request:
+      url: "{url}/posts/{wallpaper_post_id}"
+      method: PATCH
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "New title"
+    response:
+      status_code: 403

@@ -1,0 +1,227 @@
+test_name: Registration admin test
+
+stages:
+  - name: 1 - Register new admin
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+
+  - name: 2 - Register with existing login
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 409
+
+  - name: 3 - Register without name
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 400
+
+  - name: 4 - Register without surname
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 400
+
+  - name: 5 - Register without building
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 400
+
+  - name: 6 - Register without school
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        building: "11"
+        login: "Admin1"
+        password: "Test12345"
+    response:
+      status_code: 400
+
+  - name: 7 - Register without login
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        password: "Test12345"
+    response:
+      status_code: 400
+
+  - name: 8 - Register without password
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+    response:
+      status_code: 400
+
+  - name: 9 - Register incorrect password
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "123"
+    response:
+      status_code: 400
+
+  - name: 10 - Register incorrect name
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "A"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "123"
+    response:
+      status_code: 400
+
+  - name: 11 - Register incorrect surname
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "A"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "123"
+    response:
+      status_code: 400
+
+  - name: 12 - Register incorrect name №2
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "UserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUser"
+        surname: "Admin1"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "123"
+    response:
+      status_code: 400
+
+  - name: 13 - Register incorrect surname №2
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin1"
+        surname: "UserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUserUser"
+        school: "1561"
+        building: "11"
+        login: "Admin1"
+        password: "123"
+    response:
+      status_code: 400
+
+  - name: 14 - Register new user №2
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin2"
+        surname: "Admin2"
+        school: "1561"
+        building: "11"
+        login: "Admin2"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin2"
+        surname: "Admin2"
+        school: "1561"
+        building: "11"
+        login: "Admin2"
+
+  - name: 15 - Register new user №3
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin3"
+        surname: "Admin3"
+        school: "1561"
+        building: "11"
+        login: "Admin3"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin3"
+        surname: "Admin3"
+        school: "1561"
+        building: "11"
+        login: "Admin3"

@@ -14,7 +14,7 @@ def dashboard():
     return jsonify(walls.as_dict()), 200
 
 
-@user_routes.route('/profile')
+@user_routes.route('/profile', methods=['GET'])
 @safe("blueprints/users.py | profile")
 @jwt_required()
 def profile():

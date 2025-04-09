@@ -11,8 +11,12 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['POST'])
 @safe("blueprints/auth.py | login")
 def login():
-    login_field = request.json.get('username')
-    password = request.json.get('password')
+    login_field = request.json.get('login', None)
+    password = request.json.get('password', None)
+
+    if login_field is None or password is None:
+        raise BadRequest('login and password are required')
+
     user = find_user_by_login(login_field)
 
     if not user or not check_password_hash(user.password_hash, password):
@@ -35,8 +39,10 @@ def login():
 def refresh():
     identity = get_jwt_identity()
     add = get_jwt()
+    claims = {"user_id": add["user_id"], "is_admin": add["is_admin"]}
+
     new_access_token = create_access_token(identity=identity,
-                                           additional_claims=add)
+                                           additional_claims=claims)
 
     return jsonify({"access_token": new_access_token})
 
@@ -46,19 +52,19 @@ def refresh():
 @validate()
 def register_user(body: UserRegisterRequest):
     if find_user_by_login(body.login):
-        return jsonify({'message': 'Этот логин уже занят'}), 400
+        return jsonify({'message': 'Этот логин уже занят'}), 409
 
     new_user = create_user(body.name, body.surname, body.school, body.building, False, body.login, body.password)
 
     return jsonify(new_user.as_dict()), 201
 
 
-@auth.route('/admin/register', methods=['POST'])
+@auth.route('/register/admin', methods=['POST'])
 @safe("blueprints/auth.py | register_admin")
 @validate()
 def register_admin(body: UserRegisterRequest):
     if find_user_by_login(body.login):
-        return jsonify({'message': 'Этот логин уже занят'}), 400
+        return jsonify({'message': 'Этот логин уже занят'}), 409
 
     new_user = create_user(body.name, body.surname, body.school, body.building, True, body.login, body.password)
 

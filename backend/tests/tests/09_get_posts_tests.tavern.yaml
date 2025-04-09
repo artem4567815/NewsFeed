@@ -1,0 +1,511 @@
+test_name: Get posts tests
+
+stages:
+  - name: 1 - Register test admin
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        avatar_img: "image"
+    save:
+      json:
+        author_id: user_id
+        author_login: login
+        author_img: avatar_img
+
+  - name: 2 - Register test client
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        avatar_img: "image"
+    save:
+      json:
+        author_client_id: user_id
+        author_client_login: login
+        author_client_img: avatar_img
+
+  - name: 3 - Login admin
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "admin"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token"
+      json:
+        access_token: access_token
+
+  - name: 4 - Login client
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token_user"
+      json:
+        access_token_client: access_token
+
+  - name: 5 - Create test post
+    request:
+      url: "{url}/posts/create/news"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test Post"
+        type: "news"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+        tags:
+          - "Образование"
+          - "Наука"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "news"
+        status: "published"
+        author:
+          json:
+            id: author_id
+            login: author_login
+            avatar_url: author_img
+        created_at: !anything
+        tags:
+          - "Образование"
+          - "Наука"
+      save:
+        json:
+          post_id1: post_id
+
+  - name: 6 - Create test post №2
+    request:
+      url: "{url}/posts/create/news"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test Post2"
+        type: "news"
+        content: "Test content2"
+        short_content: "short content2"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster2"
+        post_img_detail: "detail image2"
+        tags:
+          - "Наука"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Pos2t"
+        short_content: "short content2"
+        full_content: "Test content2"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster2"
+        type: "news"
+        status: "published"
+        author:
+          json:
+            id: author_id
+            login: author_login
+            avatar_url: author_img
+        created_at: !anything
+        tags:
+          - "Наука"
+      save:
+        json:
+          post_id2: post_id
+
+  - name: 7 - Create test post№3
+    request:
+      url: "{url}/posts/create/news"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test Post3"
+        type: "news"
+        content: "Test content3"
+        short_content: "short content3"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster3"
+        post_img_detail: "detail image3"
+        tags:
+          - "Уроки"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Post3"
+        short_content: "short content3"
+        full_content: "Test content3"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster3"
+        type: "news"
+        status: "published"
+        author:
+          json:
+            id: author_id
+            login: author_login
+            avatar_url: author_img
+        created_at: !anything
+        tags:
+          - "Уроки"
+      save:
+        json:
+          post_id3: post_id
+
+  - name: 8 - Create test post№4
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test Post4"
+        type: "wallpapers"
+        content: "Test content4"
+        short_content: "short content4"
+        start_date: 1744070400
+        end_date: 1744243200
+        post_img: "image poster4"
+        post_img_detail: "detail image4"
+        tags:
+          - "Олимпиада"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Post4"
+        short_content: "short content4"
+        full_content: "Test content4"
+        start_date: 1744070400
+        end_date: 1744243200
+        img_url: "image poster4"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          json:
+            id: author_client_id
+            login: author_client_login
+            avatar_url: author_client_img
+        created_at: !anything
+        tags:
+          - "Олимпиада"
+      save:
+        json:
+          post_id4: post_id
+
+  - name: 9 - Get all posts
+    request:
+      url: "{url}/posts"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+          - !anything
+          - !anything
+
+  - name: 10 - Get post by ID
+    request:
+      url: "{url}/posts/post/{post_id1}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        post_id: !anything
+        title: "Test Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "news"
+        status: "published"
+        author:
+          json:
+            id: author_id
+            login: author_login
+            avatar_url: author_img
+        created_at: !anything
+
+  - name: 11 - Get post2 by ID
+    request:
+      url: "{url}/posts/post/{post_id2}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        post_id: !anything
+        title: "Test Post2"
+        short_content: "short content2"
+        full_content: "Test content2"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster2"
+        type: "news"
+        status: "published"
+        author:
+          json:
+            id: author_id
+            login: author_login
+            avatar_url: author_img
+        created_at: !anything
+
+  - name: 12 - Get non-existent post
+    request:
+      url: "{url}/posts/post/00000000-0000-0000-0000-000000000000"
+      method: GET
+    response:
+      status_code: 404
+
+  - name: 13 - Get posts with invalid pagination
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        page: -1
+        size: 0
+    response:
+      status_code: 400
+
+  - name: 14 - Get posts with invalid pagination
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        page: 0
+        size: -1
+    response:
+      status_code: 400
+
+  - name: 15 - Get posts with invalid building
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        building: "-11"
+    response:
+      status_code: 400
+
+  - name: 16 - Get posts with filter by type
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        type: "news"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+          - !anything
+          - !anything
+
+  - name: 17 - Get posts with filter by type
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        type: "wallpaper"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+
+  - name: 18 - Get posts with date range filter
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        start_date: "1744070400"
+        end_date: "1744243200"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+
+  - name: 19 - Get posts with invalid date range
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        start_date: "1744243200"
+        end_date: "1744070400"
+    response:
+      status_code: 400
+
+  - name: 20 - Get posts with invalid date format
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        start_date: "invalid-date"
+        end_date: "invalid-date"
+    response:
+      status_code: 400
+
+  - name: 21 - Get posts with limit
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        type: "mews"
+        limit: 2
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+          - !anything
+
+  - name: 22 - Get posts with offset and limit
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        type: "mews"
+        limit: 2
+        offset: 1
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+
+  - name: 23 - Get posts with tags filter
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        tags:
+          - "Олимпиада"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+
+  - name: 24 - Get posts with tags filter№2
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        tags:
+          - "Наука"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+          - !anything
+
+  - name: 25 - Get posts with tags filter№3
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        tags:
+          - "Наука"
+          - "Образование"
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+
+  - name: 26 - Get posts with invalid type
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        type: "invalid"
+    response:
+      status_code: 400
+
+  - name: 27 - Get posts with none tags
+    request:
+      url: "{url}/posts"
+      method: GET
+      params:
+        tags: [ ]
+    response:
+      status_code: 200
+      json:
+        posts:
+          - !anything
+          - !anything
+          - !anything

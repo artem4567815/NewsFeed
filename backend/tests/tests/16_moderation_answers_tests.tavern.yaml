@@ -1,0 +1,303 @@
+test_name: Moderation answers tests
+
+stages:
+  - name: 1 - Register test admin
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        avatar_img: "image"
+    save:
+      json:
+        author_id: user_id
+        author_login: login
+        author_img: avatar_img
+
+  - name: 2 - Register test client
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        avatar_img: "image"
+    save:
+      json:
+        author_client_id: user_id
+        author_client_login: login
+        author_client_img: avatar_img
+
+  - name: 3 - Login admin
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "admin"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token"
+      json:
+        access_token: access_token
+
+  - name: 4 - Login client
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token_user"
+      json:
+        access_token_client: access_token
+
+  - name: 5 - Create test post for moderation
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "Test short content"
+        post_img: "image"
+        post_img_detail: "image_detail"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "Test short content"
+        post_img: "image"
+        post_img_detail: "image_detail"
+    save:
+      json:
+        post_id: post_id
+
+  - name: 6 - Get posts for moderation as admin
+    request:
+      url: "{url}/admin/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        wall_newspapers:
+          - post_id: "{post_id}"
+            title: "Test Wallpaper"
+            type: "wallpapers"
+            content: "Test content"
+            short_content: "Test short content"
+            post_img: "image"
+            post_img_detail: "image_detail"
+            status: "pending"
+
+  - name: 7 - Apply post as admin
+    request:
+      url: "{url}/admin/moderation/{post_id}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 8 - Verify post status after apply
+    request:
+      url: "{url}/admin/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        wall_newspapers: []
+
+  - name: 9 - Create another test post
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper 2"
+        type: "wallpapers"
+        content: "Test content 2"
+        short_content: "Test short content 2"
+        post_img: "image2"
+        post_img_detail: "image_detail2"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper 2"
+        type: "wallpapers"
+        content: "Test content 2"
+        short_content: "Test short content 2"
+        post_img: "image2"
+        post_img_detail: "image_detail2"
+    save:
+      json:
+        post_id_2: post_id
+
+  - name: 10 - Reject post as admin
+    request:
+      url: "{url}/admin/moderation/{post_id_2}/reject"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        reason: "Post contains inappropriate content"
+    response:
+      status_code: 200
+      json:
+        reason: "Post contains inappropriate content"
+
+  - name: 11 - Verify post status after reject
+    request:
+      url: "{url}/admin/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        wall_newspapers: []
+
+  - name: 12 - Try to apply non-existent post
+    request:
+      url: "{url}/admin/moderation/00000000-0000-0000-0000-000000000000/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 404
+
+  - name: 13 - Try to reject non-existent post
+    request:
+      url: "{url}/admin/moderation/00000000-0000-0000-0000-000000000000/reject"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        reason: "Test reason"
+    response:
+      status_code: 404
+
+  - name: 14 - Try to apply post as client
+    request:
+      url: "{url}/admin/moderation/{post_id}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 403
+
+  - name: 15 - Try to reject post as client
+    request:
+      url: "{url}/admin/moderation/{post_id}/reject"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        reason: "Test reason"
+    response:
+      status_code: 403
+
+  - name: 16 - Try to apply post without auth
+    request:
+      url: "{url}/admin/moderation/{post_id}/apply"
+      method: POST
+    response:
+      status_code: 401
+
+  - name: 17 - Try to reject post without auth
+    request:
+      url: "{url}/admin/moderation/{post_id}/reject"
+      method: POST
+      json:
+        reason: "Test reason"
+    response:
+      status_code: 401
+
+  - name: 18 - Try to apply post with invalid token
+    request:
+      url: "{url}/admin/moderation/{post_id}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer invalid_token"
+    response:
+      status_code: 401
+
+  - name: 19 - Try to reject post with invalid token
+    request:
+      url: "{url}/admin/moderation/{post_id}/reject"
+      method: POST
+      headers:
+        Authorization: "Bearer invalid_token"
+      json:
+        reason: "Test reason"
+    response:
+      status_code: 401
+
+  - name: 20 - Try to reject post without reason
+    request:
+      url: "{url}/admin/moderation/{post_id}/reject"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json: {}
+    response:
+      status_code: 400

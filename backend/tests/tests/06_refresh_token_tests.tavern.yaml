@@ -1,0 +1,85 @@
+test_name: Refresh token tests
+
+stages:
+  - name: 1 - Register test user
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "TestUser"
+        surname: "TestUser"
+        school: "1561"
+        building: "11"
+        login: "testuser"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "TestUser"
+        surname: "TestUser"
+        school: "1561"
+        building: "11"
+        login: "testuser"
+
+  - name: 2 - Login test user
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "testuser"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+
+  - name: 3 - Successful token refresh
+    request:
+      url: "{url}/auth/refresh"
+      method: POST
+      headers:
+        X-CSRF-TOKEN: "{csrf_token}"
+      cookies:
+        - refresh_token_cookie: "{refresh_token}"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+
+  - name: 4 - Refresh with invalid refresh token
+    request:
+      url: "{url}/auth/refresh"
+      method: POST
+      headers:
+        X-CSRF-TOKEN: "{csrf_token}"
+      cookies:
+        - refresh_token_cookie: "invalid token"
+    response:
+      status_code: 401
+
+  - name: 5 - Refresh without refresh token
+    request:
+      url: "{url}/auth/refresh"
+      method: POST
+      cookies: []
+    response:
+      status_code: 401
+
+  - name: 6 - Refresh with expired refresh token
+    request:
+      url: "{url}/auth/refresh"
+      method: POST
+      headers:
+        X-CSRF-TOKEN: "{csrf_token}"
+      cookies:
+        - refresh_token_cookie: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj3UFYzPUVaVP43sZ_5VSkL1q7sMpR5d6p5vT3cM"
+    response:
+      status_code: 401

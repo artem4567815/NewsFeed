@@ -1,0 +1,7 @@
+---
+variables:
+  url: http://localhost:8081
+
+plugins:
+  - name: helpers
+    path: ./helpers.py

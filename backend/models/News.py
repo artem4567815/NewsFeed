@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
 class News(db.Model):
-    news_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    post_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
 
     title = db.Column(db.String(100), nullable=False)
     short_content = db.Column(db.Text, nullable=False)
@@ -22,7 +22,7 @@ class News(db.Model):
 
     def as_dict(self):
         return {
-            "news_id": self.news_id,
+            "post_id": self.post_id,
             "title": self.title,
             "short_content": self.short_content,
             "full_content": self.full_content,
@@ -33,8 +33,7 @@ class News(db.Model):
             "status": self.status,
             "author": {
                 "id": self.user_id,
-                "name": self.user.name,
-                "surname": self.user.surname,
+                "login": self.user.login,
                 "avatar_url": "string"
             },
             "created_at": self.created_at

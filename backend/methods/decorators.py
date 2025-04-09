@@ -3,7 +3,7 @@ import jwt
 from flask import jsonify
 from werkzeug.exceptions import *
 from flask_jwt_extended import get_jwt
-from flask_jwt_extended.exceptions import JWTDecodeError
+from flask_jwt_extended.exceptions import JWTDecodeError, NoAuthorizationError
 from flask_pydantic import ValidationError
 from manage import logger
 
@@ -35,6 +35,9 @@ def safe(func_name):
             except ValidationError as e:
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {get_first_error(e)}")
                 return jsonify({"Validation error": f"{get_first_error(e)}"}), 400
+            except BadRequest as e:
+                logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {str(e)}")
+                return jsonify({"status": "error", "message": "Ошибка в данных запроса." + str(e)}), 400
             except ValueError as e:
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {str(e)}")
                 return jsonify({"status": "error", "message": "Ошибка в данных запроса." + str(e)}), 400
@@ -50,6 +53,9 @@ def safe(func_name):
             except JWTDecodeError as e:
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {e}")
                 return jsonify({"reason": "Incorrect token"}), 403
+            except NoAuthorizationError as e:
+                logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {e}")
+                return jsonify({"reason": "Missing JWT in headers or cookies (Missing Authorization Header; Missing cookie 'refresh_token_cookie')"}), 401
             except jwt.exceptions.InvalidSignatureError as e:
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {e}")
                 return jsonify({"reason": "Signature verification failed"}), 401

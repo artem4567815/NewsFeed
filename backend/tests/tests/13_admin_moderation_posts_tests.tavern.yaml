@@ -1,0 +1,299 @@
+test_name: Admin moderation posts tests
+
+stages:
+  - name: 1 - Register test admin
+    request:
+      url: "{url}/auth/register/admin"
+      method: POST
+      json:
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Admin"
+        surname: "Admin"
+        school: "1561"
+        building: "11"
+        login: "admin"
+        avatar_img: "image"
+    save:
+      json:
+        author_id: user_id
+        author_login: login
+        author_img: avatar_img
+
+  - name: 2 - Register test client
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        password: "Test12345"
+        avatar_img: "image"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User"
+        surname: "User"
+        school: "1561"
+        building: "11"
+        login: "user"
+        avatar_img: "image"
+    save:
+      json:
+        author_client_id: user_id
+        author_client_login: login
+        author_client_img: avatar_img
+
+  - name: 3 - Login admin
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "admin"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token"
+      json:
+        access_token: access_token
+
+  - name: 4 - Login client
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+    save:
+      $ext:
+        function: helpers:get_refresh_token
+        extra_kwargs:
+          cookie_name: "refresh_token_user"
+      json:
+        access_token_client: access_token
+
+  - name: 5 - Create wallpaper post as client
+    request:
+      url: "{url}/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+          avatar_url: "{author_client_img}"
+        created_at: !anything
+    save:
+      json:
+        wallpaper_post_id: post_id
+
+  - name: 6 - Create wallpaper post as client №2
+    request:
+      url: "{url}/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post2"
+        type: "wallpapers"
+        content: "Test content2"
+        short_content: "short content2"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post2"
+        short_content: "short content2"
+        full_content: "Test content2"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+          avatar_url: "{author_client_img}"
+        created_at: !anything
+    save:
+      json:
+        wallpaper_post_id2: post_id
+
+  - name: 6 - Get moderation posts as admin
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        wall_newspapers:
+          - !anything
+          - !anything
+
+  - name: 8 - Get moderation posts with pagination
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+      params:
+        offset: 1
+        limit: 5
+    response:
+      status_code: 200
+      json:
+        wall_newspapers:
+          - !anything
+
+  - name: 9 - Get moderation posts as client (should fail)
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 403
+
+  - name: 10 - Get moderation posts without auth
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+    response:
+      status_code: 401
+
+  - name: 11 - Get moderation posts with invalid token
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer invalid_token"
+    response:
+      status_code: 401
+
+  - name: 12 - Get moderation posts with invalid pagination
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+      params:
+        offset: -1
+        limit: 0
+    response:
+      status_code: 400
+
+  - name: 13 - Get moderation posts with invalid pagination
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+      params:
+        offset: 0
+        limit: -1
+    response:
+      status_code: 400
+
+  - name: 14 - Create another draft post
+    request:
+      url: "{url}/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post 3"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 1744110904
+        end_date: 1749381304
+        post_img: "image poster"
+        post_img_detail: "detail image"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post 3"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 1744110904
+        end_date: 1749381304
+        img_url: "image poster"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+          avatar_url: "{author_client_img}"
+        created_at: !anything
+    save:
+      json:
+        wallpaper_post_id3: post_id
+
+  - name: 15 - Get moderation posts with multiple drafts
+    request:
+      url: "{url}/posts/moderation"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        wall_newspapers:
+          - !anything
+          - !anything
+          - !anything

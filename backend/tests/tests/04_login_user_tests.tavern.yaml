@@ -1,0 +1,124 @@
+test_name: Login user test
+
+stages:
+  - name: 1 - Registration new user
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "Test1"
+        surname: "Test1"
+        school: "1561"
+        building: "11"
+        login: "Test1"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Test1"
+        surname: "Test1"
+        school: "1561"
+        building: "11"
+        login: "Test1"
+
+  - name: 2 - Registration new user#2
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "Test2"
+        surname: "Test2"
+        school: "1561"
+        building: "11"
+        login: "Test2"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "Test2"
+        surname: "Test2"
+        school: "1561"
+        building: "11"
+        login: "Test2"
+
+  - name: 3 - Login user №1
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "Test1"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+
+  - name: 4 - Login user №2
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "Test2"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+
+  - name: 5 - Запрос на повторную авторизацию клиента №2
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "Test2"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+
+  - name: 6 - Запрос на авторизацию с неверным паролем
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "Test1"
+        password: "123"
+    response:
+      status_code: 401
+
+  - name: 7 - Запрос на авторизацию несуществующего пользователя
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "incognita@gmail.com"
+        password: "123456789"
+    response:
+      status_code: 401
+
+  - name: 8 - Запрос на авторизацию с недостающими полями №1
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        password: "123456789"
+    response:
+      status_code: 400
+
+  - name: 9 - Запрос на авторизацию с недостающими полями №2
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "Test1"
+    response:
+      status_code: 400
