@@ -1,14 +1,189 @@
 <template>
-<header-main></header-main>
-    <div>Детальная новость уйо</div> 
+  <div class="min-h-screen  bg-pattern">
+    <div class="relative flex justify-center">
+      <div class="flex w-full justify-center max-w-[2000px]">
+        <!-- Основной контейнер -->
+        <div class="flex-1 p-2 sm:p-8 2xl:max-w-[calc(100%-280px)]">
+
+          <!-- Заголовок новости -->
+          <div class="mb-8">
+            <div class="flex items-center gap-2 mb-4">
+              <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">День открытых дверей в нашей школе</h1>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <div class="flex items-center gap-2">
+                <span class="font-medium text-gray-700">А. Школа 1561</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <CalendarDays class="w-4 h-4" />
+                <span>12.03.2025</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <Eye class="w-4 h-4" />
+                <span>1,235 просмотров</span>
+              </div>
+              <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">Мероприятие</span>
+            </div>
+          </div>
+
+          <!-- Основное содержимое новости -->
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
+            <!-- Изображение новости (заглушка) -->
+            <div class="w-full h-64 bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center">
+              <span class="text-gray-400">Изображение мероприятия</span>
+            </div>
+
+            <!-- Текст новости -->
+            <div class="p-6 sm:p-8">
+              <p class="text-lg text-gray-700 mb-6">
+                Приглашаем всех родителей и будущих учеников на день открытых дверей в нашу школу.
+                Вы сможете познакомиться с преподавателями и программами обучения.
+              </p>
+
+              <div class="prose max-w-none text-gray-700 mb-8">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent euismod, nisi eget fermentum aliquam, nisi nunc tincidunt nunc, eget tincidunt nisi nisi eget nisi. Nulla facilisi. Nulla facilisi. Nulla facilisi. Nulla facilisi.</p>
+
+                <h2 class="text-xl font-bold mt-8 mb-4 text-gray-900">Подробности события</h2>
+
+                <p>Curabitur auctor, nisi eget fermentum aliquam, nisi nunc tincidunt nunc, eget tincidunt nisi nisi eget nisi. Nulla facilisi. Nulla facilisi. Nulla facilisi. Nulla facilisi.</p>
+
+                <blockquote class="border-l-4 border-blue-500 pl-4 italic my-6 text-gray-600">
+                  <p>"Образование — это не подготовка к жизни; образование — это и есть жизнь."</p>
+                  <footer class="mt-2 text-sm font-medium text-gray-500">— Джон Дьюи</footer>
+                </blockquote>
+
+                <p>Praesent euismod, nisl eget fermentum aliquam, nisl nunc tincidunt nunc, eget tincidunt nisl nisl eget nisl. Nulla facilisi. Nulla facilisi. Nulla facilisi. Nulla facilisi. Nulla facilisi.</p>
+              </div>
+
+              <!-- Действия с новостью -->
+              <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200">
+                <div class="flex items-center gap-2">
+                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <Heart class="w-4 h-4" />
+                    <span>128</span>
+                  </button>
+                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <MessageSquare class="w-4 h-4" />
+                    <span>24</span>
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <Bookmark class="w-4 h-4" />
+                    <span>Сохранить</span>
+                  </button>
+                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <Share2 class="w-4 h-4" />
+                    <span>Поделиться</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Похожие новости -->
+          <div class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Похожие новости</h2>
+
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div v-for="i in 3" :key="i" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="h-40 bg-gradient-to-r from-blue-50 to-indigo-50"></div>
+                <div class="p-4">
+                  <span class="inline-block px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800 mb-2">Мероприятие</span>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">Название похожей новости {{ i }}</h3>
+                  <p class="text-sm text-gray-500 mb-3">Краткое описание похожей новости...</p>
+                  <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>12.03.2025</span>
+                    <span>5 мин. чтения</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer-main></footer-main>
+  </div>
 </template>
 
-<script>
-export default {
+<script setup>
+import { CalendarDays, Clock, Eye, Heart, MessageSquare, Bookmark, Share2 } from 'lucide-vue-next'
+import { ref } from 'vue'
+import FilterPanel from "@/components/filterPanel.vue"
 
-    }
+const timelineItems = [
+  {
+    title: "Спортивные соревнования по плаванию",
+    date: "01.03.2025",
+    timePassed: "1 неделю назад",
+    category: "Спорт"
+  },
+  {
+    title: "Выставка творческих работ учеников",
+    date: "25.02.2025",
+    timePassed: "2 недели назад",
+    category: "Искусство"
+  },
+  {
+    title: "Экскурсия в Планетарий",
+    date: "15.02.2025",
+    timePassed: "3 недели назад",
+    category: "Наука"
+  },
+  {
+    title: "Олимпиада по математике",
+    date: "10.02.2025",
+    timePassed: "1 месяц назад",
+    category: "Наука"
+  }
+]
+
+function onFilterUpdate(newFilters) {
+  // Логика фильтрации
+}
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+/* Используем те же стили, что и на главной странице */
+.bg-pattern {
+  background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+  background-image:
+      radial-gradient(at 20% 25%, rgba(59, 130, 246, 0.04) 0px, transparent 50%),
+      radial-gradient(at 80% 75%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-size: cover;
+  position: relative;
+}
 
+.bg-pattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.timeline-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.timeline-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: #a7f3d0;
+  border-radius: 4px;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: #6ee7b7;
+}
 </style>
