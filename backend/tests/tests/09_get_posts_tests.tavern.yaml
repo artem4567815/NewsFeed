@@ -98,7 +98,7 @@ stages:
 
   - name: 5 - Create test post
     request:
-      url: "{url}/admin/create/post"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -139,7 +139,7 @@ stages:
 
   - name: 6 - Create test post №2
     request:
-      url: "{url}/admin/create/post"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -178,7 +178,7 @@ stages:
 
   - name: 7 - Create test post№3
     request:
-      url: "{url}/admin/create/post"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"

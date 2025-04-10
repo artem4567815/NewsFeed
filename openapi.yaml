@@ -130,6 +130,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /user/HomePage:
+    get:
+      tags:
+        - User
+      summary: Get user's posts (admin too)
+      security:
+        - BearerAuth: [ ]
+      responses:
+        '200':
+          description: Posts return successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /user/profile:
     get:
       tags:
@@ -176,6 +197,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/{postId}/send/to/moderation:
+    post:
+      tags:
+        - User
+      summary: Send posts to moderation
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Send post
         '401':
           description: Unauthorized
           content:
