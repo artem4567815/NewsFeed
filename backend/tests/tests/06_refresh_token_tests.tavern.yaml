@@ -73,13 +73,27 @@ stages:
     response:
       status_code: 401
 
-  - name: 6 - Refresh with expired refresh token
+  - name: 6.0 промежуточный тест чисто заполнить данные для следующего теста я хз как сделать по другому
     request:
       url: "{url}/auth/refresh"
       method: POST
       headers:
         X-CSRF-TOKEN: "{csrf_token}"
       cookies:
-        - refresh_token_cookie: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.4Adcj3UFYzPUVaVP43sZ_5VSkL1q7sMpR5d6p5vT3cM"
+        - refresh_token_cookie: "test"
+    response:
+      status_code: 401
+      save:
+        $ext:
+          function: helpers:create_expired_refresh_token
+
+  - name: 6 - Refresh with expired refresh token
+    request:
+      url: "{url}/auth/refresh"
+      method: POST
+      headers:
+        X-CSRF-TOKEN: "{csrf_token2}"
+      cookies:
+        - refresh_token_cookie: "{refresh_token2}"
     response:
       status_code: 401
