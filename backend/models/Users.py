@@ -14,10 +14,12 @@ class Users(db.Model):
     login = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
 
+    avatar_url = db.Column(db.String(300), nullable=True)
+
     news = db.relationship('News', backref='user', uselist=True)
 
     def as_dict(self):
-        return {
+        result = {
             "user_id": self.user_id,
             "name": self.name,
             "surname": self.surname,
@@ -25,3 +27,8 @@ class Users(db.Model):
             "building": self.building,
             "login": self.login,
         }
+
+        if self.avatar_url is not None:
+            result['avatar_url'] = self.avatar_url
+
+        return result

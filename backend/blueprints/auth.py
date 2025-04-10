@@ -24,7 +24,7 @@ def login():
 
     access_token = create_access_token(identity=user.user_id,
                                        additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
-
+    print(access_token)
     refresh_token = create_refresh_token(identity=user.user_id, additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
 
     response = make_response(jsonify({"access_token": access_token, "is_admin": user.is_admin}))
@@ -40,7 +40,6 @@ def refresh():
     identity = get_jwt_identity()
     add = get_jwt()
     claims = {"user_id": add["user_id"], "is_admin": add["is_admin"]}
-
     new_access_token = create_access_token(identity=identity,
                                            additional_claims=claims)
 
@@ -54,7 +53,8 @@ def register_user(body: UserRegisterRequest):
     if find_user_by_login(body.login):
         return jsonify({'message': 'Этот логин уже занят'}), 409
 
-    new_user = create_user(body.name, body.surname, body.school, body.building, False, body.login, body.password)
+    new_user = create_user(body.name, body.surname, body.school, body.building, False,
+                           body.login, body.password, body.avatar_url)
 
     return jsonify(new_user.as_dict()), 201
 
@@ -66,7 +66,8 @@ def register_admin(body: UserRegisterRequest):
     if find_user_by_login(body.login):
         return jsonify({'message': 'Этот логин уже занят'}), 409
 
-    new_user = create_user(body.name, body.surname, body.school, body.building, True, body.login, body.password)
+    new_user = create_user(body.name, body.surname, body.school, body.building, True, body.login,
+                           body.password, body.avatar_url)
 
     return jsonify(new_user.as_dict()), 201
 

@@ -92,7 +92,7 @@ stages:
       url: "{url}/user/profile"
       method: GET
       headers:
-        Authorization: "Bearer {$ext: {function: helpers:generate_invalid_user_jwt}}"
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0NDI0NDgyOCwianRpIjoiZjMzMGQzZjAtNzZlMC00OGY0LWJiYTUtNDFjYzk3NTFmNDY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImY4MDBlYjNmLWViMTEtNGYyMi04OGQwLTlmMTU0NjIyZTJiOCIsIm5iZiI6MTc0NDI0NDgyOCwiY3NyZiI6ImIxNTljMGY1LWJiNmItNGM0NS04YzUwLTE5MTE4NzZiY2U5YiIsImV4cCI6MTc0NDI0NTEyOCwidXNlcl9pZCI6ImY4MDBlYjNmLWViMTEtNGYyMi04OGQwLTlmMTU0NjIyZTJiOCIsImlzX2FkbWluIjpmYWxzZX0.ekwn8p0O_D6sIS5rNkuywT9rcJ0tJpzH9Khybc8ixIA"
     response:
       status_code: 404
 
