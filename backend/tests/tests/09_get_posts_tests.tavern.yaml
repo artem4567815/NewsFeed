@@ -1,5 +1,8 @@
 test_name: Get posts tests
 
+includes:
+  - !include encoded_images.yaml
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +15,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +24,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +40,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,12 +49,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
   - name: 3 - Login admin
     request:
@@ -70,13 +67,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
   - name: 4 - Login client
     request:
@@ -91,17 +88,17 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
-      json:
-        access_token_client: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
 
   - name: 5 - Create test post
     request:
-      url: "{url}/posts/create/news"
+      url: "{url}/admin/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -110,10 +107,10 @@ stages:
         type: "news"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
         tags:
           - "Образование"
           - "Наука"
@@ -124,16 +121,14 @@ stages:
         title: "Test Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
-          json:
-            id: author_id
-            login: author_login
-            avatar_url: author_img
+          id: "{author_id}"
+          login: "{author_login}"
         created_at: !anything
         tags:
           - "Образование"
@@ -144,7 +139,7 @@ stages:
 
   - name: 6 - Create test post №2
     request:
-      url: "{url}/posts/create/news"
+      url: "{url}/admin/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -153,29 +148,27 @@ stages:
         type: "news"
         content: "Test content2"
         short_content: "short content2"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster2"
-        post_img_detail: "detail image2"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
         tags:
           - "Наука"
     response:
       status_code: 201
       json:
         post_id: !anything
-        title: "Test Pos2t"
+        title: "Test Post2"
         short_content: "short content2"
         full_content: "Test content2"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster2"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
-          json:
-            id: author_id
-            login: author_login
-            avatar_url: author_img
+          id: "{author_id}"
+          login: "{author_login}"
         created_at: !anything
         tags:
           - "Наука"
@@ -185,7 +178,7 @@ stages:
 
   - name: 7 - Create test post№3
     request:
-      url: "{url}/posts/create/news"
+      url: "{url}/admin/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -194,10 +187,10 @@ stages:
         type: "news"
         content: "Test content3"
         short_content: "short content3"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster3"
-        post_img_detail: "detail image3"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
         tags:
           - "Уроки"
     response:
@@ -207,16 +200,14 @@ stages:
         title: "Test Post3"
         short_content: "short content3"
         full_content: "Test content3"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster3"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
-          json:
-            id: author_id
-            login: author_login
-            avatar_url: author_img
+          id: "{author_id}"
+          login: "{author_login}"
         created_at: !anything
         tags:
           - "Уроки"
@@ -229,16 +220,16 @@ stages:
       url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
-        Authorization: "Bearer {access_token}"
+        Authorization: "Bearer {access_token_client}"
       json:
         title: "Test Post4"
         type: "wallpapers"
         content: "Test content4"
         short_content: "short content4"
-        start_date: 1744070400
-        end_date: 1744243200
-        post_img: "image poster4"
-        post_img_detail: "detail image4"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
         tags:
           - "Олимпиада"
     response:
@@ -248,16 +239,14 @@ stages:
         title: "Test Post4"
         short_content: "short content4"
         full_content: "Test content4"
-        start_date: 1744070400
-        end_date: 1744243200
-        img_url: "image poster4"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "wallpapers"
         status: "draft"
         author:
-          json:
-            id: author_client_id
-            login: author_client_login
-            avatar_url: author_client_img
+          id: "{author_client_id}"
+          login: "{author_client_login}"
         created_at: !anything
         tags:
           - "Олимпиада"
@@ -288,17 +277,19 @@ stages:
         title: "Test Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
-          json:
-            id: author_id
-            login: author_login
-            avatar_url: author_img
+          id: "{author_id}"
+          login: "{author_login}"
         created_at: !anything
+        tags:
+          - "Образование"
+          - "Наука"
+
 
   - name: 11 - Get post2 by ID
     request:
@@ -311,17 +302,17 @@ stages:
         title: "Test Post2"
         short_content: "short content2"
         full_content: "Test content2"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster2"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
-          json:
-            id: author_id
-            login: author_login
-            avatar_url: author_img
+          id: "{author_id}"
+          login: "{author_login}"
         created_at: !anything
+        tags:
+          - "Наука"
 
   - name: 12 - Get non-existent post
     request:
@@ -335,8 +326,8 @@ stages:
       url: "{url}/posts"
       method: GET
       params:
-        page: -1
-        size: 0
+        offset: -1
+        limit: 0
     response:
       status_code: 400
 
@@ -345,21 +336,12 @@ stages:
       url: "{url}/posts"
       method: GET
       params:
-        page: 0
-        size: -1
+        offset: 0
+        limit: -1
     response:
       status_code: 400
 
-  - name: 15 - Get posts with invalid building
-    request:
-      url: "{url}/posts"
-      method: GET
-      params:
-        building: "-11"
-    response:
-      status_code: 400
-
-  - name: 16 - Get posts with filter by type
+  - name: 15 - Get posts with filter by type
     request:
       url: "{url}/posts"
       method: GET
@@ -373,32 +355,33 @@ stages:
           - !anything
           - !anything
 
-  - name: 17 - Get posts with filter by type
+  - name: 16 - Get posts with filter by type
     request:
       url: "{url}/posts"
       method: GET
       params:
-        type: "wallpaper"
+        type: "wallpapers"
     response:
       status_code: 200
       json:
         posts:
           - !anything
 
-  - name: 18 - Get posts with date range filter
+  - name: 17 - Get posts with date range filter
     request:
       url: "{url}/posts"
       method: GET
       params:
-        start_date: "1744070400"
-        end_date: "1744243200"
+        start_date: "2217628800"
+        end_date: "2218060800"
+        type: "wallpapers"
     response:
       status_code: 200
       json:
         posts:
           - !anything
 
-  - name: 19 - Get posts with invalid date range
+  - name: 18 - Get posts with invalid date range
     request:
       url: "{url}/posts"
       method: GET
@@ -408,7 +391,7 @@ stages:
     response:
       status_code: 400
 
-  - name: 20 - Get posts with invalid date format
+  - name: 19 - Get posts with invalid date format
     request:
       url: "{url}/posts"
       method: GET
@@ -418,12 +401,12 @@ stages:
     response:
       status_code: 400
 
-  - name: 21 - Get posts with limit
+  - name: 20 - Get posts with limit
     request:
       url: "{url}/posts"
       method: GET
       params:
-        type: "mews"
+        type: "news"
         limit: 2
     response:
       status_code: 200
@@ -432,12 +415,12 @@ stages:
           - !anything
           - !anything
 
-  - name: 22 - Get posts with offset and limit
+  - name: 21 - Get posts with offset and limit
     request:
       url: "{url}/posts"
       method: GET
       params:
-        type: "mews"
+        type: "news"
         limit: 2
         offset: 1
     response:
@@ -446,20 +429,21 @@ stages:
         posts:
           - !anything
 
-  - name: 23 - Get posts with tags filter
+  - name: 22 - Get posts with tags filter
     request:
       url: "{url}/posts"
       method: GET
       params:
         tags:
           - "Олимпиада"
+        type: "wallpapers"
     response:
       status_code: 200
       json:
         posts:
           - !anything
 
-  - name: 24 - Get posts with tags filter№2
+  - name: 23 - Get posts with tags filter№2
     request:
       url: "{url}/posts"
       method: GET
@@ -473,7 +457,7 @@ stages:
           - !anything
           - !anything
 
-  - name: 25 - Get posts with tags filter№3
+  - name: 24 - Get posts with tags filter№3
     request:
       url: "{url}/posts"
       method: GET
@@ -487,7 +471,7 @@ stages:
         posts:
           - !anything
 
-  - name: 26 - Get posts with invalid type
+  - name: 25 - Get posts with invalid type
     request:
       url: "{url}/posts"
       method: GET
@@ -496,7 +480,7 @@ stages:
     response:
       status_code: 400
 
-  - name: 27 - Get posts with none tags
+  - name: 26 - Get posts with none tags
     request:
       url: "{url}/posts"
       method: GET

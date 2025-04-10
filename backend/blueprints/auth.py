@@ -24,9 +24,9 @@ def login():
 
     access_token = create_access_token(identity=user.user_id,
                                        additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
-    print("access", access_token)
+
     refresh_token = create_refresh_token(identity=user.user_id, additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
-    print("refresh", refresh_token)
+
     response = make_response(jsonify({"access_token": access_token, "is_admin": user.is_admin}))
     response.set_cookie("refresh_token", refresh_token, httponly=True, samesite="Strict", secure=True)
 

@@ -16,11 +16,11 @@ admin_routes = Blueprint('admin', __name__)
 def save_news(body: CreateNewsRequest):
     file = save_base64_image(body.post_img)
     user_id = get_jwt_identity()
-    print(user_id)
 
-    news = create_news(body.title, body.short_content, body.content, file, body.start_date // 1000, body.end_date // 1000, user_id, body.type)
+    news = create_news(body.title, body.short_content, body.content, file,
+                       body.start_date, body.end_date, user_id, body.type, body.tags)
 
-    return jsonify(news.as_dict()), 200
+    return jsonify(news.as_dict()), 201
 
 
 @admin_routes.route('/moderation', methods=['GET'])

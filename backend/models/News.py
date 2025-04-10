@@ -1,6 +1,7 @@
 from . import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+from sqlalchemy.dialects.postgresql import ARRAY
 
 class News(db.Model):
     post_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
@@ -9,19 +10,20 @@ class News(db.Model):
     short_content = db.Column(db.Text, nullable=False)
     full_content = db.Column(db.Text, nullable=False)
 
-    start_date = db.Column(db.Integer, nullable=False)
-    end_date = db.Column(db.Integer, nullable=False)
+    start_date = db.Column(db.BigInteger, nullable=True)
+    end_date = db.Column(db.BigInteger, nullable=True)
 
     image_url = db.Column(db.String(500), nullable=True)
 
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=True)
     type = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False, default='draft')
+    tags = db.Column(ARRAY(db.String))
 
     user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
     def as_dict(self):
-        return {
+        result =  {
             "post_id": self.post_id,
             "title": self.title,
             "short_content": self.short_content,
@@ -34,7 +36,14 @@ class News(db.Model):
             "author": {
                 "id": self.user_id,
                 "login": self.user.login,
-                "avatar_url": "string"
             },
             "created_at": self.created_at
         }
+
+        if self.user.avatar_url is not None:
+            result['author']['avatar_url'] = self.user.avatar_url
+
+        if self.tags is not None:
+            result['tags'] = self.tags
+
+        return result

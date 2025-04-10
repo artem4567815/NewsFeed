@@ -7,13 +7,13 @@ from schemas import PatchUserRequest
 user_routes = Blueprint('user', __name__)
 
 
-@user_routes.route('/HomePage')
-@safe("blueprints/users.py | dashboard")
+@user_routes.route('/HomePage', methods=['GET'])
+@safe("blueprints/users.py | get_posts_by_user_id")
 @jwt_required()
-def dashboard():
+def get_posts_by_user_id():
     user_id = get_jwt_identity()
-    walls = find_news_by_user_id(user_id)
-    return jsonify(walls.as_dict()), 200
+    posts = find_news_by_user_id(user_id)
+    return jsonify(posts.as_dict()), 200
 
 
 @user_routes.route('/profile', methods=['GET'])

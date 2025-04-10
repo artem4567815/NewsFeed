@@ -14,7 +14,7 @@ def pytest_tavern_beta_before_every_request(request_args: MutableMapping):
     
     message += f"\nRequest body: {request_args.get('json', '<no body>')}"
 
-    logging.info(message)
+    #logging.info(message)
 
 
 def pytest_tavern_beta_after_every_response(expected: Any, response: Any) -> None:

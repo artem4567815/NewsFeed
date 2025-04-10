@@ -65,7 +65,6 @@ def create_expired_refresh_token(response):
     jwtt = JWTManager(app)
 
     non_user = str(uuid.uuid4())
-    print(non_user)
 
     with app.app_context():
         refresh_token = create_refresh_token(identity=non_user,

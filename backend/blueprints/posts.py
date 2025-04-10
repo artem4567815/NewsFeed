@@ -10,14 +10,14 @@ posts = Blueprint('posts', __name__)
 
 @posts.route("", methods=["GET"])
 @safe("blueprints/posts.py | category_posts")
-def category_posts():
-    query = request.args.get("type", "news")
-    posts_list = get_news_for_category(query)
+@validate()
+def category_posts(query: QueryRequest):
+    posts_list = get_news_by_query(query)
     posts_list = [news.as_dict() for news in posts_list]
-    return jsonify(posts_list), 200
+    return jsonify({"posts": posts_list}), 200
 
 
-@posts.route("/post/<int:post_id>", methods=["GET"])
+@posts.route("/post/<post_id>", methods=["GET"])
 @safe("blueprints/posts.py | detailed_news")
 def detailed_news(post_id):
     news = find_news_by_id(post_id)
@@ -35,6 +35,6 @@ def save_wallpapers(body: CreateNewsRequest):
     user_id = get_jwt_identity()
 
     news = create_news(body.title, body.short_content, body.content, file, body.start_date, body.end_date,
-                       user_id, body.type, "draft")
+                       user_id, body.type, body.tags, "draft")
 
-    return jsonify(news.as_dict()), 200
+    return jsonify(news.as_dict()), 201
