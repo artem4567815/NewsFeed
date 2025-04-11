@@ -11,8 +11,11 @@
 </template>
 
 <script>
-export default {
 
+import HeaderMain from "@/components/headerMain.vue";
+
+export default {
+  components: {HeaderMain}
 }
 </script>
 

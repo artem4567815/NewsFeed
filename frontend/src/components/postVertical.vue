@@ -1,11 +1,11 @@
 <template>
   <div
       ref="card"
-      class=" bg-white rounded-2xl shadow-lg overflow-hidden w-95/100 transition-transform duration-300 ease-out cursor-pointer"
+      class=" bg-white rounded-2xl max-w-150 shadow-lg overflow-hidden w-95/100 transition-transform duration-300 ease-out cursor-pointer"
   >
-    <div class="flex flex-col lg:flex-row h-full">
+    <div class="flex flex-col  h-full">
       <!-- Изображение -->
-      <div class="lg:w-[500px] relative overflow-hidden">
+      <div class=" relative overflow-hidden">
         <img
             src="https://loremflickr.com/800/450"
             alt="Изображение новости"
@@ -27,8 +27,6 @@
               <Clock class="w-4 h-4 mr-1.5 mb-1" />
               2 часа назад
             </span>
-            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">Новость</span>
-
           </div>
 
 
@@ -42,22 +40,21 @@
             Краткое описание новости, которое дает представление о содержании статьи. Здесь может быть несколько строк текста, которые будут обрезаны при необходимости. Дополнительная информация о событии и его значимости.
           </p>
         </div>
-          <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
-            <div class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-              Технологии
-            </div>
-
-              <div class="bg-green-600/20 text-green-600  border-green-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-                автобусы
-              </div>
-              <div class="bg-orange-600/20 text-orange-600 border-orange-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-                Технологии
-              </div>
-              <div class="bg-violet-600/20 text-violet-600 border-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
-                dbedbe
-              </div>
-
+        <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
+          <div class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
+            Технологии
           </div>
+          <div class="bg-green-600/20 text-green-600  border-green-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
+            автобусы
+          </div>
+          <div class="bg-orange-600/20 text-orange-600 border-orange-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
+            Технологии
+          </div>
+          <div class="bg-violet-600/20 text-violet-600 border-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
+            dbedbe
+          </div>
+
+        </div>
 
 
 
@@ -128,7 +125,7 @@ onUnmounted(() => {
 
 <script>
 export default {
-  name: "post-main",
+  name: "post-vertical",
   props: {
     post: Object
   }

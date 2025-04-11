@@ -31,9 +31,11 @@
           <!-- Основное содержимое новости -->
           <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
             <!-- Изображение новости (заглушка) -->
-            <div class="w-full h-64 bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center">
-              <span class="text-gray-400">Изображение мероприятия</span>
-            </div>
+            <img
+                src="https://loremflickr.com/800/450"
+                alt="Изображение новости"
+                class="w-full aspect-16/9 lg:h-full object-cover"
+            />
 
             <!-- Текст новости -->
             <div class="p-6 sm:p-8">
@@ -89,18 +91,7 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Похожие новости</h2>
 
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <div v-for="i in 3" :key="i" class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div class="h-40 bg-gradient-to-r from-blue-50 to-indigo-50"></div>
-                <div class="p-4">
-                  <span class="inline-block px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800 mb-2">Мероприятие</span>
-                  <h3 class="text-lg font-medium text-gray-900 mb-2">Название похожей новости {{ i }}</h3>
-                  <p class="text-sm text-gray-500 mb-3">Краткое описание похожей новости...</p>
-                  <div class="flex items-center justify-between text-xs text-gray-400">
-                    <span>12.03.2025</span>
-                    <span>5 мин. чтения</span>
-                  </div>
-                </div>
-              </div>
+              <post-vertical v-for="i in 3" @click="$router.push(`/post/${post.id}`)"></post-vertical>
             </div>
           </div>
         </div>
@@ -115,6 +106,8 @@
 import { CalendarDays, Clock, Eye, Heart, MessageSquare, Bookmark, Share2 } from 'lucide-vue-next'
 import { ref } from 'vue'
 import FilterPanel from "@/components/filterPanel.vue"
+import PostMain from "@/components/postMain.vue";
+import PostVertical from "@/components/postVertical.vue";
 
 const timelineItems = [
   {

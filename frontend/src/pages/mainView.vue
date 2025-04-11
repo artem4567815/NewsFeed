@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-pattern">
     <div class="relative flex justify-center">
-      <div class="flex flex-col 2xl:flex-row w-full max-w-screen-3xl mx-auto">
+      <div class="flex max-w-[2000px] flex-col 2xl:flex-row w-full max-w-screen-3xl mx-auto">
         <!-- Основной контейнер -->
         <div class="flex-1 w-full max-w-screen-2xl px-2 sm:px-8 mx-auto">
           <!-- Заголовок -->
@@ -27,7 +27,7 @@
           </div>
 
           <!-- Пагинация -->
-          <div class="flex justify-center mt-16">
+          <div class="flex  justify-center my-8">
             <nav class="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-lg shadow-sm divide-x divide-gray-200">
               <button class="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-l-lg">
                 <ChevronLeft />

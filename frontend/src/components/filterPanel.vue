@@ -1,6 +1,6 @@
 <template>
   <div class="rounded-2xl bg-white p-4 space-y-4 border border-gray-200 shadow-sm">
-    <h2 class="text-lg font-semibold text-gray-900">Фильтры</h2>
+    <h2 class="text-3xl font-semibold text-gray-900">Фильтры</h2>
 
     <!-- Поиск -->
     <div>
