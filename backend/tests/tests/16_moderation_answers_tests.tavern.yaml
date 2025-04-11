@@ -1,5 +1,8 @@
 test_name: Moderation answers tests
 
+includes:
+  - !include encoded_images.yaml
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +15,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +24,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +40,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,12 +49,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
   - name: 3 - Login admin
     request:
@@ -70,13 +67,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
   - name: 4 - Login client
     request:
@@ -91,13 +88,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
-      json:
-        access_token_client: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
 
   - name: 5 - Create test post for moderation
     request:
@@ -110,23 +107,31 @@ stages:
         type: "wallpapers"
         content: "Test content"
         short_content: "Test short content"
-        post_img: "image"
-        post_img_detail: "image_detail"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
         post_id: !anything
         title: "Test Wallpaper"
         type: "wallpapers"
-        content: "Test content"
+        full_content: "Test content"
         short_content: "Test short content"
-        post_img: "image"
-        post_img_detail: "image_detail"
-    save:
-      json:
-        post_id: post_id
+        image_url: !re_match "^http://.*$"
+      save:
+        json:
+          post_id: post_id
 
-  - name: 6 - Get posts for moderation as admin
+  - name: 6 - Send post to moderation as client
+    request:
+      url: "{url}/user/{post_id}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 7 - Get posts for moderation as admin
     request:
       url: "{url}/admin/moderation"
       method: GET
@@ -139,10 +144,9 @@ stages:
           - post_id: "{post_id}"
             title: "Test Wallpaper"
             type: "wallpapers"
-            content: "Test content"
+            full_content: "Test content"
             short_content: "Test short content"
-            post_img: "image"
-            post_img_detail: "image_detail"
+            image_url: !re_match "^http://.*$"
             status: "pending"
 
   - name: 7 - Apply post as admin
@@ -176,21 +180,20 @@ stages:
         type: "wallpapers"
         content: "Test content 2"
         short_content: "Test short content 2"
-        post_img: "image2"
-        post_img_detail: "image_detail2"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
         post_id: !anything
         title: "Test Wallpaper 2"
         type: "wallpapers"
-        content: "Test content 2"
+        full_content: "Test content 2"
         short_content: "Test short content 2"
-        post_img: "image2"
-        post_img_detail: "image_detail2"
-    save:
-      json:
-        post_id_2: post_id
+        image_url: !re_match "^http://.*$"
+      save:
+        json:
+          post_id_2: post_id
 
   - name: 10 - Reject post as admin
     request:

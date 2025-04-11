@@ -1,4 +1,4 @@
-from . import db
+from . import db, UsersHistory
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -22,6 +22,8 @@ class News(db.Model):
 
     user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
+    user_history = db.relationship('UsersHistory', backref='post', uselist=True)
+
     def as_dict(self):
         result =  {
             "post_id": self.post_id,
@@ -37,7 +39,9 @@ class News(db.Model):
                 "id": self.user_id,
                 "login": self.user.login,
             },
-            "created_at": self.created_at
+            "created_at": self.created_at,
+            "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
+            "views": len([x for x in self.user_history if x.viewed and x.post_id == self.post_id])
         }
 
         if self.user.avatar_url is not None:

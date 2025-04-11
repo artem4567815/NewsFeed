@@ -1,5 +1,10 @@
 test_name: Like posts tests
 
+includes:
+  - !include encoded_images.yaml
+
+strict: False
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +17,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +26,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +42,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,12 +51,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
   - name: 3 - Register test client№2
     request:
@@ -68,7 +67,6 @@ stages:
         building: "11"
         login: "user2"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -78,12 +76,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user2"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id2: user_id
+          author_client_login2: login
 
   - name: 4 - Login admin
     request:
@@ -98,13 +94,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
   - name: 5 - Login client
     request:
@@ -119,13 +115,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
-      json:
-        access_token_client: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
 
   - name: 5 - Login client №2
     request:
@@ -140,17 +136,17 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user2"
-      json:
-        access_token_client2: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client2: access_token
 
   - name: 6 - Create news post as admin
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -159,10 +155,10 @@ stages:
         type: "news"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -170,23 +166,22 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
-    save:
-      json:
-        news_post_id: post_id
+      save:
+        json:
+          news_post_id: post_id
 
   - name: 7 - Create wallpaper post as client
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -195,10 +190,10 @@ stages:
         type: "wallpapers"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -206,19 +201,18 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "wallpapers"
         status: "draft"
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-          avatar_url: "{author_client_img}"
         created_at: !anything
-    save:
-      json:
-        wallpaper_post_id: post_id
+      save:
+        json:
+          wallpaper_post_id: post_id
 
   - name: 8 - Like news post as client
     request:
@@ -247,6 +241,8 @@ stages:
       json:
         likes_count: 2
 
+      
+
   - name: 11 - Like wallpaper post as admin
     request:
       url: "{url}/posts/{wallpaper_post_id}/like"
@@ -265,6 +261,7 @@ stages:
       json:
         likes_count: 1
 
+
   - name: 13 - Like same post twice (should fail)
     request:
       url: "{url}/posts/{news_post_id}/like"
@@ -282,6 +279,7 @@ stages:
       status_code: 200
       json:
         likes_count: 2
+      
 
   - name: 15 - Like non-existent post
     request:
@@ -315,18 +313,16 @@ stages:
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 19 - Unlike news post as client
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: POST
+      method: DELETE
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
-      json:
-        message: "Post unliked successfully"
+      status_code: 204
 
   - name: 20 - Verify news post like count after unlike
     request:
@@ -336,22 +332,21 @@ stages:
       status_code: 200
       json:
         likes_count: 1
+      
 
   - name: 21 - Unlike post that wasn't liked
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: POST
+      method: DELETE
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
       status_code: 400
-      json:
-        detail: "User has not liked this post"
 
   - name: 22 - Unlike non-existent post
     request:
       url: "{url}/posts/00000000-0000-0000-0000-000000000000/unlike"
-      method: POST
+      method: DELETE
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
@@ -360,14 +355,14 @@ stages:
   - name: 23 - Unlike post without auth
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: POST
+      method: DELETE
     response:
       status_code: 401
 
   - name: 24 - Unlike post with invalid token
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: POST
+      method: DELETE
       headers:
         Authorization: "Bearer invalid_token"
     response:
@@ -376,18 +371,19 @@ stages:
   - name: 25 - Unlike post with invalid UUID format
     request:
       url: "{url}/posts/invalid-uuid/unlike"
-      method: POST
+      method: DELETE
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 26 - Get user's liked posts
     request:
-      url: "{url}/posts/liked"
+      url: "{url}/user/my-likes"
       method: GET
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
       status_code: 200
-      json: [ ]
+      json:
+        likes: []

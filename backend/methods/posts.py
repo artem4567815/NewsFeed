@@ -1,5 +1,6 @@
-from models import News, db
-from sqlalchemy import select
+from models import News, db, UsersHistory
+import uuid
+from werkzeug.exceptions import BadRequest
 
 
 def get_all_news():
@@ -48,3 +49,84 @@ def create_news(title, short_content, full_content, image_url, start_date,
     db.session.commit()
 
     return new_record
+
+
+def patch_post_method(post, body):
+    if body.title is not None:
+        post.title = body.title
+    if body.content is not None:
+        post.full_content = body.content
+    if body.short_content is not None:
+        post.short_content = body.short_content
+    if body.end_date is not None:
+        post.end_date = body.end_date
+    if body.start_date is not None:
+        post.start_date = body.start_date
+    if body.image_url is not None:
+        post.image_url = body.image_url
+    if body.tags is not None:
+        post.tags = body.tags
+
+    db.session.commit()
+
+    return post
+
+
+def is_valid_uuid(value):
+    uuid_obj = uuid.UUID(value)
+    return str(uuid_obj) == value
+
+
+def like_post_method(post, user_id):
+    history = UsersHistory.query.filter_by(user_id=user_id, post_id=post.post_id).first()
+
+    if history is None:
+        history = UsersHistory(user_id=user_id, post_id=post.post_id, liked=True)
+        db.session.add(history)
+    else:
+        if history.liked:
+            return 204
+
+        history.liked = True
+
+    db.session.commit()
+
+
+def unlike_post_method(post, user_id):
+    history = UsersHistory.query.filter_by(user_id=user_id, post_id=post.post_id).first()
+
+    if history is None or not history.liked:
+        raise BadRequest("Like not found")
+
+    history.liked = False
+    db.session.commit()
+
+
+def view_post_method(post, user_id):
+    history = UsersHistory.query.filter_by(user_id=user_id, post_id=post.post_id).first()
+
+    if history is None:
+        history = UsersHistory(user_id=user_id, post_id=post.post_id, viewed=True)
+        db.session.add(history)
+    else:
+        if history.viewed:
+            return 204
+
+        history.viewed = True
+
+    db.session.commit()
+
+
+def join_post_method(post, user_id):
+    history = UsersHistory.query.filter_by(user_id=user_id, post_id=post.post_id).first()
+
+    if history is None:
+        history = UsersHistory(user_id=user_id, post_id=post.post_id, joined=True)
+        db.session.add(history)
+    else:
+        if history.joined:
+            return 204
+
+        history.joined = True
+
+    db.session.commit()

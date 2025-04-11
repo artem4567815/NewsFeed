@@ -17,6 +17,7 @@ class Users(db.Model):
     avatar_url = db.Column(db.String(300), nullable=True)
 
     news = db.relationship('News', backref='user', uselist=True)
+    users_history = db.relationship('UsersHistory', backref='user', uselist=True)
 
     def as_dict(self):
         result = {

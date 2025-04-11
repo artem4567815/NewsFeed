@@ -1,19 +1,20 @@
 from pydantic import BaseModel, Field, model_validator, field_validator
-from typing import Optional, List, Literal
+from typing import Optional, List
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import re
 
-class CreateNewsRequest(BaseModel):
-    title: str = Field(..., min_length=1, max_length=100)
-    content: str = Field(..., min_length=10)
-    short_content: str = Field(..., min_length=1)
-    type: Literal["news", "wallpapers"] = Field(...)
+class PatchPostRequest(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=100)
+    content: Optional[str] = Field(None, min_length=10)
+    short_content: Optional[str] = Field(None, min_length=1)
     start_date:  Optional[int] = Field(None, ge=0)
     end_date: Optional[int] = Field(None, ge=0)
-    post_img: Optional[str] = None
-    post_img_detail: Optional[str] = None
+    image_url: Optional[str] = None
     tags: Optional[List[str]] = None
+
+    class Config:
+        extra = "forbid"
 
     @model_validator(mode="after")
     def check_dates(cls, values):
@@ -33,9 +34,9 @@ class CreateNewsRequest(BaseModel):
 
         return values
 
-    @field_validator("post_img")
+    @field_validator("image_url")
     @classmethod
-    def validate_post_img(cls, value):
+    def validate_image_url(cls, value):
         if value is not None:
             if value == "" or value == " ":
                 return None

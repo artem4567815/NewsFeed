@@ -268,7 +268,7 @@ stages:
 
   - name: 10 - Get post by ID
     request:
-      url: "{url}/posts/post/{post_id1}"
+      url: "{url}/posts/{post_id1}"
       method: GET
     response:
       status_code: 200
@@ -293,7 +293,7 @@ stages:
 
   - name: 11 - Get post2 by ID
     request:
-      url: "{url}/posts/post/{post_id2}"
+      url: "{url}/posts/{post_id2}"
       method: GET
     response:
       status_code: 200
@@ -316,7 +316,7 @@ stages:
 
   - name: 12 - Get non-existent post
     request:
-      url: "{url}/posts/post/00000000-0000-0000-0000-000000000000"
+      url: "{url}/posts/00000000-0000-0000-0000-000000000000"
       method: GET
     response:
       status_code: 404

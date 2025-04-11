@@ -1,5 +1,8 @@
 test_name: Delete posts tests
 
+includes:
+  - !include encoded_images.yaml
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +15,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +24,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +40,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,12 +49,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
   - name: 3 - Login admin
     request:
@@ -70,13 +67,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
   - name: 4 - Login client
     request:
@@ -91,17 +88,17 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
-      json:
-        access_token_client: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
 
   - name: 5 - Create news post as admin
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -110,10 +107,10 @@ stages:
         type: "news"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -121,23 +118,22 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
-    save:
-      json:
-        news_post_id: post_id
+      save:
+        json:
+          news_post_id: post_id
 
   - name: 6 - Create wallpaper post as client
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -146,10 +142,10 @@ stages:
         type: "wallpapers"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -157,19 +153,18 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "wallpapers"
         status: "draft"
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-          avatar_url: "{author_client_img}"
         created_at: !anything
-    save:
-      json:
-        wallpaper_post_id: post_id
+      save:
+        json:
+          wallpaper_post_id: post_id
 
   - name: 7 - Delete news post as admin
     request:
@@ -195,7 +190,8 @@ stages:
         type: "news"
     response:
       status_code: 200
-      json: []
+      json:
+        posts: []
 
   - name: 10 - Delete wallpaper post as client
     request:
@@ -221,7 +217,8 @@ stages:
         type: "wallpapers"
     response:
       status_code: 200
-      json: [ ]
+      json:
+        posts: [ ]
 
   - name: 13 - Delete non-existent post
     request:
@@ -248,7 +245,42 @@ stages:
     response:
       status_code: 401
 
-  - name: 16 - Delete news post as client (should fail)
+  - name: 16 - Create news post as admin
+    request:
+      url: "{url}/posts/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test News Post"
+        type: "news"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test News Post"
+        short_content: "short content"
+        full_content: "Test content"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
+        type: "news"
+        status: "published"
+        author:
+          id: "{author_id}"
+          login: "{author_login}"
+        created_at: !anything
+      save:
+        json:
+          news_post_id: post_id
+
+  - name: 17 - Delete news post as client (should fail)
     request:
       url: "{url}/posts/{news_post_id}"
       method: DELETE
@@ -257,18 +289,18 @@ stages:
     response:
       status_code: 403
 
-  - name: 17 - Delete post with invalid UUID format
+  - name: 18 - Delete post with invalid UUID format
     request:
       url: "{url}/posts/invalid-uuid"
       method: DELETE
       headers:
         Authorization: "Bearer {access_token}"
     response:
-      status_code: 404
+      status_code: 400
 
-  - name: 18 - Create wallpaper post as client
+  - name: 19 - Create wallpaper post as client
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -277,10 +309,10 @@ stages:
         type: "wallpapers"
         content: "Test content2"
         short_content: "short content2"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster2"
-        post_img_detail: "detail image2"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -288,21 +320,20 @@ stages:
         title: "Test Wallpaper Post2"
         short_content: "short content2"
         full_content: "Test content2"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster2"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "wallpapers"
         status: "draft"
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-          avatar_url: "{author_client_img}"
         created_at: !anything
-    save:
-      json:
-        wallpaper_post_id: post_id
+      save:
+        json:
+          wallpaper_post_id: post_id
 
-  - name: 19 - Delete wallpaper post as another user
+  - name: 20 - Delete wallpaper post as another user
     request:
       url: "{url}/posts/{wallpaper_post_id}"
       method: DELETE
@@ -311,7 +342,7 @@ stages:
     response:
       status_code: 403
 
-  - name: 20 - Delete wallpaper post as client
+  - name: 21 - Delete wallpaper post as client
     request:
       url: "{url}/posts/{wallpaper_post_id}"
       method: DELETE
@@ -320,7 +351,7 @@ stages:
     response:
       status_code: 204
 
-  - name: 21 - Get all posts
+  - name: 22 - Get all posts
     request:
       url: "{url}/posts"
       method: GET
@@ -328,4 +359,5 @@ stages:
         type: "wallpapers"
     response:
       status_code: 200
-      json: [ ]
+      json:
+        posts: [ ]
