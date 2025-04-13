@@ -1,5 +1,8 @@
 test_name: Posts statistics tests
 
+includes:
+  - !include encoded_images.yaml
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +15,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +24,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +40,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,14 +49,87 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
-  - name: 3 - Login admin
+  - name: 3 - Register test client №2
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User2"
+        surname: "User2"
+        school: "1561"
+        building: "11"
+        login: "user2"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User2"
+        surname: "User2"
+        school: "1561"
+        building: "11"
+        login: "user2"
+      save:
+        json:
+          author_client_id2: user_id
+          author_client_login2: login
+
+  - name: 4 - Register test client №3
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User3"
+        surname: "User3"
+        school: "1561"
+        building: "11"
+        login: "user3"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User3"
+        surname: "User3"
+        school: "1561"
+        building: "11"
+        login: "user3"
+      save:
+        json:
+          author_client_id3: user_id
+          author_client_login3: login
+
+  - name: 5 - Register test client №4
+    request:
+      url: "{url}/auth/register/client"
+      method: POST
+      json:
+        name: "User4"
+        surname: "User4"
+        school: "1561"
+        building: "11"
+        login: "user4"
+        password: "Test12345"
+    response:
+      status_code: 201
+      json:
+        user_id: !anything
+        name: "User4"
+        surname: "User4"
+        school: "1561"
+        building: "11"
+        login: "user4"
+      save:
+        json:
+          author_client_id4: user_id
+          author_client_login4: login
+
+  - name: 6 - Login admin
     request:
       url: "{url}/auth/login"
       method: POST
@@ -70,15 +142,15 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
-  - name: 4 - Login client
+  - name: 7 - Login client
     request:
       url: "{url}/auth/login"
       method: POST
@@ -91,17 +163,80 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
-      json:
-        access_token_client: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
 
-  - name: 5 - Create news post as admin
+  - name: 8 - Login client №2
     request:
-      url: "{url}/create/post"
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user2"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client2: access_token
+
+  - name: 9 - Login client №3
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user3"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client3: access_token
+
+  - name: 10 - Login client №4
+    request:
+      url: "{url}/auth/login"
+      method: POST
+      json:
+        login: "user4"
+        password: "Test12345"
+    response:
+      status_code: 200
+      json:
+        access_token: !anything
+      headers:
+        Set-Cookie: !anything
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client4: access_token
+
+  - name: 11 - Create news post as admin
+    request:
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token}"
@@ -110,10 +245,10 @@ stages:
         type: "news"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -121,23 +256,22 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
-    save:
-      json:
-        news_post_id: post_id
+      save:
+        json:
+          news_post_id: post_id
 
-  - name: 6 - Create wallpaper post as client
+  - name: 12 - Create wallpaper post as client
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -146,10 +280,8 @@ stages:
         type: "wallpapers"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -157,34 +289,47 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        image_url: !re_match "^http://.*$"
         type: "wallpapers"
         status: "draft"
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-          avatar_url: "{author_client_img}"
         created_at: !anything
-    save:
-      json:
-        wallpaper_post_id: post_id
+      save:
+        json:
+          wallpaper_post_id: post_id
 
-  - name: 7 - Like news post as client
+  - name: 12.1 - Send wallpaper post to moderation
+    request:
+      url: "{url}/user/{wallpaper_post_id}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 12.2 - Apply moderation for wallpaper post
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 13 - Like news post as client
     request:
       url: "{url}/posts/{news_post_id}/like"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
-      json:
-        message: "Post liked successfully"
+      status_code: 204
 
-  - name: 8 - Get general statistics as admin
+  - name: 14 - Get general statistics as admin
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -192,18 +337,16 @@ stages:
       status_code: 200
       json:
         total_posts: 2
-        most_active_user:
-          id: "{author_id}"
-          login: "{author_login}"
-          post_count: 1
-        likes: 1
-        views: 0
-        joined: 0
-        conversion: 0
+        posts_by_this_author: 1
+        most_three_active_user:
+          - id: "{author_client_id}"
+            login: "{author_client_login}"
+            post_count: 1
+        avg_conversion: !anyint
 
-  - name: 9 - Get post statistics as admin
+  - name: 15 - Get post statistics as admin
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -215,64 +358,62 @@ stages:
         joined: 0
         conversion: 0
 
-  - name: 10 - Get statistics as client (should fail)
+  - name: 16 - Get statistics as client (should fail)
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
       status_code: 403
 
-  - name: 11 - Get statistics without auth
+  - name: 17 - Get statistics without auth
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
     response:
       status_code: 401
 
-  - name: 12 - Get statistics with invalid token
+  - name: 18 - Get statistics with invalid token
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
       headers:
         Authorization: "Bearer invalid_token"
     response:
       status_code: 401
 
-  - name: 13 - Get statistics for non-existent post
+  - name: 19 - Get statistics for non-existent post
     request:
-      url: "{url}/statistics/00000000-0000-0000-0000-000000000000"
+      url: "{url}/admin/statistics/00000000-0000-0000-0000-000000000000"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
     response:
       status_code: 404
 
-  - name: 14 - Get statistics with invalid UUID format
+  - name: 20 - Get statistics with invalid UUID format
     request:
-      url: "{url}/statistics/invalid-uuid"
+      url: "{url}/admin/statistics/invalid-uuid"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
     response:
-      status_code: 404
+      status_code: 400
 
-  - name: 15 - Create another news post as admin
+  - name: 21 - Create another news post as client №2
     request:
-      url: "{url}/create/post"
+      url: "{url}/posts/create/wallpapers"
       method: POST
       headers:
-        Authorization: "Bearer {access_token}"
+        Authorization: "Bearer {access_token_client2}"
       json:
         title: "Test News Post 2"
-        type: "news"
+        type: "wallpapers"
         content: "Test content"
         short_content: "short content"
-        start_date: 1744110904
-        end_date: 1749381304
-        post_img: "image poster"
-        post_img_detail: "detail image"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
     response:
       status_code: 201
       json:
@@ -280,34 +421,47 @@ stages:
         title: "Test News Post 2"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
-        type: "news"
-        status: "published"
+        image_url: !re_match "^http://.*$"
+        type: "wallpapers"
+        status: "draft"
         author:
-          id: "{author_id}"
-          login: "{author_login}"
-          avatar_url: "{author_img}"
+          id: "{author_client_id2}"
+          login: "{author_client_login2}"
         created_at: !anything
-    save:
-      json:
-        news_post_id_2: post_id
+      save:
+        json:
+          wallpaper_post_id_2: post_id
 
-  - name: 16 - Like second news post as client
+  - name: 21.1 - Send wallpaper post 2 to moderation
     request:
-      url: "{url}/posts/{news_post_id_2}/like"
+      url: "{url}/user/{wallpaper_post_id_2}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 204
+
+  - name: 21.2 - Apply moderation for wallpaper post 2
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id_2}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 22 - Like second news post as client
+    request:
+      url: "{url}/posts/{wallpaper_post_id_2}/like"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
-      json:
-        message: "Post liked successfully"
+      status_code: 204
 
-  - name: 17 - Verify updated general statistics
+  - name: 23 - Verify updated general statistics
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -315,18 +469,19 @@ stages:
       status_code: 200
       json:
         total_posts: 3
-        most_active_user:
-          id: "{author_id}"
-          login: "{author_login}"
-          post_count: 2
-        likes: 2
-        views: 0
-        joined: 0
-        conversion: 0
+        posts_by_this_author: 1
+        most_three_active_user: !anylist
+          - id: "{author_client_id}"
+            login: "{author_client_login}"
+            post_count: 1
+          - id: "{author_client_id2}"
+            login: "{author_client_login2}"
+            post_count: 1
+        avg_conversion: !anyint
 
-  - name: 18 - Verify updated post statistics
+  - name: 24 - Verify updated post statistics
     request:
-      url: "{url}/statistics/{news_post_id_2}"
+      url: "{url}/admin/statistics/{wallpaper_post_id_2}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -338,7 +493,7 @@ stages:
         joined: 0
         conversion: 0
 
-  - name: 19 - View news post as client
+  - name: 25 - View news post as client
     request:
       url: "{url}/posts/{news_post_id}"
       method: GET
@@ -351,20 +506,19 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
 
-  - name: 20 - Verify post views increased
+  - name: 26 - Verify post views increased
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -376,7 +530,7 @@ stages:
         joined: 0
         conversion: 0
 
-  - name: 21 - Join news post as client
+  - name: 27 - Join news post as client
     request:
       url: "{url}/posts/{news_post_id}/join"
       method: POST
@@ -385,9 +539,9 @@ stages:
     response:
       status_code: 204
 
-  - name: 22 - Verify post joined increased
+  - name: 28 - Verify post joined increased
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -397,9 +551,9 @@ stages:
         likes: 1
         views: 1
         joined: 1
-        conversion: 100
+        conversion: 1
 
-  - name: 23 - View same post again (views should not increase)
+  - name: 29 - View same post again (views should not increase)
     request:
       url: "{url}/posts/{news_post_id}"
       method: GET
@@ -412,20 +566,19 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
 
-  - name: 24 - Verify views remained same
+  - name: 30 - Verify views remained same
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -437,7 +590,7 @@ stages:
         joined: 1
         conversion: 100
 
-  - name: 25 - Join same post again (should fail)
+  - name: 31 - Join same post again
     request:
       url: "{url}/posts/{news_post_id}/join"
       method: POST
@@ -446,9 +599,9 @@ stages:
     response:
       status_code: 204
 
-  - name: 26 - Verify joined remained same
+  - name: 32 - Verify joined remained same
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -458,14 +611,14 @@ stages:
         likes: 1
         views: 1
         joined: 1
-        conversion: 100
+        conversion: 1
 
-  - name: 27 - View post as another user (views should increase)
+  - name: 33 - View post as another user (views should increase)
     request:
       url: "{url}/posts/{news_post_id}"
       method: GET
       headers:
-        Authorization: "Bearer {access_token}"
+        Authorization: "Bearer {access_token_client2}"
     response:
       status_code: 200
       json:
@@ -473,20 +626,19 @@ stages:
         title: "Test News Post"
         short_content: "short content"
         full_content: "Test content"
-        start_date: 1744110904
-        end_date: 1749381304
-        img_url: "image poster"
+        start_date: 2217628800
+        end_date: 2218060800
+        image_url: !re_match "^http://.*$"
         type: "news"
         status: "published"
         author:
           id: "{author_id}"
           login: "{author_login}"
-          avatar_url: "{author_img}"
         created_at: !anything
 
-  - name: 28 - Verify views increased for new user
+  - name: 34 - Verify views increased for new user
     request:
-      url: "{url}/statistics/{news_post_id}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -496,10 +648,11 @@ stages:
         likes: 1
         views: 2
         joined: 1
-        conversion: 50
-  - name: 29 - Verify updated general statistics
+        conversion: 0.5
+
+  - name: 35 - Verify updated general statistics
     request:
-      url: "{url}/statistics"
+      url: "{url}/admin/statistics"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
@@ -507,11 +660,407 @@ stages:
       status_code: 200
       json:
         total_posts: 3
-        most_active_user:
-          id: "{author_id}"
-          login: "{author_login}"
-          post_count: 2
+        posts_by_this_author: 1
+        most_three_active_user:
+          - id: "{author_client_id}"
+            login: "{author_client_login}"
+            post_count: 1
+          - id: "{author_client_id2}"
+            login: "{author_client_login2}"
+            post_count: 1
+        avg_conversion: !anything
+
+  - name: 36 - Create wallpaper post as client №3
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client3}"
+      json:
+        title: "Test Wallpaper Post 3" 
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post 3"
+        short_content: "short content"
+        full_content: "Test content"
+        image_url: !re_match "^http://.*$"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id3}"
+          login: "{author_client_login3}"
+        created_at: !anything
+      save:
+        json:
+          wallpaper_post_id_3: post_id
+
+  - name: 36.1 - Send wallpaper post 3 to moderation
+    request:
+      url: "{url}/user/{wallpaper_post_id_3}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client3}"
+    response:
+      status_code: 204
+
+  - name: 36.2 - Apply moderation for wallpaper post 3
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id_3}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 37 - Create wallpaper post as client №4
+    request:
+      url: "{url}/posts/create/wallpapers" 
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client4}"
+      json:
+        title: "Test Wallpaper Post 4"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post 4"
+        short_content: "short content"
+        full_content: "Test content"
+        image_url: !re_match "^http://.*$"
+        type: "wallpapers" 
+        status: "draft"
+        author:
+          id: "{author_client_id4}"
+          login: "{author_client_login4}"
+        created_at: !anything
+      save:
+        json:
+          wallpaper_post_id_4: post_id
+
+  - name: 37.1 - Send wallpaper post 4 to moderation
+    request:
+      url: "{url}/user/{wallpaper_post_id_4}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client4}"
+    response:
+      status_code: 204
+
+  - name: 37.2 - Apply moderation for wallpaper post 4
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id_4}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 38 - Create another wallpaper post as client №5
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post 5"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post 5"
+        short_content: "short content"
+        full_content: "Test content"
+        image_url: !re_match "^http://.*$"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+        created_at: !anything
+      save:
+        json:
+          wallpaper_post_id_5: post_id
+
+  - name: 38.1 - Send wallpaper post 5 to moderation
+    request:
+      url: "{url}/user/{wallpaper_post_id_5}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 38.2 - Apply moderation for wallpaper post 5
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id_5}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 39 - Like post 3 as client №1
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}/like"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 40 - Like post 3 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}/like"
+      method: POST  
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 204
+
+  - name: 41 - Like post 4 as client №1
+    request:
+      url: "{url}/posts/{wallpaper_post_id_4}/like"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 42 - View post 3 statistics
+    request:
+      url: "{url}/admin/statistics/{wallpaper_post_id_3}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        likes: 2
+        views: 0
+        joined: 0
+        conversion: 0
+
+  - name: 43 - View post 4 statistics
+    request:
+      url: "{url}/admin/statistics/{wallpaper_post_id_4}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        likes: 1
+        views: 0
+        joined: 0
+        conversion: 0
+
+  - name: 44 - View post 5 statistics
+    request: 
+      url: "{url}/admin/statistics/{wallpaper_post_id_5}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        likes: 0
+        views: 0
+        joined: 0
+        conversion: 0
+
+  - name: 45 - Check updated general statistics
+    request:
+      url: "{url}/admin/statistics"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        total_posts: 6
+        posts_by_this_author: 1
+        most_three_active_user:
+          - id: "{author_client_id}"
+            login: "{author_client_login}"
+            post_count: 2
+          - id: "{author_client_id2}"
+            login: "{author_client_login2}"
+            post_count: 1
+          - id: "{author_client_id3}"
+            login: "{author_client_login3}"
+            post_count: 1
+        avg_conversion: !anything
+
+  - name: 46 - View post 3 as client №1
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 200
+
+  - name: 47 - Join post 3 as client №1
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}/join"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 48 - View post 3 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 200
+
+  - name: 49 - Join post 3 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_3}/join"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 204
+
+  - name: 50 - View post 4 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_4}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 200
+
+  - name: 51 - Join post 4 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_4}/join"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 204
+
+  - name: 52 - View post 4 as client №3
+    request:
+      url: "{url}/posts/{wallpaper_post_id_4}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client3}"
+    response:
+      status_code: 200
+
+  - name: 53 - View post 5 as client №2
+    request:
+      url: "{url}/posts/{wallpaper_post_id_5}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client2}"
+    response:
+      status_code: 200
+
+  - name: 54 - View post 5 as client №3
+    request:
+      url: "{url}/posts/{wallpaper_post_id_5}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client3}"
+    response:
+      status_code: 200
+
+  - name: 55 - Join post 5 as client №3
+    request:
+      url: "{url}/posts/{wallpaper_post_id_5}/join"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client3}"
+    response:
+      status_code: 204
+
+  - name: 56 - Check post 3 final statistics
+    request:
+      url: "{url}/admin/statistics/{wallpaper_post_id_3}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
         likes: 2
         views: 2
+        joined: 2
+        conversion: 1.0
+
+  - name: 57 - Check post 4 final statistics
+    request:
+      url: "{url}/admin/statistics/{wallpaper_post_id_4}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        likes: 1
+        views: 2
         joined: 1
-        conversion: 50
+        conversion: 0.5
+
+  - name: 58 - Check post 5 final statistics
+    request:
+      url: "{url}/admin/statistics/{wallpaper_post_id_5}"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        likes: 0
+        views: 2
+        joined: 1
+        conversion: 0.5
+
+  - name: 59 - Check final general statistics
+    request:
+      url: "{url}/admin/statistics"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 200
+      json:
+        total_posts: 6
+        posts_by_this_author: 1
+        most_three_active_user:
+          - id: "{author_client_id}"
+            login: "{author_client_login}"
+            post_count: 2
+          - id: "{author_client_id2}"
+            login: "{author_client_login2}"
+            post_count: 1
+          - id: "{author_client_id3}"
+            login: "{author_client_login3}"
+            post_count: 1
+        avg_conversion: !anything
+ 

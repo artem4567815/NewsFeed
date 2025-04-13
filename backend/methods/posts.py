@@ -8,7 +8,7 @@ def get_all_news():
 
 
 def get_news_by_query(query):
-    posts = News.query
+    posts = News.query.filter_by(status="published")
 
     if query.type is not None:
         posts = posts.filter_by(type=query.type)

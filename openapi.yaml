@@ -299,7 +299,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /posts/create/news:
+  /posts/create/post:
     post:
       tags:
         - Posts
@@ -671,7 +671,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /statistics:
+  /admin/statistics:
     get:
       tags:
         - Admin
@@ -698,7 +698,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /statistics/{post_id}:
+  /admin/statistics/{post_id}:
     get:
       tags:
         - Admin
@@ -1082,22 +1082,19 @@ components:
       properties:
         total_posts:
           type: integer
-        most_active_user:
-          type: object
-          properties:
-            id:
-              type: string
-            login:
-              type: string
-            post_count:
-              type: integer
-        likes:
-          type: number
-        views:
-          type: number
-        joined:
-          type: number
-        conversion:
+        posts_by_this_author:
+          type: integer
+        most_three_active_user:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+              login:
+                type: string
+              post_count:
+                type: integer
+        avg_conversion:
           type: number
 
     StatisticDetailResponse:

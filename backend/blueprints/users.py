@@ -3,7 +3,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from methods import *
 from flask_pydantic import validate
 
-from schemas import PatchUserRequest
+from schemas import PatchUserRequest, SubscribeRequest
+from models import Subscription
 
 user_routes = Blueprint('user', __name__)
 
@@ -86,5 +87,60 @@ def send_to_moderation(post_id):
     return jsonify({}), 204
 
 
+@user_routes.route('/subscribe', methods=['POST'])
+@safe("blueprints/subscribe.py | subscribe")
+@jwt_required()
+@validate()
+def subscribe(body: SubscribeRequest):
+    user_id = get_jwt_identity()
+    subscriptions = Subscription.query.filter_by(user_id=user_id).first()
+
+    if subscriptions is not None:
+        db.session.delete(subscriptions)
+
+    found_authors = None
+
+    if body.tags:
+        valid_tags = db.session.query(db.func.unnest(News.tags)).distinct().all()
+        valid_tags = [tag[0] for tag in valid_tags]
+        invalid_tags = [tag for tag in body.tags if tag not in valid_tags]
+        if invalid_tags:
+            raise BadRequest(f"Invalid tags: {', '.join(invalid_tags)}")
+
+    if body.authors:
+        authors = Users.query.filter(Users.login.in_(body.authors)).all()
+        found_authors = [author.login for author in authors]
+        missing_authors = [a for a in body.authors if a not in found_authors]
+
+        if missing_authors:
+            raise BadRequest(f"Authors not found: {', '.join(missing_authors)}")
+
+    subscription = Subscription(
+        user_id=user_id,
+        tags=body.tags,
+        authors=found_authors
+    )
+
+    db.session.add(subscription)
+    db.session.commit()
+
+    return jsonify({"message": "subscription was successful"}), 200
 
 
+@user_routes.route('/subscribe', methods=['GET'])
+@safe("blueprints/subscribe.py | get_subscribe")
+@jwt_required()
+def get_subscribe():
+    user_id = get_jwt_identity()
+    subscribe = Subscription.query.filter_by(user_id=user_id).first()
+
+    if not subscribe:
+        return jsonify({"message": "subscription was not found"}), 404
+
+    out = {}
+    if subscribe.authors:
+        out["authors"] = subscribe.authors
+    if subscribe.tags:
+        out["tags"] = subscribe.tags
+    print(out)
+    return jsonify({"subscriptions": out}), 200

@@ -106,6 +106,27 @@ def unlike_posts(post_id):
     return jsonify({}), 204
 
 
+@posts.route("/<post_id>/join", methods=["POST"])
+@safe("blueprints/posts.py | join_to_posts")
+@jwt_required()
+def join_to_posts(post_id):
+    if not is_valid_uuid(post_id):
+        raise BadRequest("post_id not valid")
+
+    post = find_news_by_id(post_id)
+    user_id = get_jwt_identity()
+
+    if not post:
+        return jsonify({"Message": "Новость не найдена"}), 404
+
+    current_timestamp = int(datetime.now().timestamp())
+    if current_timestamp > post.end_date:
+        raise BadRequest("Ты уже не можешь присоединиться, событие прошло")
+
+    join_post_method(post, user_id)
+    return jsonify({}), 204
+
+
 @posts.route('/create/post', methods=['POST'])
 @safe("blueprints/admin.py | save_news")
 @jwt_required()

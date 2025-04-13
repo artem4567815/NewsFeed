@@ -254,6 +254,24 @@ stages:
         json:
           post_id4: post_id
 
+  - name: 8.1 - Send wallpaper post to moderation
+    request:
+      url: "{url}/user/{post_id4}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 8.2 - Apply moderation for wallpaper post
+    request:
+      url: "{url}/admin/moderation/{post_id4}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
   - name: 9 - Get all posts
     request:
       url: "{url}/posts"

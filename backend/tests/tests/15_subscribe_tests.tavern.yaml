@@ -1,5 +1,8 @@
 test_name: Subscribe tests
 
+includes:
+  - !include encoded_images.yaml
+
 stages:
   - name: 1 - Register test admin
     request:
@@ -12,7 +15,6 @@ stages:
         building: "11"
         login: "admin"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -22,12 +24,10 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_img: "image"
-    save:
-      json:
-        author_id: user_id
-        author_login: login
-        author_img: avatar_img
+      save:
+        json:
+          author_id: user_id
+          author_login: login
 
   - name: 2 - Register test client
     request:
@@ -40,7 +40,6 @@ stages:
         building: "11"
         login: "user"
         password: "Test12345"
-        avatar_img: "image"
     response:
       status_code: 201
       json:
@@ -50,12 +49,10 @@ stages:
         school: "1561"
         building: "11"
         login: "user"
-        avatar_img: "image"
-    save:
-      json:
-        author_client_id: user_id
-        author_client_login: login
-        author_client_img: avatar_img
+      save:
+        json:
+          author_client_id: user_id
+          author_client_login: login
 
   - name: 3 - Login admin
     request:
@@ -70,13 +67,13 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token"
-      json:
-        access_token: access_token
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token: access_token
 
   - name: 4 - Login client
     request:
@@ -91,17 +88,135 @@ stages:
         access_token: !anything
       headers:
         Set-Cookie: !anything
-    save:
-      $ext:
-        function: helpers:get_refresh_token
-        extra_kwargs:
-          cookie_name: "refresh_token_user"
+      save:
+        $ext:
+          function: helpers:get_refresh_token
+          extra_kwargs:
+            cookie_name: "refresh_token"
+        json:
+          access_token_client: access_token
+
+  - name: 4.1 - Create news post with tags as admin
+    request:
+      url: "{url}/posts/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
-        access_token_client: access_token
+        title: "Test News Post"
+        type: "news"
+        content: "Test content"
+        short_content: "short content"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+        tags: ["Новости", "Объявления"]
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test News Post"
+        short_content: "short content"
+        full_content: "Test content"
+        image_url: !re_match "^http://.*$"
+        type: "news"
+        status: "published"
+        author:
+          id: "{author_id}"
+          login: "{author_login}"
+        created_at: !anything
+        tags: ["Новости", "Объявления"]
+      save:
+        json:
+          news_post_id: post_id
+
+  - name: 4.2 - Create wallpaper post with tags as client
+    request:
+      url: "{url}/posts/create/wallpapers"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+      json:
+        title: "Test Wallpaper Post"
+        type: "wallpapers"
+        content: "Test content"
+        short_content: "short content"
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+        tags: ["Объявления"]
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test Wallpaper Post"
+        short_content: "short content"
+        full_content: "Test content"
+        image_url: !re_match "^http://.*$"
+        type: "wallpapers"
+        status: "draft"
+        author:
+          id: "{author_client_id}"
+          login: "{author_client_login}"
+        created_at: !anything
+        tags: ["Объявления"]
+      save:
+        json:
+          wallpaper_post_id: post_id
+
+  - name: 4.3 - Send wallpaper post to moderation
+    request:
+      url: "{url}/user/{wallpaper_post_id}/send/to/moderation"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 204
+
+  - name: 4.4 - Apply moderation for wallpaper post
+    request:
+      url: "{url}/admin/moderation/{wallpaper_post_id}/apply"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+    response:
+      status_code: 204
+
+  - name: 4.5 - Create another news post with tags as admin
+    request:
+      url: "{url}/posts/create/post"
+      method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
+      json:
+        title: "Test News Post 2"
+        type: "news"
+        content: "Test content 2"
+        short_content: "short content 2"
+        start_date: 2217628800
+        end_date: 2218060800
+        post_img: "{post_image}"
+        post_img_detail: "{post_image}"
+        tags: ["Новости"]
+    response:
+      status_code: 201
+      json:
+        post_id: !anything
+        title: "Test News Post 2"
+        short_content: "short content 2"
+        full_content: "Test content 2"
+        image_url: !re_match "^http://.*$"
+        type: "news"
+        status: "published"
+        author:
+          id: "{author_id}"
+          login: "{author_login}"
+        created_at: !anything
+        tags: ["Новости"]
 
   - name: 5 - Subscribe to tags
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -114,12 +229,12 @@ stages:
 
   - name: 6 - Subscribe to authors
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
-        author: ["1561", "{author_login}"]
+        authors: ["{author_login}"]
     response:
       status_code: 200
       json:
@@ -127,13 +242,13 @@ stages:
 
   - name: 7 - Subscribe to both tags and authors
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
         tags: ["Новости"]
-        author: ["1561"]
+        authors: ["{author_login}"]
     response:
       status_code: 200
       json:
@@ -141,7 +256,7 @@ stages:
 
   - name: 8 - Subscribe without auth
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       json:
         tags: ["Новости"]
@@ -150,7 +265,7 @@ stages:
 
   - name: 9 - Subscribe with invalid token
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer invalid_token"
@@ -161,53 +276,53 @@ stages:
 
   - name: 10 - Subscribe to non-existent tags
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
         tags: ["НесуществующийТег"]
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 11 - Subscribe to non-existent authors
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
-        author: ["non_existent"]
+        authors: ["non_existent"]
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 12 - Subscribe to non-existent authors and valid tags
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
-        author: [ "non_existent" ]
+        authors: [ "non_existent" ]
         tags: ["Новости"]
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 13 - Subscribe to non-existent tags and valid author
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
-        author: [ "1561" ]
+        authors: [ "1561" ]
         tags: ["НесуществующийТег"]
     response:
-      status_code: 404
+      status_code: 400
 
   - name: 14 - Subscribe with empty request
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -217,7 +332,7 @@ stages:
 
   - name: 15 - Subscribe with empty tags
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -228,11 +343,40 @@ stages:
 
   - name: 14 - Subscribe with empty author
     request:
-      url: "{url}/subscribe"
+      url: "{url}/user/subscribe"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
       json:
-        author: []
+        authors: []
     response:
       status_code: 400
+
+  - name: 16 - Get user subscriptions
+    request:
+      url: "{url}/user/subscribe"
+      method: GET
+      headers:
+        Authorization: "Bearer {access_token_client}"
+    response:
+      status_code: 200
+      json:
+        subscriptions:
+          tags: ["Новости"]
+          authors: ["{author_login}"]
+
+  - name: 17 - Get subscriptions without auth
+    request:
+      url: "{url}/user/subscribe"
+      method: GET
+    response:
+      status_code: 401
+
+  - name: 18 - Get subscriptions with invalid token
+    request:
+      url: "{url}/user/subscribe" 
+      method: GET
+      headers:
+        Authorization: "Bearer invalid_token"
+    response:
+      status_code: 401

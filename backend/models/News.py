@@ -1,4 +1,4 @@
-from . import db, UsersHistory
+from . import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.dialects.postgresql import ARRAY
