@@ -23,7 +23,7 @@
               <h1 class="text-2xl font-bold mb-6">Профиль</h1>
               <div class="flex flex-col lg:flex-row gap-6">
                 <div class="bg-white p-6 rounded-lg shadow w-full lg:w-1/3 text-center">
-                  <img src="https://i.pravatar.cc/100" alt="avatar" class="rounded-full w-24 h-24 mx-auto mb-4" />
+                  <img :src="posts[0].image_url" alt="avatar" class="rounded-full w-24 h-24 mx-auto mb-4" />
                   <h2 class="text-xl font-semibold">Иван Петров</h2>
                   <p class="text-gray-500">ivan@example.com</p>
                   <button class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 transition text-white rounded">Изменить аватар</button>
@@ -77,7 +77,7 @@
             <div v-else-if="currentPage === 'news'">
               <h1 class="text-2xl font-bold mb-6">Твои новости</h1>
               <div v-if="news.length" class="space-y-6 flex flex-col items-center space-x-2">
-                <post-main v-for="i in 3"></post-main>
+                <post-main v-for="post in posts" :key="post.post_id" :post="post"></post-main>
               </div>
               <div v-else class="text-center mt-20 text-gray-400 italic">
                 Пока нет опубликованных новостей.
@@ -92,8 +92,8 @@
                   <h2 class="text-lg font-semibold">Ожидают проверки</h2>
                 </div>
                 <div class="space-y-6">
-                  <div v-for="i in 3" :key="i" class="flex flex-col items-center">
-                    <post-main></post-main>
+                  <div v-for="post in posts" :key="post"  class="flex flex-col items-center">
+                    <post-main :post="post"></post-main>
                     <div class="mt-2 flex flex-wrap gap-2">
                       <button class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-2xl transition">Одобрить</button>
                       <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-2xl transition">Отклонить</button>
@@ -111,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import * as icons from 'lucide-vue-next'
 import SidebarItem from "@/components/SidebarItem.vue";
 import PostMain from "@/components/postMain.vue";
@@ -151,6 +151,21 @@ const moderationList = ref([
   { id: 1, title: 'Новое исследование климата', author: 'Алексей Иванов' },
   { id: 2, title: 'Искусственный интеллект в образовании', author: 'Мария Смирнова' }
 ])
+
+const posts = ref([])
+
+onMounted(async () => {
+  try {
+    const NewsResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/posts`)
+    if (!NewsResponse.ok) throw new Error('Ошибка при загрузке новостей')
+    let get_data = await NewsResponse.json()
+    posts.value = get_data.posts
+  } catch (error) {
+    console.error('Ошибка загрузки новостей:', error)
+  }
+
+  console.log(posts.value)
+})
 </script>
 
 <style>
