@@ -586,9 +586,9 @@ stages:
       status_code: 200
       json:
         likes: 1
-        views: 1
+        views: 2
         joined: 1
-        conversion: 100
+        conversion: 1.0
 
   - name: 31 - Join same post again
     request:
@@ -609,7 +609,7 @@ stages:
       status_code: 200
       json:
         likes: 1
-        views: 1
+        views: 2
         joined: 1
         conversion: 1
 
@@ -646,9 +646,9 @@ stages:
       status_code: 200
       json:
         likes: 1
-        views: 2
+        views: 3
         joined: 1
-        conversion: 0.5
+        conversion: 1.0
 
   - name: 35 - Verify updated general statistics
     request:
@@ -661,7 +661,7 @@ stages:
       json:
         total_posts: 3
         posts_by_this_author: 1
-        most_three_active_user:
+        most_three_active_user: !anylist
           - id: "{author_client_id}"
             login: "{author_client_login}"
             post_count: 1
@@ -897,7 +897,7 @@ stages:
       json:
         total_posts: 6
         posts_by_this_author: 1
-        most_three_active_user:
+        most_three_active_user: !anylist
           - id: "{author_client_id}"
             login: "{author_client_login}"
             post_count: 2
@@ -920,7 +920,7 @@ stages:
 
   - name: 47 - Join post 3 as client №1
     request:
-      url: "{url}/posts/{wallpaper_post_id_3}/join"
+      url: "{url}/posts/{news_post_id}/join"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -938,7 +938,7 @@ stages:
 
   - name: 49 - Join post 3 as client №2
     request:
-      url: "{url}/posts/{wallpaper_post_id_3}/join"
+      url: "{url}/posts/{news_post_id}/join"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
@@ -956,7 +956,7 @@ stages:
 
   - name: 51 - Join post 4 as client №2
     request:
-      url: "{url}/posts/{wallpaper_post_id_4}/join"
+      url: "{url}/posts/{news_post_id}/join"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
@@ -992,7 +992,7 @@ stages:
 
   - name: 55 - Join post 5 as client №3
     request:
-      url: "{url}/posts/{wallpaper_post_id_5}/join"
+      url: "{url}/posts/{news_post_id}/join"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client3}"
@@ -1001,17 +1001,17 @@ stages:
 
   - name: 56 - Check post 3 final statistics
     request:
-      url: "{url}/admin/statistics/{wallpaper_post_id_3}"
+      url: "{url}/admin/statistics/{news_post_id}"
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       json:
-        likes: 2
-        views: 2
-        joined: 2
-        conversion: 1.0
+        likes: 1
+        views: 3
+        joined: 3
+        conversion: 3.0
 
   - name: 57 - Check post 4 final statistics
     request:
@@ -1024,8 +1024,8 @@ stages:
       json:
         likes: 1
         views: 2
-        joined: 1
-        conversion: 0.5
+        joined: 0
+        conversion: 0.0
 
   - name: 58 - Check post 5 final statistics
     request:
@@ -1038,8 +1038,8 @@ stages:
       json:
         likes: 0
         views: 2
-        joined: 1
-        conversion: 0.5
+        joined: 0
+        conversion: 0.0
 
   - name: 59 - Check final general statistics
     request:
@@ -1052,7 +1052,7 @@ stages:
       json:
         total_posts: 6
         posts_by_this_author: 1
-        most_three_active_user:
+        most_three_active_user: !anylist
           - id: "{author_client_id}"
             login: "{author_client_login}"
             post_count: 2

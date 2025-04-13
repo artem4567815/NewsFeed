@@ -26,8 +26,10 @@ def get_most_three_active_user():
         }
         for user in result
     ]
+    print(out)
+    out = sorted(out, key=lambda x: x["post_count"], reverse=True)
+    print(out)
 
-    out = sorted(out, key=lambda x: x["post_count"])
     return out
 
 
@@ -71,10 +73,11 @@ def get_statistics_by_posts_id(post_id):
         UsersHistory.joined == True
     ).scalar()
 
-    views_count = db.session.query(func.count(UsersHistory.id)).filter(
-        UsersHistory.post_id == post_id,
-        UsersHistory.viewed == True
-    ).scalar()
+    # views_count = db.session.query(func.count(UsersHistory.id)).filter(
+    #     UsersHistory.post_id == post_id,
+    #     UsersHistory.viewed == True
+    # ).scalar()
+    views_count = db.session.query(News).filter_by(post_id=post_id).first().views
 
     conversion = joins_count / likes_count if likes_count > 0 else 0
 

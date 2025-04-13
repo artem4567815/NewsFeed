@@ -26,6 +26,10 @@ def detailed_posts(post_id):
     post = find_news_by_id(post_id)
     if not post:
         return jsonify({"Message": "Новость не найдена"}), 404
+
+    post.views += 1
+    db.session.commit()
+
     return jsonify(post.as_dict()), 200
 
 
@@ -120,10 +124,13 @@ def join_to_posts(post_id):
         return jsonify({"Message": "Новость не найдена"}), 404
 
     current_timestamp = int(datetime.now().timestamp())
-    if current_timestamp > post.end_date:
-        raise BadRequest("Ты уже не можешь присоединиться, событие прошло")
+    if post.type == "news":
+        if current_timestamp > post.end_date:
+            raise BadRequest("Ты уже не можешь присоединиться, событие прошло")
 
-    join_post_method(post, user_id)
+        join_post_method(post, user_id)
+    else:
+        raise BadRequest("post not is news")
     return jsonify({}), 204
 
 

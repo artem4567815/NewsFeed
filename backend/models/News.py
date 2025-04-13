@@ -19,6 +19,7 @@ class News(db.Model):
     type = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False, default='draft')
     tags = db.Column(ARRAY(db.String))
+    views = db.Column(db.Integer, nullable=False, default=0)
 
     user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
@@ -41,7 +42,7 @@ class News(db.Model):
             },
             "created_at": self.created_at,
             "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
-            "views": len([x for x in self.user_history if x.viewed and x.post_id == self.post_id])
+            "views": self.views,
         }
 
         if self.user.avatar_url is not None:
