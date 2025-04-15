@@ -18,7 +18,7 @@
           <!-- Основной контент -->
           <div class="space-y-10 w-full lg:w-95/100 justify-self-center flex flex-col items-center">
             <post-main
-                v-for="post in 5"
+                v-for="post in posts"
                 :key="post.id"
                 :post="post"
                 @click="$router.push(`/post/${post.id}`)"
@@ -32,7 +32,7 @@
               <button class="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-l-lg">
                 <ChevronLeft />
               </button>
-              <button class="px-6 py-3 text-base font-medium text-white bg-blue-600">1</button>
+              <button  class="px-6 py-3 text-base font-medium text-white bg-blue-600">1</button>
               <button class="px-6 py-3 text-base font-medium text-gray-600 hover:bg-blue-50">2</button>
               <button class="px-6 py-3 text-base font-medium text-gray-600 hover:bg-blue-50">3</button>
               <button class="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-r-lg">
@@ -55,11 +55,9 @@
               </div>
               <div class="max-h-[calc(100vh-180px)] overflow-y-auto pr-4 timeline-scroll">
                 <timeline-main
-                    v-for="(item, index) in timelineItems"
-                    :key="index"
-                    :title="item.title"
-                    :start-date="item.date"
-                    :time-passed="item.timePassed"
+                    v-for="timeline in posts"
+                    :key="timeline.post_id"
+                    :timeline="timeline"
                     @click="$router.push('/post/id')"
                 />
               </div>
@@ -78,6 +76,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { ref, watch, onMounted } from 'vue'
 import FilterPanel from "@/components/filterPanel.vue"
+import TimelineMain from "@/components/timelineMain.vue";
+import postMain from "@/components/postMain.vue";
 
 const posts = ref([])
 const filters = ref({
@@ -100,33 +100,6 @@ const tabs = [
 ]
 const activeTab = ref('all')
 
-const timelineItems = [
-  {
-    title: "Важное событие в мире технологий",
-    date: "15.03.2024",
-    timePassed: "2 часа назад"
-  },
-  {
-    title: "Новый прорыв в науке",
-    date: "14.03.2024",
-    timePassed: "1 день назад"
-  },
-  {
-    title: "Интересные новости экономики",
-    date: "13.03.2024",
-    timePassed: "2 дня назад"
-  },
-  {
-    title: "Культурное событие года",
-    date: "12.03.2024",
-    timePassed: "3 дня назад"
-  },
-  {
-    title: "Спортивные достижения",
-    date: "11.03.2024",
-    timePassed: "4 дня назад"
-  }
-]
 
 function filterPosts(posts, filters) {
   return posts.filter((post) => {
@@ -159,12 +132,15 @@ watch(filters, () => {
 
 onMounted(async () => {
   try {
-    const NewsResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/posts?type=news`)
+    const NewsResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/posts`)
     if (!NewsResponse.ok) throw new Error('Ошибка при загрузке новостей')
-    posts.value = await NewsResponse.json()
+     let get_data = await NewsResponse.json()
+     posts.value = get_data.posts
   } catch (error) {
     console.error('Ошибка загрузки новостей:', error)
   }
+
+  console.log(posts.value)
 })
 </script>
 

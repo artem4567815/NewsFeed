@@ -7,8 +7,8 @@
       <!-- Изображение -->
       <div class="lg:w-[500px] relative overflow-hidden">
         <img
-            src="https://loremflickr.com/800/450"
-            alt="Изображение новости"
+            :src="post.image_url"
+            alt="Превью картинки"
             class="w-full aspect-16/9 lg:h-full object-cover"
         />
       </div>
@@ -21,25 +21,25 @@
           <div class="flex items-center space-x-4 mb-4">
             <span class="flex items-center text-sm font-medium text-gray-600">
               <CalendarDays class="w-4 h-4 mr-1.5 mb-1" />
-              13.03.2024
+              {{ timestampToDate(post.start_date) }} - {{ timestampToDate(post.end_date) }}
             </span>
             <span class="flex items-center text-sm font-medium text-gray-600">
               <Clock class="w-4 h-4 mr-1.5 mb-1" />
-              2 часа назад
+              {{ dateAgo }}
             </span>
-            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">Новость</span>
+            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">{{post.type}}</span>
 
           </div>
 
 
           <!-- Заголовок -->
           <h2 class="text-2xl font-bold text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200">
-            Важное событие в мире технологий и инноваций
+            {{post.title}}
           </h2>
 
           <!-- Описание -->
           <p class="text-base text-gray-700 mb-6 leading-relaxed line-clamp-3">
-            Краткое описание новости, которое дает представление о содержании статьи. Здесь может быть несколько строк текста, которые будут обрезаны при необходимости. Дополнительная информация о событии и его значимости.
+            {{post.short_content}}
           </p>
         </div>
           <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
@@ -65,28 +65,28 @@
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <!-- Автор -->
           <div class="flex items-center">
-            <div
+            <img
+                :src="post.image_url"
                 class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
-            >
-              A
-            </div>
+            />
             <div class="ml-3">
-              <p class="text-base font-medium text-gray-900">Автор новости</p>
-              <p class="text-sm text-gray-600">Редактор</p>
+              <p class="text-base font-medium text-gray-900">{{post.author.login}}</p>
+              <p class="text-sm text-gray-600">ТУТ БУДЕТ ШКОЛА И КОРПУС</p>
             </div>
           </div>
 
           <!-- Статистика -->
           <div class="flex items-center space-x-6">
             <button
+                @click.stop="post.likes_count ++"
                 class="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
             >
-              <Heart />
-              <span class="text-base font-medium">128</span>
+              <Heart   />
+              <span class="text-base font-medium">{{post.likes_count}}</span>
             </button>
             <span class="flex items-center text-base font-medium text-gray-600">
               <Eye class="mr-2.5" />
-              1.2K
+              {{post.views}}
             </span>
           </div>
         </div>
@@ -102,13 +102,74 @@ import { Clock } from 'lucide-vue-next';
 import { Heart } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from "vue";
 import VanillaTilt from "vanilla-tilt";
+import { defineProps } from 'vue';
 
+const props = defineProps({
+  post: Object
+});
 const card = ref(null);
+
+function timestampToDate(ts) {
+  const date = new Date(ts * 1000); // если timestamp в секундах
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы с 0
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+}
+
+const timestamp = 1744576048;
+const dateAgo = ref(timeAgo(timestamp));
+let intervalId = null;
+
+
+setInterval(() => {
+    dateAgo.value = timeAgo(timestamp);
+  }, 1000); // обновляем каждую секунду
+
+
+
+
+function timeAgo(timestampSec) {
+  const now = Date.now();
+  const timestampMs = timestampSec * 1000; // Переводим секунды в миллисекунды
+  const seconds = Math.floor((now - timestampMs) / 1000);
+
+  const intervals = [
+    { label: ['секунда', 'секунды', 'секунд'], seconds: 1 },
+    { label: ['минута', 'минуты', 'минут'], seconds: 60 },
+    { label: ['час', 'часа', 'часов'], seconds: 3600 },
+    { label: ['день', 'дня', 'дней'], seconds: 86400 },
+    { label: ['неделя', 'недели', 'недель'], seconds: 604800 },
+    { label: ['месяц', 'месяца', 'месяцев'], seconds: 2592000 },
+    { label: ['год', 'года', 'лет'], seconds: 31536000 },
+  ];
+
+  function getPlural(n, forms) {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return forms[0];
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+    return forms[2];
+  }
+
+  for (let i = intervals.length - 1; i >= 0; i--) {
+    const interval = intervals[i];
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      const label = getPlural(count, interval.label);
+      return `${count} ${label} назад`;
+    }
+  }
+
+  return 'только что';
+}
+
+
 
 onMounted(() => {
   if (card.value) {
     VanillaTilt.init(card.value, {
-      max: 3, // Чуть больше, чтобы было естественно
+      max: 1, // Чуть больше, чтобы было естественно
       speed: 200, // Понизил скорость, чтобы не было рывков
       perspective: 1200, // Чуть меньше для лучшей плавности
       scale: 1.01, // Легкий эффект увеличения
@@ -126,14 +187,7 @@ onUnmounted(() => {
 });
 </script>
 
-<script>
-export default {
-  name: "post-main",
-  props: {
-    post: Object
-  }
-};
-</script>
+
 
 <style lang="scss" scoped>
 .timeline-scroll::-webkit-scrollbar {

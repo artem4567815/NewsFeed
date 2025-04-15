@@ -20,16 +20,16 @@
 
       <!-- Заголовок -->
       <h3 class="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300 mb-2">
-        {{ title }}
+        {{ timeline.title }}
       </h3>
 
       <!-- Дата -->
       <div class="flex items-center text-sm text-gray-500">
         <CalendarDays  class="w-4 h-4 mr-1.5 mb-1"/>
-        <span>{{ startDate }}</span>
+        <span>{{ timestampToDate(timeline.start_date) }} - {{ timestampToDate(timeline.end_date) }}</span>
       </div>
       <span class="text-sm font-medium text-gray-500 bg-white/80  rounded-full ">
-          {{ timePassed }}
+           ТУТ НАДО РАСЧИТАТЬ СКОЛЬКО ВРЕМЕНИ ПРОШЛО
         </span>
     </div>
 
@@ -41,23 +41,21 @@
 
 <script setup>
 import { CalendarDays } from 'lucide-vue-next';
-</script>
+import { defineProps } from 'vue';
 
-<script>
-
-
-
-export default {
-
-  name: 'timeline-main',
-  props: {
-    title: String,
-    startDate: String,
-    endDate: String,
-    timePassed: String
-  }
+const props = defineProps({
+  timeline: Object
+});
+function timestampToDate(ts) {
+  const date = new Date(ts * 1000); // если timestamp в секундах
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы с 0
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 </script>
+
+
 
 <style scoped>
 .group:last-child .h-8 {

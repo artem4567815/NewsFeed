@@ -224,7 +224,7 @@ const submitForm = async () => {
     postNew.value.start_date = 795683520000
     postNew.value.end_date = convertToTimestamp(postNew.value.end_date)
 
-    const response = await fetch('http://127.0.0.1:8080/admin/create/post', {
+    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/create/post`, {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
