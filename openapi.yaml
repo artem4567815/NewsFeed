@@ -240,11 +240,7 @@ paths:
           content:
             application/json:
               schema:
-                properties:
-                  likes:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PostResponse'
+                $ref: '#/components/schemas/PostsResponse'
         '401':
           description: Unauthorized
           content:
@@ -285,6 +281,10 @@ paths:
           in: query
           schema:
             type: array
+        - name: status
+          in: query
+          schema:
+            type: string
       responses:
         '200':
           description: Posts retrieved successfully
@@ -311,7 +311,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminPostCreation'
+              $ref: '#/components/schemas/PostCreation'
       responses:
         '201':
           description: Post created successfully
@@ -319,39 +319,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostResponse'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /posts/create/wallpapers:
-    post:
-      tags:
-        - Posts
-      summary: Create a new wallpapers
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WallNewspapersCreation'
-      responses:
-        '201':
-          description: Post created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WallNewspapersCreation'
         '400':
           description: Invalid input
           content:
@@ -384,7 +351,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostResponse'
+                $ref: '#/components/schemas/Post'
         '400':
           description: Invalid input
           content:
@@ -421,7 +388,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostResponse'
+                $ref: '#/components/schemas/Post'
         '400':
           description: Invalid input
           content:
@@ -627,7 +594,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /subscribe:
+  /user/subscribe:
     post:
       tags:
         - General
@@ -760,7 +727,6 @@ components:
       type: object
       required:
         - name
-        - surname
         - school
         - building
         - login
@@ -775,6 +741,8 @@ components:
         building:
           type: string
         login:
+          type: string
+        email:
           type: string
         password:
           type: string
@@ -787,7 +755,6 @@ components:
       type: object
       required:
         - name
-        - surname
         - school
         - building
         - login
@@ -802,6 +769,8 @@ components:
         building:
           type: string
         login:
+          type: string
+        email:
           type: string
         password:
           type: string
@@ -825,6 +794,8 @@ components:
           type: string
         login:
           type: string
+        email:
+          type: string
         avatar_url:
           type: string
           example: "http://..."
@@ -843,6 +814,8 @@ components:
         building:
           type: string
         login:
+          type: string
+        email:
           type: string
         avatar_url:
           type: string
@@ -864,6 +837,8 @@ components:
       properties:
         post_id:
           type: string
+        title:
+          type: string
         type:
           type: string
           enum: [news, team_search, wallpapers]
@@ -881,17 +856,21 @@ components:
           $ref: '#/components/schemas/Author'
         likes:
           type: integer
+        views:
+          type: number
 
     Author:
       type: object
       properties:
         id:
           type: string
-        name:
-          type: string
-        surname:
+        login:
           type: string
         avatar_url:
+          type: string
+        school:
+          type: string
+        building:
           type: string
 
     PostsResponse:
@@ -909,14 +888,34 @@ components:
         - title
         - content
         - short_content
-        - end_date
-        - post_img
       properties:
         title:
           type: string
         type:
           type: string
-          enum: [news, team_search, wallpapers]
+          enum: [ news, wall_newspaper ]
+        content:
+          type: string
+        short_content:
+          type: string
+        start_date:
+          description: "only for news"
+          type: integer
+        end_date:
+          description: "only for news"
+          type: integer
+        post_img:
+          description: "can be and post and not post"
+          type: string
+        post_img_detail:
+          description: "can be and wallpapers and not wallpapers"
+          type: string
+
+    PostUpdate:
+      type: object
+      properties:
+        title:
+          type: string
         content:
           type: string
         short_content:
@@ -925,10 +924,10 @@ components:
           type: integer
         end_date:
           type: integer
-        post_img:
+        image_url:
           type: string
-        post_img_detail:
-          type: string
+        tags:
+          type: array
 
     PostResponse:
       type: object
@@ -945,13 +944,20 @@ components:
         short_content:
           type: string
         start_date:
+          description: "Only for news"
           type: integer
         end_date:
+          description: "Only for news"
           type: integer
-        post_img:
+        image_url:
           type: string
+          example: "http://127.0.0.1:8080/images/logo.png"
         post_img_detail:
           type: string
+        status:
+          description: "Only for user posts"
+          type: string
+          enum: [ pending, approved, rejected ]
 
     WallNewspapersCreation:
       type: object
@@ -998,59 +1004,14 @@ components:
           type: string
         short_content:
           type: string
-        post_img:
+        image_url:
           type: string
+          example: "http://127.0.0.1:8080/images/img.png"
         post_img_detail:
           type: string
         status:
           type: string
           enum: [pending, approved, rejected]
-
-    AdminPostCreation:
-      type: object
-      required:
-        - type
-        - title
-        - content
-        - short_content
-        - end_date
-        - post_img
-      properties:
-        title:
-          type: string
-        type:
-          type: string
-          enum: [news, wall_newspaper]
-        content:
-          type: string
-        short_content:
-          type: string
-        start_date:
-          type: integer
-        end_date:
-          type: integer
-        post_img:
-          type: string
-        post_img_detail:
-          type: string
-
-    PostUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-        content:
-          type: string
-        short_content:
-          type: string
-        start_date:
-          type: integer
-        end_date:
-          type: integer
-        image_url:
-          type: string
-        tags:
-          type: array
 
     NotificationsResponse:
       type: object
