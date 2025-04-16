@@ -16,7 +16,7 @@
           <div>
             <label for="emailAuth" class="block text-sm/6 font-medium text-gray-900">Почта</label>
             <div class="mt-2">
-              <input type="login" v-model="auth.username" name="emailAuth" id="emailAuth" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+              <input type="login" v-model="auth.login" name="emailAuth" id="emailAuth" autocomplete="email" required class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
             </div>
           </div>
 
@@ -33,10 +33,10 @@
           </div>
 
           <div>
-            <bl type="submit" :disabled="isLoading" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" :disabled="isLoading" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
               <span v-if="!isLoading">Войти</span>
               <span v-else>Вход...</span>
-            </bl>
+            </button>
           </div>
         </form>
 
@@ -55,7 +55,7 @@ export default {
   data() {
     return {
       auth: {
-        username: "",
+        login: "",
         password: ""
       },
       isLoading: false,
@@ -65,15 +65,19 @@ export default {
   name: 'form-auth',
   methods: {
     async submitForm() {
+      console.log(9)
+      console.log(JSON.stringify(this.auth))
+
       this.isLoading = true;
       this.errorMessage = "";
 
       try {
-        const response = await fetch('http://127.0.0.1:8080/auth/login', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // 🔥 Критически важно для кук!
           body: JSON.stringify(this.auth)
         });
 

@@ -21,7 +21,7 @@
                 v-for="post in posts"
                 :key="post.id"
                 :post="post"
-                @click="$router.push(`/post/${post.id}`)"
+                @click="$router.push(`/post/${post.post_id}`); View(post.post_id)"
                 class="transform hover:scale-[1.02] transition-transform duration-300 w-full"
             />
           </div>
@@ -78,6 +78,7 @@ import { ref, watch, onMounted } from 'vue'
 import FilterPanel from "@/components/filterPanel.vue"
 import TimelineMain from "@/components/timelineMain.vue";
 import postMain from "@/components/postMain.vue";
+import axios from "axios";
 
 const posts = ref([])
 const filters = ref({
@@ -100,6 +101,19 @@ const tabs = [
 ]
 const activeTab = ref('all')
 
+function View(id) {
+  console.log(id)
+  const ViewPost = async () => {
+    try {
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id) // axios сам вставит заголовки и токен
+    } catch (error) {
+      console.error('Ошибка лайка:', error)
+      // можно добавить уведомление или сообщение пользователю
+    }
+  }
+
+  ViewPost()
+}
 
 function filterPosts(posts, filters) {
   return posts.filter((post) => {

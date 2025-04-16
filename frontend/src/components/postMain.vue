@@ -78,16 +78,16 @@
           <!-- Статистика -->
           <div class="flex items-center space-x-6">
             <button
-                @click.stop="post.likes_count ++"
+                @click.stop="Like"
                 class="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
             >
               <Heart   />
               <span class="text-base font-medium">{{post.likes_count}}</span>
             </button>
-            <span class="flex items-center text-base font-medium text-gray-600">
+            <button class="flex items-center text-base font-medium text-gray-600">
               <Eye class="mr-2.5" />
               {{post.views}}
-            </span>
+            </button>
           </div>
         </div>
       </div>
@@ -103,6 +103,8 @@ import { Heart } from 'lucide-vue-next';
 import { onMounted, onUnmounted, ref } from "vue";
 import VanillaTilt from "vanilla-tilt";
 import { defineProps } from 'vue';
+import {jwtDecode} from "jwt-decode";
+import router from "@/router/router.js";
 
 const props = defineProps({
   post: Object
@@ -121,13 +123,36 @@ const timestamp = 1744576048;
 const dateAgo = ref(timeAgo(timestamp));
 let intervalId = null;
 
+import api from '@/api/axios'
+import { useRouter } from 'vue-router'
+import axios from "axios";
+
+function Like() {
+  const likePost = async () => {
+    try {
+      await api.post(`/posts/${props.post.post_id}/like`, {
+        post_id: props.post.post_id
+      })
+      props.post.likes_count++
+    } catch (error) {
+      console.error('Ошибка лайка:', error)
+      // Можно добавить уведомление
+    }
+  }
+
+  likePost()
+}
+
+
+
+
+
+
+
 
 setInterval(() => {
     dateAgo.value = timeAgo(timestamp);
   }, 1000); // обновляем каждую секунду
-
-
-
 
 function timeAgo(timestampSec) {
   const now = Date.now();

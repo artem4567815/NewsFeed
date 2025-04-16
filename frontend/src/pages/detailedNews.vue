@@ -8,12 +8,12 @@
           <!-- Заголовок новости -->
           <div class="mb-8">
             <div class="flex items-center gap-2 mb-4">
-              <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">День открытых дверей в нашей школе</h1>
+              <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">{{post.title}}</h1>
             </div>
 
             <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
               <div class="flex items-center gap-2">
-                <span class="font-medium text-gray-700">А. Школа 1561</span>
+                <span class="font-medium text-gray-700">ТУТ БУДЕТ ШКОЛА КОРПУС</span>
               </div>
               <div class="flex items-center gap-2">
                 <CalendarDays class="w-4 h-4" />
@@ -22,7 +22,7 @@
 
               <div class="flex items-center gap-2">
                 <Eye class="w-4 h-4" />
-                <span>1,235 просмотров</span>
+                <span>{{post.views}} просмотров</span>
               </div>
               <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">Мероприятие</span>
             </div>
@@ -91,7 +91,7 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Похожие новости</h2>
 
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <post-vertical v-for="i in 3" @click="$router.push(`/post/${post.id}`)"></post-vertical>
+<!--              <post-vertical v-for="i in 3" @click="$router.push(`/post/${post.id}`)"></post-vertical>-->
             </div>
           </div>
         </div>
@@ -104,41 +104,28 @@
 
 <script setup>
 import { CalendarDays, Clock, Eye, Heart, MessageSquare, Bookmark, Share2 } from 'lucide-vue-next'
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import FilterPanel from "@/components/filterPanel.vue"
 import PostMain from "@/components/postMain.vue";
 import PostVertical from "@/components/postVertical.vue";
+import {useRoute} from "vue-router";
 
-const timelineItems = [
-  {
-    title: "Спортивные соревнования по плаванию",
-    date: "01.03.2025",
-    timePassed: "1 неделю назад",
-    category: "Спорт"
-  },
-  {
-    title: "Выставка творческих работ учеников",
-    date: "25.02.2025",
-    timePassed: "2 недели назад",
-    category: "Искусство"
-  },
-  {
-    title: "Экскурсия в Планетарий",
-    date: "15.02.2025",
-    timePassed: "3 недели назад",
-    category: "Наука"
-  },
-  {
-    title: "Олимпиада по математике",
-    date: "10.02.2025",
-    timePassed: "1 месяц назад",
-    category: "Наука"
+
+
+const route = useRoute(); // Получаем объект маршрута
+
+const post = ref(null);
+
+onMounted(async () => {
+  try {
+    const NewsResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${route.params.id}?from=main`);
+    if (!NewsResponse.ok) throw new Error('Ошибка при загрузке новости');
+    let get_data = await NewsResponse.json();
+    post.value = get_data;
+  } catch (error) {
+    console.error('Ошибка загрузки новостей:', error);
   }
-]
-
-function onFilterUpdate(newFilters) {
-  // Логика фильтрации
-}
+});
 </script>
 
 <style scoped>

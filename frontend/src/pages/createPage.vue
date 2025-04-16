@@ -256,16 +256,6 @@ onBeforeMount(() => {
     router.push('/auth')
     return
   }
-
-  try {
-    const decoded = jwtDecode(token)
-    if (!decoded['is_admin']) {
-      router.push('/auth')
-    }
-  } catch (e) {
-    console.error("Token decoding failed", e)
-    router.push('/auth')
-  }
 })
 </script>
 

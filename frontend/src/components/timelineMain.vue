@@ -29,7 +29,7 @@
         <span>{{ timestampToDate(timeline.start_date) }} - {{ timestampToDate(timeline.end_date) }}</span>
       </div>
       <span class="text-sm font-medium text-gray-500 bg-white/80  rounded-full ">
-           ТУТ НАДО РАСЧИТАТЬ СКОЛЬКО ВРЕМЕНИ ПРОШЛО
+           {{dateAgo}}
         </span>
     </div>
 
@@ -41,11 +41,12 @@
 
 <script setup>
 import { CalendarDays } from 'lucide-vue-next';
-import { defineProps } from 'vue';
+import {defineProps, ref} from 'vue';
 
 const props = defineProps({
   timeline: Object
 });
+
 function timestampToDate(ts) {
   const date = new Date(ts * 1000); // если timestamp в секундах
   const day = String(date.getDate()).padStart(2, '0');
@@ -53,6 +54,48 @@ function timestampToDate(ts) {
   const year = date.getFullYear();
   return `${day}.${month}.${year}`;
 }
+
+setInterval(() => {
+  dateAgo.value = timeAgo(1744576048);
+}, 1000); // обновляем каждую секунду
+
+function timeAgo(timestampSec) {
+  const now = Date.now();
+  const timestampMs = timestampSec * 1000; // Переводим секунды в миллисекунды
+  const seconds = Math.floor((now - timestampMs) / 1000);
+
+  const intervals = [
+    { label: ['секунда', 'секунды', 'секунд'], seconds: 1 },
+    { label: ['минута', 'минуты', 'минут'], seconds: 60 },
+    { label: ['час', 'часа', 'часов'], seconds: 3600 },
+    { label: ['день', 'дня', 'дней'], seconds: 86400 },
+    { label: ['неделя', 'недели', 'недель'], seconds: 604800 },
+    { label: ['месяц', 'месяца', 'месяцев'], seconds: 2592000 },
+    { label: ['год', 'года', 'лет'], seconds: 31536000 },
+  ];
+
+  function getPlural(n, forms) {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return forms[0];
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
+    return forms[2];
+  }
+
+  for (let i = intervals.length - 1; i >= 0; i--) {
+    const interval = intervals[i];
+    const count = Math.floor(seconds / interval.seconds);
+    if (count >= 1) {
+      const label = getPlural(count, interval.label);
+      return `${count} ${label} назад`;
+    }
+  }
+
+  return 'только что';
+}
+
+const dateAgo = ref(timeAgo(1744576048));
+
 </script>
 
 
