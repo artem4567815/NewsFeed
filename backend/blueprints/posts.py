@@ -15,6 +15,7 @@ posts = Blueprint('posts', __name__)
 def category_posts(query: QueryRequest):
     posts_list = get_news_by_query(query)
     posts_list = [news.as_dict() for news in posts_list]
+    posts_list = sorted(posts_list, key=lambda news: news["created_at"], reverse=True)
     return jsonify({"posts": posts_list}), 200
 
 
