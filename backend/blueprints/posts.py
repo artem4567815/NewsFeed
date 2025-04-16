@@ -28,8 +28,8 @@ def detailed_posts(post_id):
     if not post:
         return jsonify({"Message": "Новость не найдена"}), 404
 
-    post.views += 1
-    db.session.commit()
+    # post.views += 1
+    # db.session.commit()
 
     return jsonify(post.as_dict()), 200
 
@@ -108,6 +108,24 @@ def unlike_posts(post_id):
 
 
     unlike_post_method(post, user_id)
+    return jsonify({}), 204
+
+
+@posts.route("/<post_id>/view", methods=["POST"])
+@safe("blueprints/posts.py | view_posts")
+@jwt_required()
+def view_posts(post_id):
+    if not is_valid_uuid(post_id):
+        raise BadRequest("post_id not valid")
+
+    post = find_news_by_id(post_id)
+
+    if not post:
+        return jsonify({"Message": "Новость не найдена"}), 404
+
+    post.views += 1
+    db.session.commit()
+
     return jsonify({}), 204
 
 
