@@ -113,7 +113,6 @@ def unlike_posts(post_id):
 
 @posts.route("/<post_id>/view", methods=["POST"])
 @safe("blueprints/posts.py | view_posts")
-@jwt_required()
 def view_posts(post_id):
     if not is_valid_uuid(post_id):
         raise BadRequest("post_id not valid")
