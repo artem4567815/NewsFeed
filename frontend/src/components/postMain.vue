@@ -18,16 +18,18 @@
         <!-- Категория -->
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
-          <div class="flex items-center space-x-4 mb-4">
+          <div class="flex items-center space-y-1 space-x-4 mb-4">
+            <div class="flex flex-col sm:flex-row space-x-3 sm:items-center">
             <span class="flex items-center text-sm font-medium text-gray-600">
               <CalendarDays class="w-4 h-4 mr-1.5 mb-1" />
               {{ timestampToDate(post.start_date) }} - {{ timestampToDate(post.end_date) }}
             </span>
             <span class="flex items-center text-sm font-medium text-gray-600">
-              <Clock class="w-4 h-4 mr-1.5 mb-1" />
+              <Clock class="w-4  h-4 mr-1.5 mb-1" />
               {{ dateAgo }}
             </span>
-            <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">{{post.type}}</span>
+            </div>
+            <span class="px-3 py-1 h-fit ml-auto sm:ml-0 text-sm font-medium rounded-full bg-blue-100 text-blue-800">{{post.type}}</span>
 
           </div>
 
@@ -241,4 +243,6 @@ onUnmounted(() => {
 .timeline-scroll::-webkit-scrollbar-thumb:hover {
   background: #6ee7b7;
 }
+
+
 </style>
