@@ -28,20 +28,24 @@ def login():
     refresh_token = create_refresh_token(identity=user.user_id, additional_claims={"user_id": user.user_id, "is_admin": user.is_admin})
 
     response = make_response(jsonify({"access_token": access_token, "is_admin": user.is_admin}))
-    #set_refresh_cookies(response, refresh_token)
-
+    # set_refresh_cookies(response, refresh_token, max_age=2592000)
     response.set_cookie("refresh_token_cookie",
                         refresh_token,
                         httponly=True,
-                        samesite="Strict",
-                        secure=False)
+                        secure=False,
+                        max_age=2592000,
+    )
 
     return response, 200
 
+@auth.route('/debug-cookies', methods=['GET'])
+def debug_cookies():
+    print(request.cookies)
+    return jsonify(dict(request.cookies))
 
 @auth.route("/refresh", methods=["POST"])
 @safe("blueprints/auth.py | refresh")
-@jwt_required(refresh=True)
+@jwt_required(refresh=True, locations=["cookies"])
 def refresh():
     identity = get_jwt_identity()
     add = get_jwt()

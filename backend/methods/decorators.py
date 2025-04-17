@@ -1,6 +1,6 @@
 from functools import wraps
 import jwt
-from flask import jsonify
+from flask import jsonify, request
 from werkzeug.exceptions import *
 from flask_jwt_extended import get_jwt
 from flask_jwt_extended.exceptions import JWTDecodeError, NoAuthorizationError
@@ -54,6 +54,11 @@ def safe(func_name):
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {e}")
                 return jsonify({"reason": "Incorrect token"}), 403
             except NoAuthorizationError as e:
+                print("Cookies received:")
+                print(request.cookies)
+                for key, value in request.cookies.items():
+                    print(112)
+                    print(f"{key}: {value}")
                 logger.log("error", f"{func_name} | Type of error: {type(e)} - error: {e}")
                 return jsonify({"reason": "Missing JWT in headers or cookies (Missing Authorization Header; Missing cookie 'refresh_token_cookie')"}), 401
             except jwt.exceptions.InvalidSignatureError as e:

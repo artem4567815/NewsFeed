@@ -6,4 +6,3 @@ backend/static/images
 *.DS_Store
 backend/test.py
 backend/images/*
-images/*

@@ -146,7 +146,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token: access_token
 
@@ -167,7 +167,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token_client: access_token
 
@@ -188,7 +188,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token_client2: access_token
 
@@ -209,7 +209,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token_client3: access_token
 
@@ -230,7 +230,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token_client4: access_token
 
@@ -495,26 +495,26 @@ stages:
 
   - name: 25 - View news post as client
     request:
-      url: "{url}/posts/{news_post_id}"
-      method: GET
+      url: "{url}/posts/{news_post_id}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
-      json:
-        post_id: "{news_post_id}"
-        title: "Test News Post"
-        short_content: "short content"
-        full_content: "Test content"
-        start_date: 2217628800
-        end_date: 2218060800
-        image_url: !re_match "^http://.*$"
-        type: "news"
-        status: "published"
-        author:
-          id: "{author_id}"
-          login: "{author_login}"
-        created_at: !anything
+      status_code: 204
+#      json: !anydict
+#        post_id: "{news_post_id}"
+#        title: "Test News Post"
+#        short_content: "short content"
+#        full_content: "Test content"
+#        start_date: 2217628800
+#        end_date: 2218060800
+#        image_url: !re_match "^http://.*$"
+#        type: "news"
+#        status: "published"
+#        author:
+#          id: "{author_id}"
+#          login: "{author_login}"
+#        created_at: !anything
 
   - name: 26 - Verify post views increased
     request:
@@ -555,26 +555,26 @@ stages:
 
   - name: 29 - View same post again (views should not increase)
     request:
-      url: "{url}/posts/{news_post_id}"
-      method: GET
+      url: "{url}/posts/{news_post_id}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
-      json:
-        post_id: "{news_post_id}"
-        title: "Test News Post"
-        short_content: "short content"
-        full_content: "Test content"
-        start_date: 2217628800
-        end_date: 2218060800
-        image_url: !re_match "^http://.*$"
-        type: "news"
-        status: "published"
-        author:
-          id: "{author_id}"
-          login: "{author_login}"
-        created_at: !anything
+      status_code: 204
+#      json: !anything
+#        post_id: "{news_post_id}"
+#        title: "Test News Post"
+#        short_content: "short content"
+#        full_content: "Test content"
+#        start_date: 2217628800
+#        end_date: 2218060800
+#        image_url: !re_match "^http://.*$"
+#        type: "news"
+#        status: "published"
+#        author:
+#          id: "{author_id}"
+#          login: "{author_login}"
+#        created_at: !anything
 
   - name: 30 - Verify views remained same
     request:
@@ -615,26 +615,26 @@ stages:
 
   - name: 33 - View post as another user (views should increase)
     request:
-      url: "{url}/posts/{news_post_id}"
-      method: GET
+      url: "{url}/posts/{news_post_id}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
     response:
-      status_code: 200
-      json:
-        post_id: "{news_post_id}"
-        title: "Test News Post"
-        short_content: "short content"
-        full_content: "Test content"
-        start_date: 2217628800
-        end_date: 2218060800
-        image_url: !re_match "^http://.*$"
-        type: "news"
-        status: "published"
-        author:
-          id: "{author_id}"
-          login: "{author_login}"
-        created_at: !anything
+      status_code: 204
+#      json: !anything
+#        post_id: "{news_post_id}"
+#        title: "Test News Post"
+#        short_content: "short content"
+#        full_content: "Test content"
+#        start_date: 2217628800
+#        end_date: 2218060800
+#        image_url: !re_match "^http://.*$"
+#        type: "news"
+#        status: "published"
+#        author:
+#          id: "{author_id}"
+#          login: "{author_login}"
+#        created_at: !anything
 
   - name: 34 - Verify views increased for new user
     request:
@@ -911,12 +911,12 @@ stages:
 
   - name: 46 - View post 3 as client №1
     request:
-      url: "{url}/posts/{wallpaper_post_id_3}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_3}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 47 - Join post 3 as client №1
     request:
@@ -929,12 +929,12 @@ stages:
 
   - name: 48 - View post 3 as client №2
     request:
-      url: "{url}/posts/{wallpaper_post_id_3}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_3}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 49 - Join post 3 as client №2
     request:
@@ -947,12 +947,12 @@ stages:
 
   - name: 50 - View post 4 as client №2
     request:
-      url: "{url}/posts/{wallpaper_post_id_4}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_4}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 51 - Join post 4 as client №2
     request:
@@ -965,30 +965,30 @@ stages:
 
   - name: 52 - View post 4 as client №3
     request:
-      url: "{url}/posts/{wallpaper_post_id_4}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_4}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client3}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 53 - View post 5 as client №2
     request:
-      url: "{url}/posts/{wallpaper_post_id_5}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_5}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 54 - View post 5 as client №3
     request:
-      url: "{url}/posts/{wallpaper_post_id_5}"
-      method: GET
+      url: "{url}/posts/{wallpaper_post_id_5}/view"
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client3}"
     response:
-      status_code: 200
+      status_code: 204
 
   - name: 55 - Join post 5 as client №3
     request:

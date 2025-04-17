@@ -39,10 +39,13 @@ class News(db.Model):
             "author": {
                 "id": self.user_id,
                 "login": self.user.login,
+                "school": self.user.school,
+                "building": self.user.building,
             },
             "created_at": self.created_at,
             "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
             "views": self.views,
+            "tags": self.tags
         }
 
         if self.user.avatar_url is not None:
