@@ -133,8 +133,10 @@ function Like() {
   const likePost = async () => {
     try {
       await api.post(`/posts/${props.post.post_id}/like`, {
-        post_id: props.post.post_id
-      })
+        post_id: props.post.post_id,
+        credentials: 'include' // 🔥 Критически важно для кук!
+      },
+    )
       props.post.likes_count++
     } catch (error) {
       console.error('Ошибка лайка:', error)
