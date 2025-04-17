@@ -16,7 +16,7 @@ def category_posts(query: QueryRequest):
     posts_list = get_news_by_query(query)
     posts_list = [news.as_dict() for news in posts_list]
     posts_list = sorted(posts_list, key=lambda news: news["created_at"], reverse=True)
-    posts_count = len(posts_list)
+    posts_count = len(News.query.all())
     return jsonify({"posts": posts_list, "posts_count":posts_count}), 200
 
 
