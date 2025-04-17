@@ -41,14 +41,7 @@
           <!-- Форма ввода -->
           <div class="flex-1 p-6 lg:min-w-120 flex flex-col">
             <!-- Метаданные -->
-            <div class="mb-6">
-              <div class="flex items-center space-x-4 mb-4">
-                <span class="flex items-center text-sm font-medium text-gray-600">
-                  <CalendarDays class="w-4 h-4 mr-1.5" />
-                  {{ currentDate }}
-                </span>
-              </div>
-            </div>
+
 
             <!-- Заголовок -->
             <div class="mb-6">
@@ -78,30 +71,56 @@
 
             <!-- Теги -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Теги</label>
-              <div class="flex flex-wrap gap-2">
-                <span
-                    v-for="(tag, index) in tags"
-                    :key="index"
-                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                    :class="tagClasses(index)"
-                >
-                  {{ tag }}
-                  <button
-                      type="button"
-                      @click.stop="removeTag(index)"
-                      class="ml-1 text-gray-500 hover:text-gray-700"
-                  >
-                    ×
-                  </button>
-                </span>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Теги (максимум 4)</label>
+
+              <!-- Выбранные теги -->
+              <div class="flex flex-wrap gap-2 mb-2">
+      <span
+          v-for="(tag, index) in selectedTags"
+          :key="index"
+          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+          :class="tagClasses(index)"
+      >
+        {{ tag }}
+        <button
+            type="button"
+            @click.stop="removeTag(index)"
+            class="ml-1 text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
+      </span>
+              </div>
+
+              <!-- Доступные теги -->
+              <div class="flex flex-wrap gap-2 mb-2">
+      <span
+          v-for="(tag, index) in availableTags"
+          :key="'available-'+index"
+          @click="selectTag(tag)"
+          class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 cursor-pointer hover:bg-gray-200"
+          :class="{ 'opacity-50': selectedTags.includes(tag) }"
+      >
+        {{ tag }}
+      </span>
+              </div>
+
+              <!-- Поле для добавления нового тега -->
+              <div class="flex  md:flex-row flex-col items-start md:items-center gap-2 mt-2">
                 <input
                     type="text"
                     v-model="newTag"
                     @keydown.enter.prevent="addTag"
-                    class="flex-1 min-w-[100px] px-3 py-1 text-sm border-0 focus:ring-0"
-                    placeholder="Добавить тег"
+                    class="flex-1 px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Добавить свой тег"
                 >
+                <button
+                    type="button"
+                    @click="addTag"
+                    class="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600"
+                >
+                  Добавить
+                </button>
               </div>
             </div>
           </div>
@@ -122,18 +141,33 @@
             ></textarea>
           </div>
 
-          <!-- Дата окончания -->
-          <div class="mb-6">
-            <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Дата окончания</label>
-            <input
-                v-model="postData.end_date"
-                type="date"
-                id="time"
-                required
-                class="block w-full px-4 py-3 text-base text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-            >
+          <!-- Дата начала -->
+          <div class="mb-6 space-x-6 flex flex-col sm:flex-row items-start md:items-center gap-4 mt-2">
+            <div class="w-full">
+              <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Дата начала</label>
+              <input
+                  v-model="postData.start_date"
+                  type="date"
+                  id="time"
+                  required
+                  class="block w-full px-4 py-3 text-base text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              >
+            </div>
+
+            <div  class="w-full">
+              <label for="time" class="block text-sm font-medium text-gray-700 mb-1">Дата окончания</label>
+              <input
+                  v-model="postData.end_date"
+                  type="date"
+                  id="time"
+                  required
+                  class="block w-full px-4 py-3 text-base text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              >
+            </div>
           </div>
+
         </div>
+
 
         <!-- Кнопка отправки -->
         <div class="p-6 border-t border-gray-200 flex justify-center lg:justify-end">
@@ -154,18 +188,24 @@
 import { ref, computed, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { CalendarDays, Upload } from 'lucide-vue-next'
-import BlueButton from "@/components/UI/blueButton.vue"
 
 const router = useRouter()
 
 // Refs
 const imageInput = ref(null)
-const newTag = ref('')
-const tags = ref(['Технологии', 'Образование', 'Школа'])
 const imagePreview = ref(null)
 const isSubmitting = ref(false)
+const newTag = ref('')
 
-// Post data
+// Теги
+const availableTags = ref([
+  'Технологии', 'Образование', 'Школа',
+  'Программирование', 'Дизайн', 'Бизнес',
+  'Наука', 'Искусство', 'Маркетинг', 'Стартапы'
+])
+const selectedTags = ref([])
+
+// Данные поста
 const postData = ref({
   title: "",
   type: "news",
@@ -180,16 +220,39 @@ const postData = ref({
 // Computed
 const currentDate = computed(() => new Date().toLocaleDateString())
 
-// Methods
+
 const addTag = () => {
-  if (newTag.value.trim() && !tags.value.includes(newTag.value.trim())) {
-    tags.value.push(newTag.value.trim())
+  if (selectedTags.value.length >= 4) {
+    alert('Можно выбрать не более 4 тегов')
+    return
+  }
+
+  const tag = newTag.value.trim()
+
+  if (tag && !selectedTags.value.includes(tag)) {
+    selectedTags.value.push(tag)
     newTag.value = ''
+
+    // Добавляем новый тег в общий список, если его там нет
+    if (!availableTags.value.includes(tag)) {
+      availableTags.value.push(tag)
+    }
   }
 }
 
 const removeTag = (index) => {
-  tags.value.splice(index, 1)
+  selectedTags.value.splice(index, 1)
+}
+
+const selectTag = (tag) => {
+  if (selectedTags.value.length >= 4) {
+    alert('Можно выбрать не более 4 тегов')
+    return
+  }
+
+  if (!selectedTags.value.includes(tag)) {
+    selectedTags.value.push(tag)
+  }
 }
 
 const tagClasses = (index) => {
@@ -202,6 +265,7 @@ const tagClasses = (index) => {
   return colors[index % 4]
 }
 
+// Методы работы с изображением
 const triggerFileInput = () => {
   imageInput.value?.click()
 }
@@ -210,13 +274,11 @@ const handleImageUpload = (event) => {
   const file = event.target.files[0]
   if (!file) return
 
-  // Проверка типа файла
   if (!file.type.match('image.*')) {
     alert('Пожалуйста, выберите изображение')
     return
   }
 
-  // Создание превью
   const reader = new FileReader()
   reader.onload = (e) => {
     imagePreview.value = e.target.result
@@ -225,21 +287,15 @@ const handleImageUpload = (event) => {
   reader.readAsDataURL(file)
 }
 
+// Вспомогательные методы
 const convertToTimestamp = (dateString, time = "00:00:00") => {
-  if (!dateString) return null
-  const [year, month, day] = dateString.split('-')
-  const [hours, minutes, seconds] = time.split(':')
+  if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return null
+  if (!/^\d{2}:\d{2}:\d{2}$/.test(time)) return null
 
-  const date = new Date(Date.UTC(
-      parseInt(year),
-      parseInt(month) - 1,
-      parseInt(day),
-      parseInt(hours),
-      parseInt(minutes),
-      parseInt(seconds)
-  ))
+  const [year, month, day] = dateString.split('-').map(Number)
+  const [hours, minutes, seconds] = time.split(':').map(Number)
 
-  return date.getTime()
+  return Date.UTC(year, month - 1, day, hours, minutes, seconds)
 }
 
 const refreshToken = async () => {
@@ -249,9 +305,7 @@ const refreshToken = async () => {
       credentials: 'include'
     })
 
-    if (response.status === 401) {
-      return "Not Auth"
-    }
+    if (response.status === 401) return "Not Auth"
 
     const data = await response.json()
     localStorage.setItem('access', data.access)
@@ -262,16 +316,16 @@ const refreshToken = async () => {
   }
 }
 
+// Отправка формы
 const submitForm = async () => {
   try {
     isSubmitting.value = true
 
-    // Подготовка данных
     const formData = {
       ...postData.value,
-      start_date: 795683520000, // Фиксированная дата начала
-      end_date: convertToTimestamp(postData.value.end_date),
-      tags: tags.value
+      start_date: convertToTimestamp(postData.value.start_date)/1000,
+      end_date: convertToTimestamp(postData.value.end_date)/1000,
+      tags: selectedTags.value
     }
 
     const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/create/post`, {
@@ -289,16 +343,14 @@ const submitForm = async () => {
         router.push('/auth')
         return
       }
-      return await submitForm() // Повторная попытка после обновления токена
+      return await submitForm()
     }
 
-    if (!response.ok) {
-      throw new Error(`Ошибка HTTP: ${response.status}`)
-    }
+    if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`)
 
     const data = await response.json()
     console.log('Post created:', data)
-    router.push('/')
+    router.push('/Create')
   } catch (error) {
     console.error('Error creating post:', error)
     alert('Произошла ошибка при создании новости')
@@ -307,10 +359,9 @@ const submitForm = async () => {
   }
 }
 
-// Хук жизненного цикла
+// Проверка авторизации
 onBeforeMount(() => {
-  const token = localStorage.getItem('authToken')
-  if (!token) {
+  if (!localStorage.getItem('authToken')) {
     router.push('/auth')
   }
 })
