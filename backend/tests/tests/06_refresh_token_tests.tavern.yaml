@@ -39,7 +39,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
 
   - name: 3 - Successful token refresh
     request:

@@ -72,7 +72,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token: access_token
 
@@ -93,7 +93,7 @@ stages:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token_client: access_token
 
