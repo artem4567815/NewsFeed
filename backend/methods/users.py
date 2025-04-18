@@ -36,7 +36,8 @@ def patch_profile_method(user, body):
     if body.building is not None:
         user.building = body.building
     if body.avatar_url is not None:
-        user.avatar_url = body.avatar_url
+        file = save_base64_image(body.avatar_url)
+        user.avatar_url = file
 
     db.session.commit()
 
