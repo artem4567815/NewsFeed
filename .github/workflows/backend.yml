@@ -30,7 +30,7 @@ jobs:
       - name: Run backend and tests in docker-compose
         run: |
           cd backend/tests
-          docker compose up --build --abort-on-container-exit --exit-code-from tavern_tests
+          docker compose up --build --abort-on-container-exit --exit-code-from tests
 
       - name: Login to DockerHub
         if: ${{ success() }}
