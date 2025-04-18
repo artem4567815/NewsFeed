@@ -15,7 +15,8 @@ user_routes = Blueprint('user', __name__)
 def get_posts_by_user_id():
     user_id = get_jwt_identity()
     posts = find_news_by_user_id(user_id)
-    return jsonify(posts.as_dict()), 200
+    posts = [post.as_dict() for post in posts]
+    return jsonify({"user_posts": posts}), 200
 
 
 @user_routes.route('/profile', methods=['GET'])
