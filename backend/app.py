@@ -1,6 +1,6 @@
 from blueprints import *
 from flask import send_from_directory
-from config import UPLOADFLOADER
+from config import UPLOADFLOADER, SERVER_PORT
 from manage import app, logger
 
 app.register_blueprint(admin_routes, url_prefix='/admin')
@@ -28,8 +28,7 @@ def drop_db():
 def serve_image(filename):
     return send_from_directory(UPLOADFLOADER, filename)
 
-print("for cicd")
 if __name__ == "__main__":
     logger.log("info", "app.py | server is starting on port:8080")
-    app.run(debug=True, port=8081, host='0.0.0.0')
+    app.run(debug=True, port=SERVER_PORT, host='0.0.0.0')
 

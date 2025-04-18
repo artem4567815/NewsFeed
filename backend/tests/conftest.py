@@ -23,7 +23,7 @@ def pytest_tavern_beta_after_every_response(expected: Any, response: Any) -> Non
 
 @pytest.fixture(autouse=True)
 def clear_db():
-    resp = requests.get('http://127.0.0.1:8081/ping')
+    resp = requests.get('http://app:8080/ping')
     if resp.status_code != 200:
         pytest.fail(f"Ping not passed with status code {resp.status_code}")
-    requests.post('http://127.0.0.1:8081/test/drop-db')
+    requests.post('http://app:8080/test/drop-db')

@@ -29,13 +29,11 @@ def login():
 
     response = make_response(jsonify({"access_token": access_token, "is_admin": user.is_admin}))
     response.set_cookie(
-        "refresh_token",
+        "refresh_token_cookie",
         refresh_token,
         httponly=True,
-        samesite="Lax",  # Изменено с Strict на Lax для кросс-доменных запросов
         secure=False,  # False для http в разработке, True для production
         path="/",      # Важно указать путь
-        max_age=30 * 24 * 60 * 60  # 30 дней
     )
 
     return response, 200

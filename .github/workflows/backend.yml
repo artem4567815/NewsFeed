@@ -27,10 +27,10 @@ jobs:
           cd backend
           pip install -r requirements.txt
 
-      - name: Run Tavern tests
+      - name: Run backend and tests in docker-compose
         run: |
           cd backend/tests
-          pytest
+          docker compose up --build --abort-on-container-exit --exit-code-from tavern_tests
 
       - name: Login to DockerHub
         if: ${{ success() }}

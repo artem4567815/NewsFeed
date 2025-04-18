@@ -1,6 +1,6 @@
 ---
 variables:
-  url: http://localhost:8081
+  url: http://app:8080
 
 plugins:
   - name: helpers

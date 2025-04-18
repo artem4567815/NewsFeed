@@ -66,12 +66,12 @@ stages:
       json:
         access_token: !anything
       headers:
-        Set-Cookie: !re_match "refresh_token=.*; HttpOnly; Path=/.*"
+        Set-Cookie: !re_match "refresh_token_cookie=.*; HttpOnly; Path=/.*"
       save:
         $ext:
           function: helpers:get_refresh_token
           extra_kwargs:
-            cookie_name: "refresh_token"
+            cookie_name: "refresh_token_cookie"
         json:
           access_token: access_token
 
