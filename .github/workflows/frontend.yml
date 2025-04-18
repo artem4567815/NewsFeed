@@ -26,6 +26,9 @@ jobs:
       - name: Create .env file
         run: echo "${{ secrets.ENV_FRONT_FILE }}" > .env
 
+      - name: List files in current directory
+        run: ls -la
+
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
