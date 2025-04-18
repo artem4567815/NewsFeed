@@ -103,7 +103,7 @@
 import { CalendarDays, Eye, Heart, Share2 } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useRoute } from "vue-router"
-import FooterMain from "@/components/FooterMain.vue"
+import FooterMain from "@/components/footerMain.vue"
 
 const route = useRoute()
 const post = ref(null)
