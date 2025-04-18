@@ -49,6 +49,8 @@ jobs:
             docker system prune -f
             docker pull arttyu/newsfeed:frontend
             cd ~/edufeed/frontend
+            docker-compose stop || true
+            docker-compose rm -f || true
             docker-compose up -d 
 
       - name: Delete .env file after tests
