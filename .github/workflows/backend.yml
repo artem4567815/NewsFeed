@@ -60,5 +60,5 @@ jobs:
             docker pull arttyu/newsfeed:backend
             cd ~/edufeed/backend
             docker-compose stop || true
-            docker-compose rm || true
+            docker-compose rm -f || true
             docker-compose up -d
