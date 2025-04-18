@@ -9,7 +9,7 @@ from flask_jwt_extended import JWTManager
 from datetime import timedelta
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+CORS(app, supports_credentials=True, origins=["http://localhost:5173", "https://edufeed.ru"])
 app.secret_key = APP_SECRET
 
 db_string = "postgresql://{}:{}@{}:{}/{}".format(DB_LOGIN, DB_PASSWORD, DB_HOST, DB_PORT, DB_DATABASE)
