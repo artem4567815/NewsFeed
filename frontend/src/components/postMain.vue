@@ -124,8 +124,7 @@ function Like() {
     try {
       await api.post(`/posts/${props.post.post_id}/like`, {
         post_id: props.post.post_id,
-        credentials: 'include' // 🔥 Критически важно для кук!
-      },
+      },{withCredentials: true}
     )
       props.post.likes_count++
     } catch (error) {

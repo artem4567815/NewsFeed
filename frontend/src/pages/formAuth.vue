@@ -1,5 +1,5 @@
 <template>
-  <div @click.stop="hideModal()" class="-z-10 fixed inset-0 flex items-center justify-center bg-black/50">
+  <div @click.stop="hideModal" class="-z-10 fixed inset-0 flex items-center justify-center bg-black/50">
     <div @click.stop class="flex bg-white rounded-xl w-11/12 sm:w-9/12 md:w-7/12 lg:w-6/12 xl:w-4/12 flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         <div class="text-3xl   justify-self-center hover:cursor-pointer font-semibold">Edu<span class="text-blue-500">Feed</span></div>
@@ -72,44 +72,43 @@ export default {
       this.errorMessage = "";
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // 🔥 Критически важно для кук!
-          body: JSON.stringify(this.auth)
-        });
+          const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(this.auth)
+          });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          if (data.message) {
-            throw new Error(data.message);
-          } else {
-            throw new Error(`Ошибка авторизации: ${response.status}`);
+          const data = await response.json();
+          if (!response.ok) {
+            if (data.message) {
+              throw new Error(data.message);
+            } else {
+              throw new Error(`Ошибка авторизации: ${response.status}`);
+            }
           }
+
+          console.log('Login successful:', data);
+
+          if (data.access_token) {
+            localStorage.setItem('authToken', data.access_token);
+          }
+
+          // this.hideModal();
+
+          // this.$store.commit('setAuth', true);
+
+          this.$router.push('/');
+
+        } catch (error) {
+          console.error('Login error:', error);
+          this.errorMessage = error.message || 'Произошла ошибка при входе. Пожалуйста, проверьте данные и попробуйте еще раз.';
+        } finally {
+          // this.isLoading = false;
         }
-
-        console.log('Login successful:', data);
-
-        if (data.access_token) {
-          localStorage.setItem('authToken', data.access_token);
-        }
-
-        // this.hideModal();
-
-        // this.$store.commit('setAuth', true);
-
-        this.$router.push('/');
-
-      } catch (error) {
-        console.error('Login error:', error);
-        this.errorMessage = error.message || 'Произошла ошибка при входе. Пожалуйста, проверьте данные и попробуйте еще раз.';
-      } finally {
-        this.isLoading = false;
       }
     }
   }
-}
 </script>

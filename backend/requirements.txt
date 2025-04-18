@@ -14,3 +14,4 @@ pydantic~=2.10.5
 redis~=5.2.1
 flask-cors~=5.0.1
 flask-pydantic
+tavern

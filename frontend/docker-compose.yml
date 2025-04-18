@@ -1,0 +1,25 @@
+networks:
+  frontend-network:
+    driver: bridge
+
+services:
+  frontend:
+    image: arttyu/newsfeed:frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend-container
+    ports:
+      - "80:80"
+    networks:
+      - frontend-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower-frontend
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
