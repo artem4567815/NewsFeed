@@ -23,6 +23,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Build and Push Frontend Image
         uses: docker/build-push-action@v5
         with:
@@ -42,3 +45,6 @@ jobs:
             docker pull arttyu/newsfeed:frontend
             cd ~/edufeed/frontend
             docker compose up -d 
+
+      - name: Remove .env
+        run: rm .env
