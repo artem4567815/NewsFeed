@@ -115,6 +115,9 @@ import {onMounted, ref} from 'vue'
 import * as icons from 'lucide-vue-next'
 import SidebarItem from "@/components/SidebarItem.vue";
 import PostMain from "@/components/postMain.vue";
+import emitter from '@/main.js'
+
+
 
 
 const { Menu } = icons
@@ -122,6 +125,10 @@ const { Menu } = icons
 const currentPage = ref('news')
 const sidebarOpen = ref(false)
 const profileTab = ref('personal')
+
+emitter.on('toggle-sidebar', () => {
+  sidebarOpen.value = !sidebarOpen.value
+})
 
 const setPage = (page) => {
   currentPage.value = page

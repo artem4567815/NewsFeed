@@ -103,7 +103,7 @@ export default {
       this.errorMessage = "";
 
       try {
-        const response = await fetch('http://127.0.0.1:8080/auth/admin/register', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/register/admin`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -124,11 +124,11 @@ export default {
         console.log('Registration successful:', data);
 
         const auth = {
-          username: this.register.name,
+          login: this.register.name,
           password: this.register.password,
         }
         try {
-          const response = await fetch('http://127.0.0.1:8080/auth/login', {
+          const response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

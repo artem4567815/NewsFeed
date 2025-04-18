@@ -40,25 +40,14 @@
           </h2>
 
           <!-- Описание -->
-          <p class="text-base text-gray-700 mb-6 leading-relaxed line-clamp-3">
+          <p class="text-base text- text-gray-700 mb-6 leading-relaxed line-clamp-3">
             {{post.short_content}}
           </p>
         </div>
           <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
-            <div class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-              Технологии
-            </div>
-
-              <div class="bg-green-600/20 text-green-600  border-green-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-                автобусы
-              </div>
-              <div class="bg-orange-600/20 text-orange-600 border-orange-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-                Технологии
-              </div>
-              <div class="bg-violet-600/20 text-violet-600 border-violet-600/40  ring-1 px-3 py-1 rounded-full text-sm font-medium ">
-                dbedbe
-              </div>
-
+            <tag-pill v-for="tag in post.tags" :key="tag" :tag="tag" class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
+              {{tag}}
+            </tag-pill>
           </div>
 
 
@@ -68,7 +57,7 @@
           <!-- Автор -->
           <div class="flex items-center">
             <img
-                :src="post.image_url"
+                :src="post.author.avatar_url"
                 class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
             />
             <div class="ml-3">
@@ -128,6 +117,7 @@ let intervalId = null;
 import api from '@/api/axios'
 import { useRouter } from 'vue-router'
 import axios from "axios";
+import TagPill from "@/components/UI/tagPill.vue";
 
 function Like() {
   const likePost = async () => {

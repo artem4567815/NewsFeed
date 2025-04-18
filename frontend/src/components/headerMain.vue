@@ -14,7 +14,7 @@
         <!-- Бургер кнопка -->
         <div
             v-if="$route.path == '/profile'"
-         @click="sidebarOpen = !sidebarOpen"
+         @click="toggleSidebar"
             class="hover:cursor-pointer block md:hidden bg-gray-200 ring-4 mr-5 ring-black/0 hover:bg-gray-300 hover:ring-gray-200 transition ease-in-out rounded-2xl p-3 sm:mr-5"
         >
           <AlignJustify /> <!-- НУЖНО НАСТРОИТЬ ЭМИТ -->
@@ -48,7 +48,14 @@
 import { Settings, Search, Filter, AlignJustify, Newspaper, Layout, BriefcaseBusiness  } from 'lucide-vue-next';
 import BlueButton from "@/components/UI/blueButton.vue";
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import emitter from '@/main.js'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+const toggleSidebar = () => {
+  emitter.emit('toggle-sidebar')
+}
 
 const token = localStorage.getItem('authToken')
 const showDropdown = ref(false)
@@ -71,6 +78,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
 </script>
 
 <style scoped>
