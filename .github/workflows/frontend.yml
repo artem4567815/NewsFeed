@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Create .env file
-        run: echo "${{ secrets.ENV_FRONT_FILE }}" > .env
+        run: echo "${{ secrets.ENV_FRONT_FILE }}" > frontend/.env
 
       - name: List files in current directory
         run: ls -la
@@ -49,3 +49,6 @@ jobs:
             docker pull arttyu/newsfeed:frontend
             cd ~/edufeed/frontend
             docker-compose up -d 
+
+      - name: Delete .env file after tests
+        run: rm -f frontend/.env
