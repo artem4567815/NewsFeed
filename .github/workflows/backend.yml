@@ -58,4 +58,4 @@ jobs:
           script: |
             docker pull arttyu/newsfeed:backend
             cd ~/edufeed/backend
-            docker compose up -d
+            docker-compose up -d
