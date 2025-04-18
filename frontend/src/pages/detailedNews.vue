@@ -112,22 +112,26 @@ const error = ref(null)
 
 const loadPost = async () => {
   try {
-    isLoading.value = true
-    error.value = null
-    const response = await fetch(`${import.meta.env.VITE_BASE_URL}/posts/${route.params.id}`)
+    isLoading.value = true;
+    error.value = null;
 
-    if (!response.ok) {
-      throw new Error(response.status === 404 ? 'Новость не найдена' : 'Ошибка сервера')
-    }
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts/${route.params.id}`);
+    post.value = response.data;
 
-    post.value = await response.json()
   } catch (err) {
-    error.value = err.message
-    console.error('Ошибка загрузки:', err)
+    if (axios.isAxiosError(err)) {
+      error.value = err.response?.status === 404
+          ? 'Новость не найдена'
+          : 'Ошибка сервера';
+    } else {
+      error.value = 'Неизвестная ошибка';
+    }
+    console.error('Ошибка загрузки:', err);
+
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 
 

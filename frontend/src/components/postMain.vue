@@ -29,7 +29,7 @@
               {{ dateAgo }}
             </span>
             </div>
-            <span class="px-3 py-1 h-fit ml-auto sm:ml-0 text-sm font-medium rounded-full bg-blue-100 text-blue-800">{{post.type}}</span>
+            <span class="px-3 py-1 h-fit ml-auto sm:ml-0 text-sm font-medium rounded-full bg-blue-100 text-blue-800"> {{ getLocalizedType(post.type) }}</span>
 
           </div>
 
@@ -56,13 +56,22 @@
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <!-- Автор -->
           <div class="flex items-center">
-            <img
-                :src="post.author.avatar_url"
-                class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
-            />
+            <div v-if="post.author">
+              <img
+                  v-if="post.author.avatar_url"
+                  :src="post.author.avatar_url"
+                  class="w-12 h-12 rounded-full"
+              />
+              <div
+                  v-else
+                  class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg"
+              >
+                {{ post.author.login.charAt(0) || '?' }}
+              </div>
+            </div>
             <div class="ml-3">
               <p class="text-base font-medium text-gray-900">{{post.author.login}}</p>
-              <p class="text-sm text-gray-600">ТУТ БУДЕТ ШКОЛА И КОРПУС</p>
+              <p class="text-sm text-gray-600">{{post.author.school}} {{post.author.building}}</p>
             </div>
           </div>
 
@@ -107,10 +116,24 @@ function timestampToDate(ts) {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0'); // месяцы с 0
   const year = date.getFullYear();
+
   return `${day}.${month}.${year}`;
 }
 
-const timestamp = 1744576048;
+const publicationTypes = [
+  { value: 'news', label: 'Новость' },
+  { value: 'wallpapers', label: 'Стенгазета' },
+  { value: 'team_search', label: 'Поиск команды' }
+];
+
+// Функция для преобразования типа
+const getLocalizedType = (type) => {
+  const foundType = publicationTypes.find(t => t.value === type);
+  return foundType ? foundType.label : type; // Возвращаем оригинальное значение, если тип не найден
+};
+
+const timestamp = 1744977935
+;
 const dateAgo = ref(timeAgo(timestamp));
 let intervalId = null;
 
@@ -135,13 +158,6 @@ function Like() {
 
   likePost()
 }
-
-
-
-
-
-
-
 
 setInterval(() => {
     dateAgo.value = timeAgo(timestamp);
