@@ -57,7 +57,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            docker system prune -f
             docker pull arttyu/newsfeed:backend
             cd ~/edufeed/backend
+            docker-compose stop || true
+            docker-compose rm || true
             docker-compose up -d
