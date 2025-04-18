@@ -28,7 +28,7 @@ def drop_db():
 def serve_image(filename):
     return send_from_directory(UPLOADFLOADER, filename)
 
-
+print("for cicd")
 if __name__ == "__main__":
     logger.log("info", "app.py | server is starting on port:8080")
     app.run(debug=True, port=8081, host='0.0.0.0')

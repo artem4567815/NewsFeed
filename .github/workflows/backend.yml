@@ -30,7 +30,7 @@ jobs:
       - name: Run Tavern tests
         run: |
           cd backend/tests
-          tavern-ci *.tavern.yaml
+          pytest
 
       - name: Login to DockerHub
         if: ${{ success() }}
