@@ -16,7 +16,7 @@ def get_posts_by_user_id():
     user_id = get_jwt_identity()
     posts = find_news_by_user_id(user_id)
     posts = [post.as_dict() for post in posts]
-    posts = sorted(posts, key=lambda news: news["created_at"], reverse=True)
+    posts = sorted(posts, key=lambda news: news["created_at"], reverse=False)
     return jsonify({"user_posts": posts}), 200
 
 

@@ -27,7 +27,7 @@ def get_most_three_active_user():
         for user in result
     ]
     print(out)
-    out = sorted(out, key=lambda x: x["post_count"], reverse=True)
+    out = sorted(out, key=lambda x: x["post_count"], reverse=False)
     print(out)
 
     return out
