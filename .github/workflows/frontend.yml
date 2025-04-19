@@ -37,7 +37,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_NAME }}:frontend
           build-args: |
-            VITE_BASE_URL=https://edufeed.ru/api
+            VITE_BASE_URL=http://edufeed.ru/api
 
       - name: Deploy frontend via SSH
         if: ${{ success() }}

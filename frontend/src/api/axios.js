@@ -16,7 +16,7 @@ api.interceptors.request.use(config => {
     }
     return config
 })
-// pupalc
+// pupalcasd
 
 // Перехватываем 401 и отправляем refresh-запрос
 api.interceptors.response.use(
