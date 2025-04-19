@@ -365,7 +365,7 @@ onMounted(async () => {
 
     // Загрузка новостей
     const allPostsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
-    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "pending");
+    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "draft");
 
     // Загрузка модерации (только для админов)
     if (isAdmin.value) {
