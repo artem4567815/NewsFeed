@@ -64,7 +64,7 @@
         <!-- Таймлайн (правая колонка) -->
         <div class="hidden 2xl:block backdrop-blur-[2px] min-h-screen w-[400px]   py-8 px-4">
           <div class="top-8">
-            <filter-panel class="mb-6" @update:filters="onFilterUpdate" />
+<!--            <filter-panel class="mb-6" @update:filters="onFilterUpdate" />-->
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <div class="flex items-center justify-between mb-8">
                 <div>
@@ -77,7 +77,7 @@
                     v-for="timelineBlock in timeline"
                     :key="timelineBlock.post_id"
                     :timeline="timelineBlock"
-                    @click="$router.push('/post/id')"
+                    @click="$router.push(`/post/${timelineBlock.post_id}`); View(timelineBlock.post_id)"
                 />
               </div>
             </div>
