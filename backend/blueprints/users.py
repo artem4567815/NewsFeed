@@ -146,3 +146,12 @@ def get_subscribe():
         out["tags"] = subscribe.tags
     print(out)
     return jsonify({"subscriptions": out}), 200
+
+
+@user_routes.route('/drafts', methods=['GET'])
+@safe("blueprints/users.py | drafts")
+@jwt_required()
+def drafts():
+    posts = News.query.filter_by(status="draft").all()
+    posts = [post.as_dict() for post in posts]
+    return jsonify({"drafts": posts}), 200
