@@ -14,5 +14,5 @@ SERVER_PORT = os.getenv('SERVER_PORT', 8080)
 
 PORT = 1234
 DEBUG = os.getenv("FLASK_DEBUG", "0")
-UPLOADFLOADER = 'backend/images'
+UPLOADFLOADER = 'images'
 USER_LIST_KEY = "users_id"
