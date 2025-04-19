@@ -3,6 +3,8 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.dialects.postgresql import ARRAY
 import time
+from sqlalchemy import DateTime, func
+from  datetime import datetime
 
 class News(db.Model):
     post_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
@@ -16,7 +18,10 @@ class News(db.Model):
 
     image_url = db.Column(db.String(500), nullable=True)
 
-    created_at = db.Column(db.BigInteger, default=lambda: int(time.time()), nullable=True)
+    timestamp = int(datetime.now().timestamp())
+    created_at = db.Column(DateTime, default=func.to_timestamp(timestamp), nullable=True)
+
+    # created_at = db.Column(db.Integer, default=lambda: int(datetime.now().timestamp()))
     type = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False, default='draft')
     tags = db.Column(ARRAY(db.String))
@@ -43,7 +48,7 @@ class News(db.Model):
                 "school": self.user.school,
                 "building": self.user.building,
             },
-            "created_at": self.created_at,
+            "created_at": int(self.created_at.timestamp()) if self.created_at else None,
             "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
             "views": self.views,
             "tags": self.tags
