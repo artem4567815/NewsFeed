@@ -292,13 +292,16 @@ const handleAvatarChange = async (event) => {
 const reason = "хцйавыв"
 const to_moderations = async (post_id) => {
   const mods = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
+  window.location.reload();
 }
 const aprove = async (post_id) => {
   const apr = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id);
+  window.location.reload();
 }
 const reject = async (post_id) => {
   const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, reason,
       {headers: {'Content-Type': 'application/json'}});
+  window.location.reload();
 }
 // Сохранение изменений профиля
 const saveProfileChanges = async () => {
@@ -360,20 +363,25 @@ onMounted(async () => {
     // Загрузка профиля
     const profileRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/profile`);
     profilePage.value = profileRes.data;
+    console.log(profilePage);
 
     // Загрузка новостей
-    const homeRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
-    DraftPagePosts.value = homeRes.data.user_posts;
-    console.log(homePagePosts);
+    const allPostsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
+    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "pending");
+    console.log(DraftPagePosts);
 
     // Загрузка модерации (только для админов)
     if (isAdmin.value) {
       const modRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/admin/moderation`);
       moderationPagePosts.value = modRes.data.wall_newspapers;
+      console.log(moderationPagePosts);
     }
 
-    const draftsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/drafts`);
-    homePagePosts.value = draftsRes.data;
+    // const draftsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/drafts`);
+    // homePagePosts.value = draftsRes.data;
+    const homePage = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
+    homePagePosts.value = homePage.data.user_posts.filter(post => post.status === "published");
+    console.log(homePagePosts);
 
   } catch (error) {
     console.error('Ошибка при запросе данных:', error);

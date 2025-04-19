@@ -474,23 +474,6 @@ const convertToTimestamp = (dateString, time = "00:00:00") => {
   return Date.UTC(year, month - 1, day, hours, minutes, seconds)
 }
 
-const refreshToken = async () => {
-  try {
-    const response = await fetch('http://localhost:5000/auth/refresh', {
-      method: 'POST',
-      credentials: 'include'
-    })
-
-    if (response.status === 401) return "Not Auth"
-
-    const data = await response.json()
-    localStorage.setItem('access', data.access)
-    return data
-  } catch (error) {
-    console.error('Error refreshing token:', error)
-    throw error
-  }
-}
 
 // Валидация всей формы
 const validateForm = () => {
@@ -529,21 +512,6 @@ const submitForm = async () => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Обработка 401 ошибки
-      if (error.response?.status === 401) {
-        try {
-          const refreshResult = await refreshToken();
-          if (refreshResult === "Not Auth") {
-            router.push('/auth');
-            return;
-          }
-          // Повторяем запрос после обновления токена
-          return await submitForm();
-        } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError);
-          router.push('/auth');
-          return;
-        }
-      }
       // Обработка других ошибок
       console.error('Error creating post:', error);
       const errorMessage = error.response?.data?.message ||
