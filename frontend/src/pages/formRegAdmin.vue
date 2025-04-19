@@ -333,7 +333,6 @@ const submitForm = async () => {
         }
     );
 
-    console.log('Успешная регистрация:', registerResponse.data);
 
     // 2. Автоматический вход после регистрации
     const loginResponse = await axios.post(
@@ -350,7 +349,6 @@ const submitForm = async () => {
         }
     );
 
-    console.log('Успешный вход:', loginResponse.data);
 
     // 3. Сохранение токена
     if (loginResponse.data.access_token) {

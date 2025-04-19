@@ -144,7 +144,6 @@ const tabs = [
 const activeTab = ref('all')
 
 function View(id) {
-  console.log(id)
   const ViewPost = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id)

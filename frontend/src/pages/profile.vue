@@ -262,7 +262,6 @@ const handleAvatarChange = async (event) => {
       reader.onerror = error => reject(error);
       reader.readAsDataURL(file);
     });
-    console.log(base64DataUrl)
     const response = await jwtApi.patch(
         `${import.meta.env.VITE_BASE_URL}/user/profile`,
         {
@@ -363,25 +362,21 @@ onMounted(async () => {
     // Загрузка профиля
     const profileRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/profile`);
     profilePage.value = profileRes.data;
-    console.log(profilePage);
 
     // Загрузка новостей
     const allPostsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
-    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "pending");
-    console.log(DraftPagePosts);
+    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "draft");
 
     // Загрузка модерации (только для админов)
     if (isAdmin.value) {
       const modRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/admin/moderation`);
       moderationPagePosts.value = modRes.data.wall_newspapers;
-      console.log(moderationPagePosts);
     }
 
     // const draftsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/drafts`);
     // homePagePosts.value = draftsRes.data;
     const homePage = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
     homePagePosts.value = homePage.data.user_posts.filter(post => post.status === "published");
-    console.log(homePagePosts);
 
   } catch (error) {
     console.error('Ошибка при запросе данных:', error);

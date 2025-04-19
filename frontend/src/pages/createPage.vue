@@ -506,8 +506,7 @@ const submitForm = async () => {
     // Основной запрос
     const response = await jwtApi.post(
         `${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData);
-    console.log('Post created:', response.data);
-    router.push('/create');
+    router.push('/');
 
   } catch (error) {
     if (axios.isAxiosError(error)) {
