@@ -36,6 +36,8 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: ${{ env.IMAGE_NAME }}:frontend
+          build-args: |
+            VITE_BASE_URL=http://127.0.0.1:8080/api
 
       - name: Deploy frontend via SSH
         if: ${{ success() }}

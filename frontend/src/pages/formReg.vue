@@ -322,7 +322,7 @@ const submitForm = async () => {
   errorMessage.value = "";
 
   try {
-    console.log(`${import.meta.env.VITE_BASE_URL}/auth/register/client`)
+    console.log(`${import.meta.env.VITE_BASE_URL}`)
     const registerResponse = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/register/client`,
         register.value,
