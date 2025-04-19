@@ -2,6 +2,7 @@ from . import db
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.dialects.postgresql import ARRAY
+import time
 
 class News(db.Model):
     post_id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
@@ -15,7 +16,7 @@ class News(db.Model):
 
     image_url = db.Column(db.String(500), nullable=True)
 
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=True)
+    created_at = db.Column(db.BigInteger, default=lambda: int(time.time()), nullable=True)
     type = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False, default='draft')
     tags = db.Column(ARRAY(db.String))
