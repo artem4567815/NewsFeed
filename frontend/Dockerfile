@@ -2,7 +2,7 @@ FROM node:20 AS builder
 
 ARG VITE_BASE_URL
 ENV VITE_BASE_URL=${VITE_BASE_URL}
-COPY .env /app/.env
+#COPY .env /app/.env
 
 WORKDIR /app
 
