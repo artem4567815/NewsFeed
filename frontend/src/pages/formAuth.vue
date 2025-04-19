@@ -165,6 +165,8 @@ const submitForm = async () => {
     if (response.data?.access_token) {
       localStorage.setItem('authToken', response.data.access_token)
       await router.push('/')
+      window.location.reload(); // или перенаправление на страницу входа
+
     } else {
       throw new Error('Не получили токен авторизации')
     }

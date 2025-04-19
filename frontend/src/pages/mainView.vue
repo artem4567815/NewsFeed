@@ -111,7 +111,7 @@ const filteredPosts = ref([])
 
 const currentPage = ref(1)
 const postsPerPage = 7
-const totalPosts = ref(0) // получим из ответа
+const totalPosts = ref(0)
 
 const totalPages = computed(() => Math.ceil(totalPosts.value / postsPerPage))
 
@@ -147,102 +147,74 @@ function View(id) {
   console.log(id)
   const ViewPost = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id) // axios сам вставит заголовки и токен
+      await axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id)
     } catch (error) {
-      console.error('Ошибка лайка:', error)
-      // можно добавить уведомление или сообщение пользователю
+      console.error('Ошибка просмотра:', error)
     }
   }
 
   ViewPost()
 }
 
-function filterPosts(posts, filters) {
-  return posts.filter((post) => {
-    const matchesQuery =
-        !filters.query || post.title.toLowerCase().includes(filters.query.toLowerCase())
-
-    const matchesSchool =
-        !filters.school || post.school === filters.school
-
-    const matchesPeriod =
-        !filters.period ||
-        new Date(post.date) >=
-        new Date(Date.now() - filters.period * 24 * 60 * 60 * 1000)
-
-    const matchesCategory =
-        !filters.categories.length ||
-        filters.categories.includes(post.category)
-
-    return matchesQuery && matchesSchool && matchesPeriod && matchesCategory
-  })
-}
-
 function onFilterUpdate(newFilters) {
   filters.value = { ...filters.value, ...newFilters }
+  currentPage.value = 1 // Сбрасываем страницу при изменении фильтров
+  loadPosts() // Перезагружаем посты с новыми фильтрами
 }
-
-watch(filters, () => {
-  filteredPosts.value = filterPosts(posts.value, filters.value)
-}, { deep: true, immediate: true })
 
 async function loadPosts() {
   const offset = (currentPage.value - 1) * postsPerPage;
 
   try {
+    const params = {
+      limit: postsPerPage,
+      offset: offset
+    }
+
+    // Добавляем параметры фильтрации, если они заданы
+    if (filters.value.query) params.search = filters.value.query
+    if (filters.value.school) params.school = filters.value.school
+    if (filters.value.period) params.days = filters.value.period
+    if (filters.value.categories.length) params.categories = filters.value.categories.join(',')
+
     const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, {
-      params: {
-        limit: postsPerPage,
-        offset: offset
-      }
+      params: params
     });
 
     posts.value = response.data.posts;
-    console.log(posts.value);
     totalPosts.value = response.data.posts_count;
-    console.log(response.data.posts_count); // зависит от API
   } catch (error) {
     console.error('Ошибка загрузки постов:', error);
     if (error.response) {
-      // Ошибка с ответом от сервера
       console.error('Статус ошибки:', error.response.status);
       console.error('Данные ошибки:', error.response.data);
     } else if (error.request) {
-      // Запрос был сделан, но ответ не получен
       console.error('Ответ не получен:', error.request);
     } else {
-      // Ошибка при настройке запроса
       console.error('Ошибка:', error.message);
     }
   }
 }
+
 async function loadTimeline() {
-  console.log(totalPosts.value);
   try {
     const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, {
       params: {
-        limit: totalPosts.value,
+        limit: 20, // Ограничиваем количество постов для таймлайна
         offset: 0
       }
     });
     timeline.value = response.data.posts;
-    console.log(timeline.value);
   } catch (error) {
-    console.error('Ошибка загрузки постов:', error);
-    if (error.response) {
-      console.error('Статус ошибки:', error.response.status);
-      console.error('Данные ошибки:', error.response.data);
-    } else if (error.request) {
-      console.error('Ответ не получен:', error.request);
-    } else {
-      console.error('Ошибка:', error.message);
-    }
+    console.error('Ошибка загрузки таймлайна:', error);
   }
 }
+
 onMounted(async () => {
   await loadPosts()
   await loadTimeline()
 })
+
 watch(currentPage, () => {
   loadPosts()
   window.scrollTo({

@@ -77,7 +77,7 @@
               <!-- Действия -->
               <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200">
                 <div class="flex items-center gap-2">
-                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
+                  <button @click="Like" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
                     <Heart class="w-4 h-4" />
                     <span>{{ post.likes_count || 0 }}</span>
                   </button>
@@ -104,11 +104,31 @@ import { CalendarDays, Eye, Heart, Share2 } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { useRoute } from "vue-router"
 import FooterMain from "@/components/footerMain.vue"
+import axios from "axios";
+import api from "@/api/axios.js";
 
 const route = useRoute()
 const post = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
+
+function Like() {
+  if (!post.value) return;
+
+  const likePost = async () => {
+    try {
+      await api.post(`/posts/${post.value.post_id}/like`, {
+        post_id: post.value.post_id,
+      }, { withCredentials: true });
+      post.value.likes_count++;
+    } catch (error) {
+      console.error('Ошибка лайка:', error);
+      // Add user notification here
+    }
+  }
+
+  likePost();
+}
 
 const loadPost = async () => {
   try {

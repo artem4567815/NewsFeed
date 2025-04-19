@@ -345,7 +345,9 @@ const submitForm = async () => {
     if (loginResponse.data.access_token) {
       localStorage.removeItem('authToken');
       localStorage.setItem('authToken', loginResponse.data.access_token);
-      router.push('/');
+      await router.push('/');
+      window.location.reload(); // или перенаправление на страницу входа
+
     }
 
   } catch (error) {

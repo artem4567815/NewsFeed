@@ -233,6 +233,7 @@ import { ref, computed, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { CalendarDays, Upload } from 'lucide-vue-next'
 import jwtApi from "@/api/jwtApi.js";
+import axios from "axios";
 
 const router = useRouter()
 
@@ -253,7 +254,7 @@ const tagsError = ref('')
 const publicationTypes = [
   { value: 'news', label: 'Новость' },
   { value: 'wallpapers', label: 'Стенгазета' },
-  { value: 'team_search', label: 'Поиск команды' }
+  // { value: 'team_search', label: 'Поиск команды' }
 ]
 
 // Теги
@@ -523,7 +524,7 @@ const submitForm = async () => {
     const response = await jwtApi.post(
         `${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData);
     console.log('Post created:', response.data);
-    router.push('/');
+    router.push('/create');
 
   } catch (error) {
     if (axios.isAxiosError(error)) {
