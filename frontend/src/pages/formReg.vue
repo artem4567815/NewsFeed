@@ -322,14 +322,12 @@ const submitForm = async () => {
   errorMessage.value = "";
 
   try {
-    console.log(`${import.meta.env.VITE_BASE_URL}`)
     const registerResponse = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/auth/register/client`,
         register.value,
         { headers: { 'Content-Type': 'application/json' } }
     );
 
-    console.log('Успешная регистрация:', registerResponse.data);
 
     const auth = {
       login: register.value.login,
