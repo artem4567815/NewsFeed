@@ -5,6 +5,7 @@ import string
 from config import UPLOADFLOADER
 import io
 from PIL import Image
+from config import SERVER_ADD
 from flask import url_for
 
 
@@ -28,5 +29,7 @@ def save_base64_image(base64_string):
         image.save(file_path)
 
     path = url_for('serve_image', filename=f"{filename}.{file_extension}", _external=True)
+    res = path.split('/images')
+    res1 = res[0] + SERVER_ADD + "/" + UPLOADFLOADER + res[1]
 
-    return str(path)
+    return str(res1)

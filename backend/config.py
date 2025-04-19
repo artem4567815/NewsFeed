@@ -16,3 +16,4 @@ PORT = 1234
 DEBUG = os.getenv("FLASK_DEBUG", "0")
 UPLOADFLOADER = 'images'
 USER_LIST_KEY = "users_id"
+SERVER_ADD = os.getenv('SERVER_ADD', "/api")
