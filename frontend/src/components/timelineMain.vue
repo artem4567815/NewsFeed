@@ -94,7 +94,7 @@ function timeAgo(timestampSec) {
   return 'только что';
 }
 
-const dateAgo = ref(timeAgo(1744576048));
+const dateAgo = ref(timeAgo(props.timeline.created_at));
 
 </script>
 

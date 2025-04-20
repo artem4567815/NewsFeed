@@ -132,7 +132,7 @@ const getLocalizedType = (type) => {
   return foundType ? foundType.label : type; // Возвращаем оригинальное значение, если тип не найден
 };
 
-const timestamp = 1744977935
+const timestamp = props.post.created_at
 ;
 const dateAgo = ref(timeAgo(timestamp));
 let intervalId = null;
