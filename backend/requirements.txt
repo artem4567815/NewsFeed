@@ -17,4 +17,3 @@ flask-pydantic
 tavern
 pytest
 boto3
-mimetypes
