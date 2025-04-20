@@ -3,14 +3,9 @@ from flask import Flask
 from flask_jwt_extended import create_access_token, JWTManager, create_refresh_token
 import uuid
 from datetime import timedelta
-import os
-import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-import backend.config as config
-
-JWT_SECRET = config.JWT_SECRET
+JWT_SECRET = "test_jwt_in_debug"
 
 def get_refresh_token(response, cookie_name):
     cookie = response.cookies.get(cookie_name)

@@ -30,6 +30,10 @@ services:
     depends_on:
       - db
     environment:
+      access_key: ${access_key}
+      secret_key: ${secret_key}
+      endpoint: ${endpoint}
+      test_bucket: test
       FLASK_DEBUG: 1
       SERVER_PORT: 8080
       DB_LOGIN: postgres
@@ -39,6 +43,7 @@ services:
       DB_DATABASE: projects
     networks:
       - test-net
+
     command: ["sh", "/usr/src/app/start.sh"]
 
   tests:
