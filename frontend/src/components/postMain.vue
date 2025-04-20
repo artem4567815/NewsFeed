@@ -5,7 +5,7 @@
   >
     <div class="flex flex-col lg:flex-row h-full">
       <!-- Изображение -->
-      <div class="lg:w-[500px] relative overflow-hidden">
+      <div class="lg:w-[500px] lg:min-w-[500px] relative overflow-hidden">
         <img
             :src="post.image_url"
             alt="Превью картинки"
@@ -14,7 +14,7 @@
       </div>
 
       <!-- Контент -->
-      <div class="flex-1 p-2 md:p-4 flex flex-col min-h-[350px] relative">
+      <div class="flex-1 p-2 md:p-4 lg:w-[400px] flex flex-col min-h-[350px]">
         <!-- Категория -->
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
@@ -44,8 +44,8 @@
             {{post.short_content}}
           </p>
         </div>
-          <div class="flex items-center space-x-4 timeline-scroll overflow-x-auto mb-4">
-            <tag-pill v-for="tag in post.tags" :key="tag" :tag="tag" class="bg-blue-600/20 text-blue-600  border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
+          <div class="flex items-center space-x-4  timeline-scroll overflow-x-auto mb-4">
+            <tag-pill v-for="tag in post.tags" :key="tag" :tag="tag" class="bg-blue-600/20 text-blue-600 text-nowrap border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
               {{tag}}
             </tag-pill>
           </div>
@@ -249,6 +249,11 @@ onUnmounted(() => {
 
 .timeline-scroll::-webkit-scrollbar-thumb:hover {
   background: #6ee7b7;
+}
+@media (min-width: 1024px) {
+  .timeline-scroll {
+    overflow-x: auto; /* На больших экранах скрываем скроллбар, если контент помещается */
+  }
 }
 
 
