@@ -258,7 +258,7 @@ stages:
         full_content: "Test content"
         start_date: 2217628800
         end_date: 2218060800
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "news"
         status: "published"
         author:
@@ -271,7 +271,7 @@ stages:
 
   - name: 12 - Create wallpaper post as client
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -289,7 +289,7 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:
@@ -403,7 +403,7 @@ stages:
 
   - name: 21 - Create another news post as client №2
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client2}"
@@ -421,7 +421,7 @@ stages:
         title: "Test News Post 2"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:
@@ -672,7 +672,7 @@ stages:
 
   - name: 36 - Create wallpaper post as client №3
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client3}"
@@ -690,7 +690,7 @@ stages:
         title: "Test Wallpaper Post 3"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:
@@ -721,7 +721,7 @@ stages:
 
   - name: 37 - Create wallpaper post as client №4
     request:
-      url: "{url}/posts/create/wallpapers" 
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client4}"
@@ -739,7 +739,7 @@ stages:
         title: "Test Wallpaper Post 4"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers" 
         status: "draft"
         author:
@@ -770,7 +770,7 @@ stages:
 
   - name: 38 - Create another wallpaper post as client №5
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -788,7 +788,7 @@ stages:
         title: "Test Wallpaper Post 5"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:

@@ -492,6 +492,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /posts/filter/info:
+    get:
+      tags:
+        - Posts
+      summary: Get filters
+      responses:
+        '200':
+          description: Data for filters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schools:
+                    type: array
+                    example: ["1561"]
+                  tags:
+                    type: array
+                    example: ["Образование", "Наука"]
+
   /admin/moderation:
     get:
       tags:

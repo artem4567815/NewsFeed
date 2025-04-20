@@ -99,7 +99,7 @@ stages:
 
   - name: 5 - Create wallpaper post as client
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -117,7 +117,7 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:
@@ -205,7 +205,7 @@ stages:
 
   - name: 13 - Create another post for moderation
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -223,7 +223,7 @@ stages:
         title: "Test Wallpaper Post2"
         short_content: "short content2"
         full_content: "Test content2"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:
@@ -322,7 +322,7 @@ stages:
 
   - name: 22 - Create another draft post
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -340,7 +340,7 @@ stages:
         title: "Test Wallpaper Post 3"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:

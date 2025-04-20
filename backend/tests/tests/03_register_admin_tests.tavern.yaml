@@ -247,7 +247,7 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_url: !re_match "^http://.*$"
+        avatar_url: !re_match "^https://.*$"
 
   - name: 17 - Register admin with invalid base64 avatar
     request:
@@ -352,4 +352,4 @@ stages:
         school: "1561"
         building: "11"
         login: "admin8"
-        avatar_url: !re_match "^http://.*$"
+        avatar_url: !re_match "^https://.*$"

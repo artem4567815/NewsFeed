@@ -3,6 +3,14 @@ from flask import Flask
 from flask_jwt_extended import create_access_token, JWTManager, create_refresh_token
 import uuid
 from datetime import timedelta
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+import backend.config as config
+
+JWT_SECRET = config.JWT_SECRET
 
 def get_refresh_token(response, cookie_name):
     cookie = response.cookies.get(cookie_name)
@@ -25,7 +33,7 @@ def get_refresh_token(response, cookie_name):
 
 def create_token_with_invalid_token(response):
     app = Flask(__name__)
-    app.config["JWT_SECRET_KEY"] = "very_secret_config"
+    app.config["JWT_SECRET_KEY"] = JWT_SECRET
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=5)
 
@@ -40,7 +48,7 @@ def create_token_with_invalid_token(response):
 
 def create_expired_access_token(response):
     app = Flask(__name__)
-    app.config["JWT_SECRET_KEY"] = "very_secret_config"
+    app.config["JWT_SECRET_KEY"] = JWT_SECRET
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=-1)
@@ -57,7 +65,7 @@ def create_expired_access_token(response):
 
 def create_expired_refresh_token(response):
     app = Flask(__name__)
-    app.config["JWT_SECRET_KEY"] = "very_secret_config"
+    app.config["JWT_SECRET_KEY"] = JWT_SECRET
     app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(seconds=-1)

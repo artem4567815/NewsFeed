@@ -98,7 +98,7 @@ stages:
 
   - name: 5 - Create test post for moderation
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -117,7 +117,7 @@ stages:
         type: "wallpapers"
         full_content: "Test content"
         short_content: "Test short content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
       save:
         json:
           post_id: post_id
@@ -146,7 +146,7 @@ stages:
             type: "wallpapers"
             full_content: "Test content"
             short_content: "Test short content"
-            image_url: !re_match "^http://.*$"
+            image_url: !re_match "^https://.*$"
             status: "pending"
 
   - name: 7 - Apply post as admin
@@ -171,7 +171,7 @@ stages:
 
   - name: 9 - Create another test post
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -190,7 +190,7 @@ stages:
         type: "wallpapers"
         full_content: "Test content 2"
         short_content: "Test short content 2"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
       save:
         json:
           post_id_2: post_id

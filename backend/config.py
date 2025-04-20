@@ -12,8 +12,14 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 APP_SECRET = os.environ.get('APP_SECRET')
 SERVER_PORT = os.getenv('SERVER_PORT', 8080)
 
-PORT = 1234
 DEBUG = os.getenv("FLASK_DEBUG", "0")
-UPLOADFLOADER = 'images'
-USER_LIST_KEY = "users_id"
 SERVER_ADD = os.getenv('SERVER_ADD', "/api")
+JWT_SECRET = os.getenv('JWT_SECRET')
+UPLOAD_FOLDER = "images"
+
+
+access_key = os.getenv("access_key")
+secret_key = os.getenv("secret_key")
+endpoint = os.getenv("endpoint")
+test_bucket = os.getenv("test_bucket")
+bucket = os.getenv("bucket") if not DEBUG else test_bucket

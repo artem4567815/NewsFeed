@@ -4,7 +4,7 @@ from methods import *
 from flask_pydantic import validate
 from schemas import *
 from werkzeug.exceptions import Forbidden
-
+from manage import minio
 
 posts = Blueprint('posts', __name__)
 
@@ -71,8 +71,11 @@ def delete_posts(post_id):
     if str(post.user_id) != str(user_id):
         raise Forbidden("not allowed")
 
+    minio.delete_file_by_url(post.image_url)
+
     db.session.delete(post)
     db.session.commit()
+
     return jsonify({}), 204
 
 
@@ -154,33 +157,33 @@ def join_to_posts(post_id):
 
 
 @posts.route('/create/post', methods=['POST'])
-@safe("blueprints/admin.py | save_news")
+@safe("blueprints/posts.py | save_news")
 @jwt_required()
 @validate()
 def save_news(body: CreateNewsRequest):
-    file = save_base64_image(body.post_img)
     user_id = get_jwt_identity()
+    user = find_user_by_user_id(user_id)
+    file = minio.upload_base64(body.post_img, user.login)
+    file_url = minio.get_public_url(file)
     access = get_jwt()['is_admin']
 
     if access:
-        news = create_news(body.title, body.short_content, body.content, file,
+        news = create_news(body.title, body.short_content, body.content, file_url,
                            body.start_date, body.end_date, user_id, body.type, body.tags)
     else:
-        news = create_news(body.title, body.short_content, body.content, file,
+        news = create_news(body.title, body.short_content, body.content, file_url,
                            body.start_date, body.end_date, user_id, body.type, body.tags, "draft")
 
     return jsonify(news.as_dict()), 201
 
 
-@posts.route('/create/wallpapers', methods=['POST'])
-@safe("blueprints/posts.py | save_wallpapers")
-@jwt_required()
-@validate()
-def save_wallpapers(body: CreateNewsRequest):
-    file = save_base64_image(body.post_img)
-    user_id = get_jwt_identity()
+@posts.route('/filter/info', methods=['GET'])
+@safe("blueprints/posts.py | get_filter_info")
+def get_filter_info():
+    tags = db.session.query(db.func.unnest(News.tags)).distinct().all()
+    tags = [tag[0] for tag in tags]
 
-    news = create_news(body.title, body.short_content, body.content, file, body.start_date, body.end_date,
-                       user_id, body.type, body.tags, "draft")
+    schools = db.session.query(Users.school).distinct().all()
+    schools = [school[0] for school in schools]
 
-    return jsonify(news.as_dict()), 201
+    return jsonify({"tags": tags, "schools": schools}), 200

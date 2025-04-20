@@ -1,9 +1,12 @@
-from flask import Blueprint, request
-from methods import *
+from flask import Blueprint, request, jsonify
+from methods import safe, check_jwt_access, is_valid_uuid, get_most_three_active_user, get_expired_posts_avg_conversion, get_statistics_by_posts_id
+
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import News
 from schemas import QueryRequest
 from flask_pydantic import validate
+from werkzeug.exceptions import BadRequest, NotFound
+from models import db
 
 admin_routes = Blueprint('admin', __name__)
 
@@ -47,6 +50,7 @@ def moderation_reject(post_id):
         return BadRequest("Invalid post id")
 
     reason = request.json.get("reason", None)
+
     if reason is None:
         raise BadRequest("Invalid reason")
 

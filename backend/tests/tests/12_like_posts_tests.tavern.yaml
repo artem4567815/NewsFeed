@@ -168,7 +168,7 @@ stages:
         full_content: "Test content"
         start_date: 2217628800
         end_date: 2218060800
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "news"
         status: "published"
         author:
@@ -181,7 +181,7 @@ stages:
 
   - name: 7 - Create wallpaper post as client
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -203,7 +203,7 @@ stages:
         full_content: "Test content"
         start_date: 2217628800
         end_date: 2218060800
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:

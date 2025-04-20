@@ -22,7 +22,7 @@ stages:
         school: "1561"
         building: "11"
         login: "admin"
-        avatar_url: !re_match "^http://.*$"
+        avatar_url: !re_match "^https://.*$"
       save:
         json:
           author_id: user_id
@@ -120,7 +120,7 @@ stages:
         full_content: "Test content"
         start_date: 2217628800
         end_date: 2218060800
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "news"
         status: "published"
         author:
@@ -258,7 +258,7 @@ stages:
 
   - name: 13 - Create wallpaper post with all fields
     request:
-      url: "{url}/posts/create/wallpapers"
+      url: "{url}/posts/create/post"
       method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
@@ -276,7 +276,7 @@ stages:
         title: "Test Wallpaper Post"
         short_content: "short content"
         full_content: "Test content"
-        image_url: !re_match "^http://.*$"
+        image_url: !re_match "^https://.*$"
         type: "wallpapers"
         status: "draft"
         author:

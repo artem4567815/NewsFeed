@@ -3,7 +3,10 @@ from collections.abc import MutableMapping
 from typing import Any
 import pytest
 import requests
+import yaml
 
+with open("config.yaml", "r") as file:
+    config = yaml.safe_load(file)
 
 def pytest_tavern_beta_before_every_request(request_args: MutableMapping):
     message = f"Request: {request_args['method']} {request_args['url']}"
@@ -23,7 +26,7 @@ def pytest_tavern_beta_after_every_response(expected: Any, response: Any) -> Non
 
 @pytest.fixture(autouse=True)
 def clear_db():
-    resp = requests.get('http://app:8080/ping')
+    resp = requests.get(f'{config['variables']['url']}/ping')
     if resp.status_code != 200:
         pytest.fail(f"Ping not passed with status code {resp.status_code}")
-    requests.post('http://app:8080/test/drop-db')
+    requests.post(f'{config['variables']['url']}/test/drop-db')
