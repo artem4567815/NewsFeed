@@ -199,11 +199,13 @@ async function loadTimeline() {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, {
       params: {
-        limit: 20, // Ограничиваем количество постов для таймлайна
+        limit: totalPosts.value, // Ограничиваем количество постов для таймлайна
         offset: 0
       }
     });
     timeline.value = response.data.posts;
+    console.log(timeline.value)
+    console.log(timeline.value)
   } catch (error) {
     console.error('Ошибка загрузки таймлайна:', error);
   }

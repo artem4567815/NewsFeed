@@ -298,7 +298,7 @@ const aprove = async (post_id) => {
   window.location.reload();
 }
 const reject = async (post_id) => {
-  const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, reason,
+  const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason},
       {headers: {'Content-Type': 'application/json'}});
   window.location.reload();
 }
