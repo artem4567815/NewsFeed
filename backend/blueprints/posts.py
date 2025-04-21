@@ -15,7 +15,7 @@ posts = Blueprint('posts', __name__)
 def category_posts(query: QueryRequest):
     posts_list, posts_count = get_news_by_query(query)
     posts_list = [news.as_dict() for news in posts_list]
-    posts_list = sorted(posts_list, key=lambda news: news["created_at"], reverse=True)
+    posts_list = sorted(posts_list, key=lambda news: news["published_at"], reverse=True)
     return jsonify({"posts": posts_list, "posts_count":posts_count}), 200
 
 
@@ -186,7 +186,7 @@ def get_filter_info():
     tags = [tag[0] for tag in tags_query.all()]
 
     schools_query = db.session.query(Users.school) \
-        .join(News, Users.id == News.user_id) \
+        .join(News, Users.user_id == News.user_id) \
         .filter(News.status == "published") \
         .distinct()
     schools = [school[0] for school in schools_query.all()]
