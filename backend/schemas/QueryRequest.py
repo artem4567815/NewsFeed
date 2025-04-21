@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 
 
 class QueryRequest(BaseModel):
-    type: Optional[List[Literal["news", "wallpapers", "team_search"]]] = None
+    type: Optional[str] = None
     limit: Optional[int] = Field(20, ge=0)
     offset: Optional[int] = Field(0, ge=0)
     start_date: Optional[int] = None
