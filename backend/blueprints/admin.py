@@ -7,6 +7,7 @@ from schemas import QueryRequest
 from flask_pydantic import validate
 from werkzeug.exceptions import BadRequest, NotFound
 from models import db
+from sqlalchemy import func
 
 admin_routes = Blueprint('admin', __name__)
 
@@ -36,6 +37,8 @@ def moderation_apply(post_id):
         return jsonify({"Message": "Новость не найдена"}), 404
 
     post.status = "published"
+    post.published_at = func.now()
+
     db.session.commit()
 
     return jsonify({}), 204

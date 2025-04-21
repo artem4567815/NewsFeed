@@ -12,6 +12,7 @@ class QueryRequest(BaseModel):
     end_date: Optional[int] = None
     tags: Optional[str] = None
     school: Optional[str] = None
+    search: Optional[str] = None
 
     @model_validator(mode="after")
     def check_dates(cls, values):

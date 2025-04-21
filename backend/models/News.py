@@ -19,6 +19,7 @@ class News(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
 
     created_at = db.Column(DateTime, default=func.now())
+    published_at = db.Column(DateTime, nullable=True)
 
     type = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(100), nullable=False, default='draft')
@@ -46,7 +47,7 @@ class News(db.Model):
                 "school": self.user.school,
                 "building": self.user.building,
             },
-            "created_at": self.created_at.timestamp() if self.created_at else None,
+            # "created_at": self.created_at.timestamp() if self.created_at else None,
             "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
             "views": self.views,
             "tags": self.tags
@@ -57,5 +58,8 @@ class News(db.Model):
 
         if self.tags is not None:
             result['tags'] = self.tags
+
+        if self.published_at is not None:
+            result['published_at'] = self.published_at.timestamp()
 
         return result

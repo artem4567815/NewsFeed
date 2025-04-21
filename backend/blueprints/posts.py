@@ -180,10 +180,15 @@ def save_news(body: CreateNewsRequest):
 @posts.route('/filter/info', methods=['GET'])
 @safe("blueprints/posts.py | get_filter_info")
 def get_filter_info():
-    tags = db.session.query(db.func.unnest(News.tags)).distinct().all()
-    tags = [tag[0] for tag in tags]
+    tags_query = db.session.query(func.unnest(News.tags)) \
+        .filter(News.status == "published") \
+        .distinct()
+    tags = [tag[0] for tag in tags_query.all()]
 
-    schools = db.session.query(Users.school).distinct().all()
-    schools = [school[0] for school in schools]
+    schools_query = db.session.query(Users.school) \
+        .join(News, Users.id == News.user_id) \
+        .filter(News.status == "published") \
+        .distinct()
+    schools = [school[0] for school in schools_query.all()]
 
     return jsonify({"tags": tags, "schools": schools}), 200

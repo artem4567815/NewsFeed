@@ -81,7 +81,6 @@ stages:
           id: "{author_id}"
           login: "{author_login}"
           avatar_url: "{author_img}"
-        created_at: !anything
       save:
         json:
           news_post_id: post_id
@@ -117,7 +116,6 @@ stages:
           id: "{author_id}"
           login: "{author_login}"
           avatar_url: "{author_img}"
-        created_at: !anything
       save:
         json:
           news_post_id: post_id
@@ -153,7 +151,6 @@ stages:
           id: "{author_id}"
           login: "{author_login}"
           avatar_url: "{author_img}"
-        created_at: !anything
       save:
         json:
           news_post_id: post_id

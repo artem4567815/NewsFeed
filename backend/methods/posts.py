@@ -1,6 +1,7 @@
 from models import News, db, UsersHistory, Users
 import uuid
 from werkzeug.exceptions import BadRequest
+from sqlalchemy import or_, func
 
 
 def get_all_news():
@@ -26,6 +27,14 @@ def get_news_by_query(query):
     if query.school is not None:
         posts = posts.join(Users).filter(Users.school == query.school)
 
+    if query.search is not None:
+        posts = posts.filter(
+            or_(
+                News.title.contains(query.search),
+                News.short_content.contains(query.search)
+            )
+        )
+
     posts_count = posts.count()
     posts = posts.offset(query.offset).limit(query.limit).all()
     return posts, posts_count
@@ -50,6 +59,10 @@ def create_news(title, short_content, full_content, image_url, start_date,
 
     if tags is not None:
         new_record.tags = tags
+
+    if status == "published":
+        new_record.published_at = func.now()
+        print(func.now())
 
     db.session.add(new_record)
     db.session.commit()
