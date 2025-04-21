@@ -63,7 +63,7 @@ def delete_posts(post_id):
         raise BadRequest("post_id not valid")
 
     post = find_news_by_id(post_id)
-    user_id, is_admin = get_jwt()["user_is"], get_jwt()["is_admin"]
+    user_id, is_admin = get_jwt()["user_id"], get_jwt()["is_admin"]
 
     if not post:
         return jsonify({"Message": "Новость не найдена"}), 404
