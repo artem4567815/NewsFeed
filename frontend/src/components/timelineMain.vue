@@ -19,7 +19,7 @@
 
 
       <!-- Заголовок -->
-      <h3 class="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300 mb-2">
+      <h3 class="text-base font-medium break-all text-gray-900 group-hover:text-blue-600 transition-colors duration-300 mb-2">
         {{ timeline.title }}
       </h3>
 

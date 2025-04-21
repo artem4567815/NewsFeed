@@ -133,7 +133,7 @@ const getLocalizedType = (type) => {
 };
 
 const timestamp = props.post.published_at ? props.post.published_at : props.post.created_at;
-;
+
 const dateAgo = ref(timeAgo(timestamp));
 let intervalId = null;
 
