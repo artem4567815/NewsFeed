@@ -123,7 +123,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id: post_id
@@ -229,7 +228,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id2: post_id
@@ -346,7 +344,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id3: post_id

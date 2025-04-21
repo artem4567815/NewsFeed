@@ -264,7 +264,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
       save:
         json:
           news_post_id: post_id
@@ -295,7 +295,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id: post_id
@@ -427,7 +426,6 @@ stages:
         author:
           id: "{author_client_id2}"
           login: "{author_client_login2}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id_2: post_id
@@ -696,7 +694,6 @@ stages:
         author:
           id: "{author_client_id3}"
           login: "{author_client_login3}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id_3: post_id
@@ -745,7 +742,6 @@ stages:
         author:
           id: "{author_client_id4}"
           login: "{author_client_login4}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id_4: post_id
@@ -794,7 +790,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id_5: post_id

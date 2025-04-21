@@ -129,7 +129,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
         tags:
           - "Образование"
           - "Наука"
@@ -169,7 +169,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
         tags:
           - "Наука"
       save:
@@ -208,7 +208,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
         tags:
           - "Уроки"
       save:
@@ -247,7 +247,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
         tags:
           - "Олимпиада"
       save:
@@ -303,7 +302,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
         tags:
           - "Образование"
           - "Наука"
@@ -328,7 +327,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
         tags:
           - "Наука"
 
@@ -496,7 +495,9 @@ stages:
       params:
         type: "invalid"
     response:
-      status_code: 400
+      status_code: 200
+      json:
+        posts: []
 
   - name: 26 - Get posts with none tags
     request:

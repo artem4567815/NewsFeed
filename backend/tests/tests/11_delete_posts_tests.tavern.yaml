@@ -126,7 +126,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
       save:
         json:
           news_post_id: post_id
@@ -161,7 +161,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id: post_id
@@ -275,7 +274,7 @@ stages:
         author:
           id: "{author_id}"
           login: "{author_login}"
-        created_at: !anything
+        published_at: !anything
       save:
         json:
           news_post_id: post_id
@@ -328,7 +327,6 @@ stages:
         author:
           id: "{author_client_id}"
           login: "{author_client_login}"
-        created_at: !anything
       save:
         json:
           wallpaper_post_id: post_id
