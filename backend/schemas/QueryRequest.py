@@ -11,6 +11,7 @@ class QueryRequest(BaseModel):
     start_date: Optional[int] = None
     end_date: Optional[int] = None
     tags: Optional[List[str]] = None
+    school: Optional[str] = None
 
     @model_validator(mode="after")
     def check_dates(cls, values):
