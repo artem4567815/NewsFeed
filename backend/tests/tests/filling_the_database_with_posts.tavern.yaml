@@ -57,7 +57,7 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
       json:
-        title: "Test News Post"
+        title: "Test News Post1"
         type: "news"
         content: "Test content"
         short_content: "short content"
@@ -69,7 +69,7 @@ stages:
       status_code: 201
       json:
         post_id: !anything
-        title: "Test News Post"
+        title: "Test News Post1"
         short_content: "short content"
         full_content: "Test content"
         start_date: 2217628800
@@ -93,7 +93,7 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
       json:
-        title: "Test News Post"
+        title: "Test News Post2"
         type: "news"
         content: "Test content"
         short_content: "short content"
@@ -105,7 +105,7 @@ stages:
       status_code: 201
       json:
         post_id: !anything
-        title: "Test News Post"
+        title: "Test News Post2"
         short_content: "short content"
         full_content: "Test content"
         start_date: 2217628800
@@ -129,7 +129,7 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
       json:
-        title: "Test News Post"
+        title: "Test News Post3"
         type: "news"
         content: "Test content"
         short_content: "short content"
@@ -141,7 +141,7 @@ stages:
       status_code: 201
       json:
         post_id: !anything
-        title: "Test News Post"
+        title: "Test News Post3"
         short_content: "short content"
         full_content: "Test content"
         start_date: 2217628800
