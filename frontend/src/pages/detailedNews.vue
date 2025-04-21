@@ -35,7 +35,7 @@
           <!-- Заголовок новости -->
           <div class="mb-8">
             <div class="flex items-center gap-2 mb-4">
-              <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl">{{ post.title }}</h1>
+              <h1 class="text-3xl font-bold break-all  text-gray-900 sm:text-4xl">{{ post.title }}</h1>
             </div>
 
             <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
@@ -68,11 +68,11 @@
 
             <!-- Текст новости -->
             <div class="p-6 sm:p-8">
-              <p class="text-lg text-gray-700 mb-6">
+              <p class="text-lg break-all text-gray-700 mb-6">
                 {{ post.short_content }}
               </p>
 
-              <div class="prose max-w-none text-gray-700 mb-8" v-html="post.full_content"></div>
+              <div class="prose max-w-none break-all prose break-words text-gray-700 mb-8" v-html="post.full_content"></div>
 
               <!-- Действия -->
               <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200">

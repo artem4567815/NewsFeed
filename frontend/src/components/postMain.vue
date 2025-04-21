@@ -35,12 +35,12 @@
 
 
           <!-- Заголовок -->
-          <h2 class="text-2xl font-bold text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200">
+          <h2 class="text-2xl font-bold break-words text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200">
             {{post.title}}
           </h2>
 
           <!-- Описание -->
-          <p class="text-base text- text-gray-700 mb-6 leading-relaxed line-clamp-3">
+          <p class="text-base text break-words- text-gray-700 mb-6 leading-relaxed line-clamp-3">
             {{post.short_content}}
           </p>
         </div>

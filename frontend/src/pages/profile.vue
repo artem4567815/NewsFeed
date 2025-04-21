@@ -288,7 +288,8 @@ const handleAvatarChange = async (event) => {
     setTimeout(() => { uploadStatus.value = null; }, 3000);
   }
 };
-const reason = "хцйавыв"
+const reason = ref(null)
+reason.value = "siejfskfej"
 const to_moderations = async (post_id) => {
   const mods = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
   window.location.reload();
@@ -298,7 +299,8 @@ const aprove = async (post_id) => {
   window.location.reload();
 }
 const reject = async (post_id) => {
-  const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason},
+
+  const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason.value},
       {headers: {'Content-Type': 'application/json'}});
   window.location.reload();
 }
