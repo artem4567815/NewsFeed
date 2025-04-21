@@ -11,7 +11,7 @@ def get_news_by_query(query):
     posts = News.query.filter_by(status="published")
 
     if query.type is not None:
-        posts = posts.filter_by(type=query.type)
+        posts = posts.where(News.type.in_(query.type))
 
     if query.start_date is not None:
         posts = posts.filter(News.start_date >= int(query.start_date))
