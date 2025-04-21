@@ -1,4 +1,4 @@
-from models import News, db, UsersHistory
+from models import News, db, UsersHistory, Users
 import uuid
 from werkzeug.exceptions import BadRequest
 
@@ -24,10 +24,11 @@ def get_news_by_query(query):
         posts = posts.where(News.tags.overlap(tags))
 
     if query.school is not None:
-        posts = posts.filter(News.user.school == query.school)
+        posts = posts.join(Users).filter(Users.school == query.school)
 
+    posts_count = posts.count()
     posts = posts.offset(query.offset).limit(query.limit).all()
-    return posts
+    return posts, posts_count
 
 
 def find_news_by_id(post_id):

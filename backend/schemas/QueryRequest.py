@@ -10,7 +10,7 @@ class QueryRequest(BaseModel):
     offset: Optional[int] = Field(0, ge=0)
     start_date: Optional[int] = None
     end_date: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags: Optional[str] = None
     school: Optional[str] = None
 
     @model_validator(mode="after")
