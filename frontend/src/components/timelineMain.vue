@@ -55,8 +55,10 @@ function timestampToDate(ts) {
   return `${day}.${month}.${year}`;
 }
 
+
+
 setInterval(() => {
-  dateAgo.value = timeAgo(1744576048);
+  dateAgo.value = timeAgo(props.timeline.published_at);
 }, 1000); // обновляем каждую секунду
 
 function timeAgo(timestampSec) {
@@ -94,7 +96,7 @@ function timeAgo(timestampSec) {
   return 'только что';
 }
 
-const dateAgo = ref(timeAgo(props.timeline.created_at));
+const dateAgo = ref(timeAgo(props.timeline.published_at));
 
 </script>
 
