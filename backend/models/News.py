@@ -47,7 +47,7 @@ class News(db.Model):
                 "school": self.user.school,
                 "building": self.user.building,
             },
-            # "created_at": self.created_at.timestamp() if self.created_at else None,
+            "created_at": self.created_at.timestamp() if self.created_at else None,
             "likes_count": len([x for x in self.user_history if x.liked and x.post_id == self.post_id]),
             "views": self.views,
             "tags": self.tags
