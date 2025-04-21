@@ -340,18 +340,9 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
     response:
-      status_code: 403
-
-  - name: 21 - Delete wallpaper post as client
-    request:
-      url: "{url}/posts/{wallpaper_post_id}"
-      method: DELETE
-      headers:
-        Authorization: "Bearer {access_token_client}"
-    response:
       status_code: 204
 
-  - name: 22 - Get all posts
+  - name: 21 - Get all posts
     request:
       url: "{url}/posts"
       method: GET

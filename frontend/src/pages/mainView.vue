@@ -64,7 +64,7 @@
         <!-- Таймлайн (правая колонка) -->
         <div class="hidden 2xl:block backdrop-blur-[2px] min-h-screen w-[400px]   py-8 px-4">
           <div class="top-8">
-<!--            <filter-panel class="mb-6" @update:filters="onFilterUpdate" />-->
+            <filter-panel class="mb-6" @update:filters="onFilterUpdate" />
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
               <div class="flex items-center justify-between mb-8">
                 <div>
@@ -105,7 +105,8 @@ const filters = ref({
   query: '',
   school: '',
   period: null,
-  categories: []
+  categories: [],
+  tags: []
 })
 const filteredPosts = ref([])
 
@@ -126,6 +127,7 @@ const visiblePages = computed(() => {
 
   for (let i = start; i <= end; i++) {
     pages.push(i)
+    console.log (pages)
   }
 
   return pages
@@ -156,39 +158,40 @@ function View(id) {
 }
 
 function onFilterUpdate(newFilters) {
-  filters.value = { ...filters.value, ...newFilters }
-  currentPage.value = 1 // Сбрасываем страницу при изменении фильтров
-  loadPosts() // Перезагружаем посты с новыми фильтрами
+  filters.value = { ...filters.value, ...newFilters };
+  currentPage.value = 1; // сброс страницы при изменении фильтра
+  loadPosts();           // загрузка новых постов
 }
 
 async function loadPosts() {
   const offset = (currentPage.value - 1) * postsPerPage;
 
+  const params = {
+    limit: postsPerPage,
+    offset: offset,
+    title: filters.value.query || undefined,
+    school: filters.value.school || undefined,
+    type: filters.value.categories.length ? filters.value.categories.join(',') : undefined,
+    tags: filters.value.tags.length ? filters.value.tags.join(',') : undefined,
+  }
+
+  console.log("🚀 Параметры запроса:", params)
+
   try {
-    const params = {
-      limit: postsPerPage,
-      offset: offset
-    }
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, { params });
 
-    // Добавляем параметры фильтрации, если они заданы
-    if (filters.value.query) params.search = filters.value.query
-    if (filters.value.school) params.school = filters.value.school
-    if (filters.value.period) params.days = filters.value.period
-    if (filters.value.categories.length) params.categories = filters.value.categories.join(',')
-
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, {
-      params: params
-    });
+    console.log("📦 Ответ с постами:", response.data);
 
     posts.value = response.data.posts;
+    console.log(posts)
     totalPosts.value = response.data.posts_count;
   } catch (error) {
-    console.error('Ошибка загрузки постов:', error);
+    console.error('❌ Ошибка загрузки постов:', error);
     if (error.response) {
       console.error('Статус ошибки:', error.response.status);
-      console.error('Данные ошибки:', error.response.data);
+      console.error('Ответ:', error.response.data);
     } else if (error.request) {
-      console.error('Ответ не получен:', error.request);
+      console.error('Нет ответа от сервера:', error.request);
     } else {
       console.error('Ошибка:', error.message);
     }
@@ -216,13 +219,10 @@ onMounted(async () => {
   await loadTimeline()
 })
 
-watch(currentPage, () => {
-  loadPosts()
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  })
-})
+watch([currentPage, filters], () => {
+  loadPosts();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 </script>
 
 <style>

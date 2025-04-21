@@ -1,4 +1,4 @@
-from models import News, db, UsersHistory
+from models import News, db, UsersHistory, Users
 import uuid
 from werkzeug.exceptions import BadRequest
 
@@ -11,7 +11,8 @@ def get_news_by_query(query):
     posts = News.query.filter_by(status="published")
 
     if query.type is not None:
-        posts = posts.filter_by(type=query.type)
+        types = query.type.split(',')
+        posts = posts.where(News.type.in_(types))
 
     if query.start_date is not None:
         posts = posts.filter(News.start_date >= int(query.start_date))
@@ -19,10 +20,15 @@ def get_news_by_query(query):
         posts = posts.filter(News.end_date <= int(query.end_date))
 
     if query.tags is not None:
-        posts = posts.where(News.tags.overlap(query.tags))
+        tags = query.tags.split(',')
+        posts = posts.where(News.tags.overlap(tags))
 
+    if query.school is not None:
+        posts = posts.join(Users).filter(Users.school == query.school)
+
+    posts_count = posts.count()
     posts = posts.offset(query.offset).limit(query.limit).all()
-    return posts
+    return posts, posts_count
 
 
 def find_news_by_id(post_id):

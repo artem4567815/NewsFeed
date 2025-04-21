@@ -6,6 +6,8 @@
         <SidebarItem icon="Newspaper" text="Твои новости" :active="currentPage === 'news'" @click="setPage('news')" />
         <SidebarItem icon="FileEdit" text="Черновики" :active="currentPage === 'drafts'" @click="setPage('drafts')" />
         <SidebarItem icon="ShieldCheck" text="Модерация" v-if="isAdmin" :active="currentPage === 'moderation'" @click="setPage('moderation')" />
+        <SidebarItem icon="ScrollText" text="Все новости" v-if="isAdmin" :active="currentPage === 'moderation_list'" @click="setPage('moderation_list')" />
+
         <SidebarItem icon="User" text="Профиль" :active="currentPage === 'profile'" @click="setPage('profile')" />
       </nav>
     </aside>
@@ -140,6 +142,8 @@
             </div>
           </div>
 
+
+
           <!-- NEWS -->
           <div v-else-if="currentPage === 'news'">
             <h1 class="text-2xl font-bold mb-6">Твои новости</h1>
@@ -181,6 +185,22 @@
             </div>
           </div>
 
+          <!-- MODERATION LIST -->
+          <div v-else-if="currentPage === 'moderation_list'">
+            <h1 class="text-2xl font-bold mb-6">Все новости</h1>
+            <div v-if="allPosts && allPosts.length" class="space-y-6 flex flex-col items-center space-x-2">
+              <div class="w-full flex flex-col items-center " v-for="post in allPosts" :key="post.post_id">
+                <post-main :post="post"></post-main>
+                <button class="mt-2 hover:cursor-pointer bg-red-500 ring-4 ring-transparent hover:ring-red-700/30 hover:bg-red-600 transition ease-in rounded-2xl text-white px-3 py-2 " :value="post.post_id" @click="DeletePost(post.post_id)">Удалить новость</button>
+              </div>
+            </div>
+            <div v-else class="text-center mt-20">
+              <h1 class="text-2xl font-bold mb-2">Пока что нет новостей на сайте</h1>
+              <p class="text-gray-500 mb-6">Создайте первую новость!</p>
+              <button @click="$router.push('/Create')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition text-white rounded">Создать новость</button>
+            </div>
+          </div>
+
         </transition>
       </div>
     </main>
@@ -199,6 +219,7 @@ import router from "@/router/router.js";
 const { Menu } = icons
 import { useRoute } from "vue-router"
 import BlueButton from "@/components/UI/blueButton.vue";
+import axios from "axios";
 
 const currentPage = ref('news')
 const sidebarOpen = ref(false)
@@ -210,6 +231,8 @@ const isAdmin = ref(false) // Добавляем флаг администрат
 const homePagePosts = ref(null);
 const moderationPagePosts = ref(null);
 const DraftPagePosts = ref(null);
+const allPosts = ref(null);
+
 const profilePage = ref({
   name: '',
   surname: '',
@@ -304,6 +327,16 @@ const reject = async (post_id) => {
       {headers: {'Content-Type': 'application/json'}});
   window.location.reload();
 }
+const DeletePost = async (post_id) => {
+  const del = await jwtApi.delete(`${import.meta.env.VITE_BASE_URL}/posts/${post_id}`, {post_id: post_id},
+      {headers: {
+        'Content-Type': 'application/json'},
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      });
+
+  window.location.reload();
+}
+
 // Сохранение изменений профиля
 const saveProfileChanges = async () => {
   if (!profilePage.value.name || !profilePage.value.surname || !profilePage.value.login) {
@@ -373,6 +406,12 @@ onMounted(async () => {
     if (isAdmin.value) {
       const modRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/admin/moderation`);
       moderationPagePosts.value = modRes.data.wall_newspapers;
+    }
+
+    if (isAdmin.value) {
+      const Posts = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`);
+      allPosts.value = Posts.data.posts;
+      console.log(moderationPagePosts);
     }
 
     // const draftsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/drafts`);

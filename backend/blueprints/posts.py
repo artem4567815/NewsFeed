@@ -13,10 +13,9 @@ posts = Blueprint('posts', __name__)
 @safe("blueprints/posts.py | category_posts")
 @validate()
 def category_posts(query: QueryRequest):
-    posts_list = get_news_by_query(query)
+    posts_list, posts_count = get_news_by_query(query)
     posts_list = [news.as_dict() for news in posts_list]
-    posts_list = sorted(posts_list, key=lambda news: news["created_at"], reverse=False)
-    posts_count = len(News.query.filter_by(status="published").all())
+    posts_list = sorted(posts_list, key=lambda news: news["created_at"], reverse=True)
     return jsonify({"posts": posts_list, "posts_count":posts_count}), 200
 
 
@@ -63,13 +62,14 @@ def delete_posts(post_id):
         raise BadRequest("post_id not valid")
 
     post = find_news_by_id(post_id)
-    user_id = get_jwt_identity()
+    user_id, is_admin = get_jwt()["user_id"], get_jwt()["is_admin"]
 
     if not post:
         return jsonify({"Message": "Новость не найдена"}), 404
 
-    if str(post.user_id) != str(user_id):
-        raise Forbidden("not allowed")
+    if not is_admin:
+        if str(post.user_id) != str(user_id):
+            raise Forbidden("not allowed")
 
     minio.delete_file_by_url(post.image_url)
 

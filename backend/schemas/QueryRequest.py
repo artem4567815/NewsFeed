@@ -5,12 +5,13 @@ from zoneinfo import ZoneInfo
 
 
 class QueryRequest(BaseModel):
-    type: Literal["news", "wallpapers"] = "news"
+    type: Optional[str] = None
     limit: Optional[int] = Field(20, ge=0)
     offset: Optional[int] = Field(0, ge=0)
     start_date: Optional[int] = None
     end_date: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags: Optional[str] = None
+    school: Optional[str] = None
 
     @model_validator(mode="after")
     def check_dates(cls, values):
