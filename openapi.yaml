@@ -240,7 +240,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostsResponse'
+                type: object
+                properties:
+                  posts_liked_by_user:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                    example:
+                      - 7fc62bf6-369a-4af5-a85c-fe012269b8fd
+                      - 482c470c-e398-4cef-97b6-4cc225e4e16c
+                      - afd2f8d0-79cd-4a4d-90ad-c7b8203492e7
         '401':
           description: Unauthorized
           content:

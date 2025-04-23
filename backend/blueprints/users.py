@@ -59,11 +59,7 @@ def my_likes():
         user_id=user_id, liked=True
     ).all()
 
-    posts = []
-    for post_id in liked_post_ids:
-        posts.append(News.query.filter_by(post_id=post_id).first())
-
-    return jsonify({"likes": posts}), 200
+    return jsonify({"posts_liked_by_user": liked_post_ids}), 200
 
 
 @user_routes.route("/<post_id>/send/to/moderation", methods=["POST"])

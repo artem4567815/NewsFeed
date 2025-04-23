@@ -204,3 +204,4 @@ def get_rejected_posts():
         out.append({"reasons": RejectMessages.query.filter_by(post_id=post.post_id).all(), "post_id": post.post_id})
 
     return jsonify({"reasons": out}), 200
+
