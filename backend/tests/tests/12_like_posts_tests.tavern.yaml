@@ -331,7 +331,6 @@ stages:
       status_code: 200
       json:
         likes_count: 1
-      
 
   - name: 21 - Unlike post that wasn't liked
     request:
@@ -385,4 +384,4 @@ stages:
     response:
       status_code: 200
       json:
-        likes: []
+        posts_liked_by_user: []

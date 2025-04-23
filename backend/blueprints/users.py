@@ -59,7 +59,9 @@ def my_likes():
         user_id=user_id, liked=True
     ).all()
 
-    return jsonify({"posts_liked_by_user": liked_post_ids}), 200
+    liked_post_ids_list = [str(post_id) for (post_id,) in liked_post_ids]
+
+    return jsonify({"posts_liked_by_user": liked_post_ids_list}), 200
 
 
 @user_routes.route("/<post_id>/send/to/moderation", methods=["POST"])
