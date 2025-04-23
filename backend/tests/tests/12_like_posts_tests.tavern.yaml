@@ -317,7 +317,7 @@ stages:
   - name: 19 - Unlike news post as client
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: DELETE
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
@@ -335,7 +335,7 @@ stages:
   - name: 21 - Unlike post that wasn't liked
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: DELETE
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
@@ -344,7 +344,7 @@ stages:
   - name: 22 - Unlike non-existent post
     request:
       url: "{url}/posts/00000000-0000-0000-0000-000000000000/unlike"
-      method: DELETE
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
@@ -353,14 +353,14 @@ stages:
   - name: 23 - Unlike post without auth
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: DELETE
+      method: POST
     response:
       status_code: 401
 
   - name: 24 - Unlike post with invalid token
     request:
       url: "{url}/posts/{news_post_id}/unlike"
-      method: DELETE
+      method: POST
       headers:
         Authorization: "Bearer invalid_token"
     response:
@@ -369,7 +369,7 @@ stages:
   - name: 25 - Unlike post with invalid UUID format
     request:
       url: "{url}/posts/invalid-uuid/unlike"
-      method: DELETE
+      method: POST
       headers:
         Authorization: "Bearer {access_token_client}"
     response:
