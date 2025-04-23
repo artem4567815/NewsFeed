@@ -19,8 +19,9 @@
           <div class="space-y-10 w-full lg:w-95/100 justify-self-center flex flex-col items-center">
             <post-main
                 v-for="post in posts"
-                :key="post.id"
+                :key="post.post_id"
                 :post="post"
+                :isLiked = "isLiked(post.post_id)"
                 @click="$router.push(`/post/${post.post_id}`); View(post.post_id)"
                 class="transform hover:scale-[1.02] transition-transform duration-300 w-full"
             />
@@ -128,7 +129,6 @@ const visiblePages = computed(() => {
 
   for (let i = start; i <= end; i++) {
     pages.push(i)
-    console.log (pages)
   }
 
   return pages
@@ -200,14 +200,20 @@ async function loadPosts() {
 }
 const likes = ref([])
 async function loadLikes() {
+  const offset = (currentPage.value - 1) * postsPerPage;
+
 
   try {
     const response = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/my-likes`);
-    likes.value = response.data;
-    console.log(likes.value)
+    likes.value = response.data.posts_liked_by_user;
   } catch (error) {
     console.error('Ошибка загрузки таймлайна:', error);
   }
+}
+
+const isLiked = (id) => {
+  console.log(likes.value.includes(id), id);
+  return likes.value.includes(id);
 }
 
 async function loadTimeline() {
@@ -219,17 +225,16 @@ async function loadTimeline() {
       }
     });
     timeline.value = response.data.posts;
-    console.log(timeline.value)
-    console.log(timeline.value)
   } catch (error) {
     console.error('Ошибка загрузки таймлайна:', error);
   }
 }
 
 onMounted(async () => {
+  await loadLikes()
+
   await loadPosts()
   await loadTimeline()
-  await loadLikes()
 })
 
 watch([currentPage, filters], () => {

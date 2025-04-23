@@ -123,14 +123,7 @@ onUnmounted(() => {
 });
 </script>
 
-<script>
-export default {
-  name: "post-vertical",
-  props: {
-    post: Object
-  }
-};
-</script>
+
 
 <style lang="scss" scoped>
 .timeline-scroll::-webkit-scrollbar {

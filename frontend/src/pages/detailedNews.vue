@@ -141,8 +141,6 @@ import { previousRoute } from '@/router/router.js' // или откуда ты �
 const fromProfile = ref(false)
 
 onMounted(() => {
-  console.log(fromProfile.value)
-  console.log(previousRoute.path )
 
   if (previousRoute.path === '/profile') {
     fromProfile.value = true
