@@ -161,6 +161,10 @@ def join_to_posts(post_id):
 def save_news(body: CreateNewsRequest):
     user_id = get_jwt_identity()
     user = find_user_by_user_id(user_id)
+
+    if user is None:
+        raise NotFound("user not found")
+
     file = minio.upload_base64(body.post_img, user.login)
     file_url = minio.get_public_url(file)
     access = get_jwt()['is_admin']
