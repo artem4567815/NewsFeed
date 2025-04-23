@@ -35,8 +35,17 @@ def get_news_by_query(query):
             )
         )
 
+    posts = posts.order_by(News.published_at.desc())
     posts_count = posts.count()
-    posts = posts.offset(query.offset).limit(query.limit).all()
+
+    if query.offset is not None:
+        posts = posts.offset(query.offset)
+
+    if query.limit is not None:
+        posts = posts.limit(query.limit)
+
+    posts = posts.all()
+
     return posts, posts_count
 
 

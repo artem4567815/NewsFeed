@@ -16,9 +16,8 @@ admin_routes = Blueprint('admin', __name__)
 @safe("blueprints/admin.py | moderation")
 @jwt_required()
 @check_jwt_access
-@validate()
-def moderation(query: QueryRequest):
-    posts = News.query.filter_by(status="pending").limit(query.limit).offset(query.offset).all()
+def moderation():
+    posts = News.query.filter_by(status="pending").all()
     posts = [post.as_dict() for post in posts]
     return jsonify({"wall_newspapers": posts}), 200
 

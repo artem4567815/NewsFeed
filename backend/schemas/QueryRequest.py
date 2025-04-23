@@ -6,8 +6,8 @@ from zoneinfo import ZoneInfo
 
 class QueryRequest(BaseModel):
     type: Optional[str] = None
-    limit: Optional[int] = Field(20, ge=0)
-    offset: Optional[int] = Field(0, ge=0)
+    limit: Optional[int] = None
+    offset: Optional[int] = None
     start_date: Optional[int] = None
     end_date: Optional[int] = None
     tags: Optional[str] = None
