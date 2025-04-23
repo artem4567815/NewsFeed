@@ -62,6 +62,7 @@ jobs:
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             docker pull arttyu/newsfeed:backend
             cd ~/edufeed/backend
+            docker-compose down -v
             docker-compose stop || true
             docker-compose rm -f || true
             docker-compose up -d

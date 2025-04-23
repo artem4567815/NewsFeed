@@ -51,6 +51,7 @@ jobs:
             docker system prune -f
             docker pull arttyu/newsfeed:frontend
             cd ~/edufeed/frontend
+            docker-compose down -v
             docker-compose stop || true
             docker-compose rm -f || true
             docker-compose up -d 
