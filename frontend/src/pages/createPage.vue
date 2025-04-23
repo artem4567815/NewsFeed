@@ -229,21 +229,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onBeforeMount, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { CalendarDays, Upload } from 'lucide-vue-next'
-import jwtApi from "@/api/jwtApi.js";
-import axios from "axios";
+import { Upload } from 'lucide-vue-next'
+import jwtApi from "@/api/jwtApi.js"
+import axios from "axios"
+import { useToast } from "vue-toastification"
+import { jwtDecode } from "jwt-decode"
 
 const router = useRouter()
+const toast = useToast()
 
-// Refs
 const imageInput = ref(null)
 const imagePreview = ref(null)
 const isSubmitting = ref(false)
 const newTag = ref('')
 
-// Ошибки валидации
 const titleError = ref('')
 const shortDescriptionError = ref('')
 const contentError = ref('')
@@ -254,10 +255,8 @@ const tagsError = ref('')
 const publicationTypes = [
   { value: 'news', label: 'Новость' },
   { value: 'wallpapers', label: 'Стенгазета' },
-  // { value: 'team_search', label: 'Поиск команды' }
 ]
 
-// Теги
 const availableTags = ref([
   'Технологии', 'Образование', 'Школа',
   'Программирование', 'Дизайн', 'Бизнес',
@@ -265,7 +264,6 @@ const availableTags = ref([
 ])
 const selectedTags = ref([])
 
-// Данные поста
 const postData = ref({
   title: "",
   type: "news",
@@ -277,10 +275,6 @@ const postData = ref({
   post_img_detail: ""
 })
 
-// Computed
-const currentDate = computed(() => new Date().toLocaleDateString())
-
-// Проверяем есть ли ошибки
 const hasErrors = computed(() => {
   return !!(
       titleError.value ||
@@ -292,7 +286,6 @@ const hasErrors = computed(() => {
   )
 })
 
-// Валидация изображения
 const validateImage = () => {
   if (!postData.value.post_img) {
     imageError.value = 'Изображение обязательно'
@@ -302,7 +295,6 @@ const validateImage = () => {
   return true
 }
 
-// Валидация заголовка
 const validateTitle = () => {
   if (postData.value.title.length > 100) {
     titleError.value = 'Заголовок не должен превышать 100 символов'
@@ -316,7 +308,6 @@ const validateTitle = () => {
   }
 }
 
-// Валидация краткого описания
 const validateShortDescription = () => {
   if (postData.value.short_content.length > 200) {
     shortDescriptionError.value = 'Краткое описание не должно превышать 200 символов'
@@ -330,7 +321,6 @@ const validateShortDescription = () => {
   }
 }
 
-// Валидация полного описания
 const validateContent = () => {
   if (postData.value.content.length > 5000) {
     contentError.value = 'Описание не должно превышать 5000 символов'
@@ -344,7 +334,6 @@ const validateContent = () => {
   }
 }
 
-// Валидация дат
 const validateDates = () => {
   if (!postData.value.start_date || !postData.value.end_date) {
     dateError.value = 'Даты начала и окончания обязательны'
@@ -370,7 +359,6 @@ const validateDates = () => {
   return true
 }
 
-// Валидация тегов
 const validateTags = () => {
   if (selectedTags.value.length === 0) {
     tagsError.value = 'Добавьте хотя бы один тег'
@@ -384,32 +372,24 @@ const validateTags = () => {
   }
 }
 
-// Добавление тега
 const addTag = () => {
   const tag = newTag.value.trim()
-
   if (!tag) return
-
   if (tag.length > 20) {
     tagsError.value = 'Тег не должен превышать 20 символов'
     return
   }
-
   if (selectedTags.value.length >= 4) {
     tagsError.value = 'Можно выбрать не более 4 тегов'
     return
   }
-
   if (!selectedTags.value.includes(tag)) {
     selectedTags.value.push(tag)
     newTag.value = ''
-
-    // Добавляем новый тег в общий список, если его там нет
     if (!availableTags.value.includes(tag)) {
       availableTags.value.push(tag)
     }
   }
-
   validateTags()
 }
 
@@ -423,7 +403,6 @@ const selectTag = (tag) => {
     tagsError.value = 'Можно выбрать не более 4 тегов'
     return
   }
-
   if (!selectedTags.value.includes(tag)) {
     selectedTags.value.push(tag)
     validateTags()
@@ -440,7 +419,6 @@ const tagClasses = (index) => {
   return colors[index % 4]
 }
 
-// Методы работы с изображением
 const triggerFileInput = () => {
   imageInput.value?.click()
 }
@@ -448,7 +426,6 @@ const triggerFileInput = () => {
 const handleImageUpload = (event) => {
   const file = event.target.files[0]
   if (!file) return
-
   if (!file.type.match('image.*')) {
     imageError.value = 'Пожалуйста, выберите изображение'
     return
@@ -459,25 +436,21 @@ const handleImageUpload = (event) => {
     imagePreview.value = e.target.result
     postData.value.post_img = e.target.result
     imageError.value = ''
+    saveFormData()
   }
   toast.success("Картинка загружена!")
-
   reader.readAsDataURL(file)
 }
 
-// Вспомогательные методы
 const convertToTimestamp = (dateString, time = "00:00:00") => {
   if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return null
   if (!/^\d{2}:\d{2}:\d{2}$/.test(time)) return null
 
   const [year, month, day] = dateString.split('-').map(Number)
   const [hours, minutes, seconds] = time.split(':').map(Number)
-
   return Date.UTC(year, month - 1, day, hours, minutes, seconds)
 }
 
-
-// Валидация всей формы
 const validateForm = () => {
   const validations = [
     validateImage(),
@@ -487,15 +460,8 @@ const validateForm = () => {
     validateDates(),
     validateTags()
   ]
-
   return validations.every(valid => valid)
 }
-
-// Отправка формы
-import { useToast } from "vue-toastification"
-import {jwtDecode} from "jwt-decode";
-
-const toast = useToast()
 
 const submitForm = async () => {
   if (!validateForm()) {
@@ -505,7 +471,6 @@ const submitForm = async () => {
 
   try {
     isSubmitting.value = true
-
     const formData = {
       ...postData.value,
       start_date: convertToTimestamp(postData.value.start_date) / 1000,
@@ -513,39 +478,56 @@ const submitForm = async () => {
       tags: selectedTags.value
     }
 
-    const response = await jwtApi.post(
-        `${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData)
-    const decoded = jwtDecode(localStorage.getItem('authToken')
-  )
-    if (decoded['is_admin']) {
-      toast.success("Новость успешно опубликована!")
-    } else {
-      toast.success("Новость успешно добавлена в черновики!")
+    const response = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData)
+    const decoded = jwtDecode(localStorage.getItem('authToken'))
 
-    }
-    router.push('/')
-
+    toast.success(decoded['is_admin'] ? "Новость успешно опубликована!" : "Новость успешно добавлена в черновики!")
+    localStorage.removeItem('savedPostData')
+    localStorage.removeItem('savedSelectedTags')
+    router.push('/create')
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message ||
-          'Произошла ошибка при создании новости'
-      toast.error(errorMessage)
-    } else {
-      console.error('Unknown error:', error)
-      toast.error('Произошла неизвестная ошибка')
-    }
+    const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || 'Произошла ошибка при создании новости'
+        : 'Произошла неизвестная ошибка'
+    toast.error(errorMessage)
   } finally {
     isSubmitting.value = false
   }
 }
 
-// Проверка авторизации
+// ====== ЛОКАЛЬНОЕ СОХРАНЕНИЕ ======
+const saveFormData = () => {
+  localStorage.setItem('savedPostData', JSON.stringify(postData.value))
+  localStorage.setItem('savedSelectedTags', JSON.stringify(selectedTags.value))
+}
+
+const loadFormData = () => {
+  const saved = localStorage.getItem('savedPostData')
+  const savedTags = localStorage.getItem('savedSelectedTags')
+  if (saved) {
+    Object.assign(postData.value, JSON.parse(saved))
+    imagePreview.value = postData.value.post_img || null
+  }
+  if (savedTags) {
+    selectedTags.value = JSON.parse(savedTags)
+  }
+}
+
+// Автосохранение при любом изменении
+watch(postData, saveFormData, { deep: true })
+watch(selectedTags, saveFormData, { deep: true })
+
+onMounted(() => {
+  loadFormData()
+})
+
 onBeforeMount(() => {
   if (!localStorage.getItem('authToken')) {
     router.push('/auth')
   }
 })
 </script>
+
 
 <style>
 /* Стили остаются без изменений */
