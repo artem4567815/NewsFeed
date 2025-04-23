@@ -7,6 +7,7 @@ class PatchUserRequest(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     surname: Optional[str] = Field(None, min_length=1, max_length=120)
     building: Optional[str] = Field(None, min_length=1, max_length=100)
+    login: Optional[str] = Field(None, min_length=1, max_length=100)
     avatar_url: Optional[str] = None
 
     class Config:

@@ -42,6 +42,8 @@ def patch_profile_method(user, body):
         file = minio.upload_base64(body.avatar_url, user.login)
         file_url = minio.get_public_url(file)
         user.avatar_url = file_url
+    if body.login is not None:
+        user.login = body.login
 
     db.session.commit()
 
