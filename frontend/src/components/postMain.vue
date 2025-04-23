@@ -1,7 +1,7 @@
 <template>
   <div
       ref="card"
-      class=" bg-white rounded-2xl shadow-lg overflow-hidden w-95/100 transition-transform duration-300 ease-out cursor-pointer"
+      class=" bg-white rounded-2xl shadow-lg overflow-hidden mx-auto w-95/100 transition-transform duration-300 ease-out cursor-pointer"
   >
     <div class="flex flex-col lg:flex-row h-full">
       <!-- Изображение -->
@@ -14,7 +14,7 @@
       </div>
 
       <!-- Контент -->
-      <div class="flex-1 p-2 md:p-4 lg:w-[400px] flex flex-col min-h-[350px]">
+      <div class="flex-1 p-2 md:p-4  flex flex-col min-h-[350px]">
         <!-- Категория -->
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
@@ -29,8 +29,14 @@
               {{ dateAgo }}
             </span>
             </div>
-            <span class="px-3 py-1 h-fit ml-auto sm:ml-0 text-sm font-medium rounded-full bg-blue-100 text-blue-800"> {{ getLocalizedType(post.type) }}</span>
-
+            <div class="flex flex-wrap gap-2 ml-auto sm:ml-0">
+              <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
+                {{ getLocalizedType(post.type) }}
+              </span>
+              <span v-show="$route.path === '/profile'" class="px-3 py-1 text-sm font-medium rounded-full" :class="[getStatusLabel(post.status).bg, getStatusLabel(post.status).text]">
+                {{ getStatusLabel(post.status).label }}
+              </span>
+            </div>
           </div>
 
 
@@ -78,11 +84,11 @@
           <!-- Статистика -->
           <div class="flex items-center space-x-6">
             <button
-                @click.stop="Like"
+                @click.stop="likePost"
                 class="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
             >
               <Heart   />
-              <span class="text-base font-medium">{{post.likes_count}}</span>
+              <span class="text-base font-medium">{{likesCount}}</span>
             </button>
             <button class="flex items-center text-base font-medium text-gray-600">
               <Eye class="mr-2.5" />
@@ -126,6 +132,17 @@ const publicationTypes = [
   { value: 'team_search', label: 'Поиск команды' }
 ];
 
+const getStatusLabel = (status) => {
+  const statuses = {
+    draft: { label: 'Черновик', bg: 'bg-gray-200', text: 'text-gray-700' },
+    pending: { label: 'На модерации', bg: 'bg-yellow-200', text: 'text-yellow-800' },
+    rejected: { label: 'Отклонено', bg: 'bg-red-200', text: 'text-red-800' },
+    published: { label: 'Опубликовано', bg: 'bg-green-200', text: 'text-green-800' },
+
+  };
+  return statuses[status] || { label: status, bg: 'bg-green-100', text: 'text-green-700' };
+};
+
 // Функция для преобразования типа
 const getLocalizedType = (type) => {
   const foundType = publicationTypes.find(t => t.value === type);
@@ -142,23 +159,23 @@ import { useRouter } from 'vue-router'
 import axios from "axios";
 import TagPill from "@/components/UI/tagPill.vue";
 
-function Like() {
-  const likePost = async () => {
-    try {
-      await api.post(`/posts/${props.post.post_id}/like`, {
-        post_id: props.post.post_id,
-      },{withCredentials: true}
-    )
-      props.post.likes_count++
-    } catch (error) {
-      console.error('Ошибка лайка:', error)
-      // Можно добавить уведомление
-    }
+const isLiked = ref(props.post.is_liked || false);
+const likesCount = ref(props.post.likes_count || 0);
+
+const likePost = async () => {
+  if (isLiked.value) return;
+
+  try {
+    await api.post(`/posts/${props.post.post_id}/like`, {
+      post_id: props.post.post_id,
+    }, { withCredentials: true });
+
+    isLiked.value = true;
+    likesCount.value++;
+  } catch (error) {
+    console.error('Ошибка лайка:', error);
   }
-
-  likePost()
-}
-
+};
 
 setInterval(() => {
     dateAgo.value = timeAgo(timestamp);

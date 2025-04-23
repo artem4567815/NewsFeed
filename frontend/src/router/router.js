@@ -53,4 +53,14 @@ const router = createRouter({
 
 })
 
+let previousRoute = null;
+
+router.beforeEach((to, from, next) => {
+    previousRoute = from;
+    next();
+});
+
+// потом экспортировать или сохранять в глобальное хранилище
+
 export default router
+export { previousRoute };

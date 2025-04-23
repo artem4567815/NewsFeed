@@ -1,5 +1,11 @@
 <template>
   <div class="max-w-6xl mx-auto">
+    <button
+        @click="goBack"
+        class="mb-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
+    >
+      ← Назад
+    </button>
     <h1 class="text-3xl font-bold text-center mb-6">Vue Paint</h1>
 
     <!-- Toolbar -->
@@ -59,6 +65,21 @@
     </div>
   </div>
 </template>
+<script setup>
+import { useRouter } from 'vue-router'
+import { previousRoute } from '@/router/router.js' // или откуда ты сохраняешь предыдущий путь
+
+const router = useRouter()
+
+function goBack() {
+
+  if (previousRoute?.fullPath && previousRoute.fullPath !== '/') {
+    router.push(previousRoute.fullPath)
+  } else {
+    router.push('/')
+  }
+}
+</script>
 
 <script>
 export default {

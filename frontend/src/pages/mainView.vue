@@ -98,6 +98,7 @@ import FilterPanel from "@/components/filterPanel.vue"
 import TimelineMain from "@/components/timelineMain.vue";
 import postMain from "@/components/postMain.vue";
 import axios from "axios";
+import jwtApi from "@/api/jwtApi.js";
 
 const timeline = ref([])
 const posts = ref([])
@@ -197,6 +198,17 @@ async function loadPosts() {
     }
   }
 }
+const likes = ref([])
+async function loadLikes() {
+
+  try {
+    const response = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/my-likes`);
+    likes.value = response.data;
+    console.log(likes.value)
+  } catch (error) {
+    console.error('Ошибка загрузки таймлайна:', error);
+  }
+}
 
 async function loadTimeline() {
   try {
@@ -217,6 +229,7 @@ async function loadTimeline() {
 onMounted(async () => {
   await loadPosts()
   await loadTimeline()
+  await loadLikes()
 })
 
 watch([currentPage, filters], () => {

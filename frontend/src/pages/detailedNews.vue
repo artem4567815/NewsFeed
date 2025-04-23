@@ -50,9 +50,16 @@
                 <Eye class="w-4 h-4" />
                 <span>{{ post.views }} просмотров</span>
               </div>
+              <div class="flex flex-wrap gap-2 ml-auto sm:ml-0">
+
               <span v-if="post.type" class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
                 {{ postTypeLabel(post.type) }}
               </span>
+              <span v-if="fromProfile" class="px-3 py-1 text-sm font-medium rounded-full" :class="[getStatusLabel(post.status).bg, getStatusLabel(post.status).text]">
+                {{ getStatusLabel(post.status).label }}
+              </span>
+              </div>
+
             </div>
           </div>
 
@@ -129,6 +136,18 @@ function Like() {
 
   likePost();
 }
+import { previousRoute } from '@/router/router.js' // или откуда ты сохраняешь предыдущий путь
+
+const fromProfile = ref(false)
+
+onMounted(() => {
+  console.log(fromProfile.value)
+  console.log(previousRoute.path )
+
+  if (previousRoute.path === '/profile') {
+    fromProfile.value = true
+  }
+})
 
 const loadPost = async () => {
   try {
@@ -153,7 +172,16 @@ const loadPost = async () => {
   }
 };
 
+const getStatusLabel = (status) => {
+  const statuses = {
+    draft: { label: 'Черновик', bg: 'bg-gray-200', text: 'text-gray-700' },
+    pending: { label: 'На модерации', bg: 'bg-yellow-200', text: 'text-yellow-800' },
+    rejected: { label: 'Отклонено', bg: 'bg-red-200', text: 'text-red-800' },
+    published: { label: 'Опубликовано', bg: 'bg-green-200', text: 'text-green-800' },
 
+  };
+  return statuses[status] || { label: status, bg: 'bg-green-100', text: 'text-green-700' };
+};
 
 const postTypeLabel = (type) => {
   const types = {

@@ -7,7 +7,6 @@
         <SidebarItem icon="FileEdit" text="Черновики" :active="currentPage === 'drafts'" @click="setPage('drafts')" />
         <SidebarItem icon="ShieldCheck" text="Модерация" v-if="isAdmin" :active="currentPage === 'moderation'" @click="setPage('moderation')" />
         <SidebarItem icon="ScrollText" text="Все новости" v-if="isAdmin" :active="currentPage === 'moderation_list'" @click="setPage('moderation_list')" />
-
         <SidebarItem icon="User" text="Профиль" :active="currentPage === 'profile'" @click="setPage('profile')" />
       </nav>
     </aside>
@@ -82,7 +81,7 @@
                     </div>
                     <div class="flex flex-col">
                       <label class="block w-full text-sm font-medium text-gray-700">Логин</label>
-                      <input v-model="profilePage.building" class="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-blue-200" placeholder="Login" />
+                      <input v-model="profilePage.login" class="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-blue-200" placeholder="Login" />
                     </div>
                     <div class="flex w-full justify-between items-center">
                       <button
@@ -127,15 +126,21 @@
           </div>
 
           <!-- DRAFTS -->
-          <!-- DRAFTS -->
           <div v-else-if="currentPage === 'drafts'">
             <h1 class="text-2xl font-bold mb-6">Твои черновики</h1>
-            <div v-if="DraftPagePosts && DraftPagePosts.length" class="space-y-6 flex flex-col items-center space-x-2">
-              <transition-group name="post-fade">
-                <div v-for="post in DraftPagePosts" :key="post.post_id" class="w-full flex flex-col items-center">
-                  <post-main :post="post"></post-main>
-                  <blue-button class="mt-2" :value="post.post_id" @click="to_moderations(post.post_id)">Отправить на модерацию</blue-button>
-                </div>
+            <div v-if="DraftPagePosts && DraftPagePosts.length" class="space-y-6 w-full flex flex-col items-center space-x-2">
+                <transition-group name="post-fade" class="w-full " tag="div">
+                  <div
+                      v-for="post in DraftPagePosts"
+                      :key="post.post_id + '-' + post.status"
+                      class="mb-4 w-full"
+                  >
+                    <post-main :post="post" @click="$router.push(`/post/${post.post_id}`)" />
+                    <!-- тут можно показывать кнопки в зависимости от статуса -->
+                    <div v-if="post.status === 'draft'" class="flex gap-2 mt-2">
+                      <button @click="to_moderations(post.post_id)" class="bg-blue-500 text-white px-3 py-2 rounded-xl">На модерацию</button>
+                    </div>
+                  </div>
               </transition-group>
             </div>
             <div v-else class="text-center mt-20">
@@ -150,7 +155,7 @@
             <h1 class="text-2xl font-bold mb-6">Твои новости</h1>
             <div v-if="homePagePosts && homePagePosts.length" class="space-y-6 flex flex-col items-center space-x-2">
               <transition-group name="post-fade">
-                <post-main v-for="post in homePagePosts" :key="post.post_id" :post="post"></post-main>
+                <post-main v-for="post in homePagePosts" @click="$router.push(`/post/${post.post_id}`)" :key="post.post_id" :post="post"></post-main>
               </transition-group>
             </div>
             <div v-else class="text-center mt-20">
@@ -175,7 +180,7 @@
               <div class="space-y-6">
                 <transition-group name="post-fade">
                   <div v-for="post in moderationPagePosts" :key="post.post_id" class="flex flex-col items-center">
-                    <post-main :post="post"></post-main>
+                    <post-main @click="$router.push(`/post/${post.post_id}`)" :post="post"></post-main>
                     <div class="mt-2 flex flex-wrap gap-2">
                       <button @click="aprove(post.post_id)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-2xl transition">Одобрить</button>
                       <button @click="reject(post.post_id)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-2xl transition">Отклонить</button>
@@ -196,7 +201,7 @@
             <div v-if="allPosts && allPosts.length" class="space-y-6 flex flex-col items-center space-x-2">
               <transition-group name="post-fade">
                 <div v-for="post in allPosts" :key="post.post_id" class="w-full flex flex-col items-center">
-                  <post-main :post="post"></post-main>
+                  <post-main @click="$router.push(`/post/${post.post_id}`)" :post="post"></post-main>
                   <button class="mt-2 hover:cursor-pointer bg-red-500 ring-4 ring-transparent hover:ring-red-700/30 hover:bg-red-600 transition ease-in rounded-2xl text-white px-3 py-2" :value="post.post_id" @click="DeletePost(post.post_id)">Удалить новость</button>
                 </div>
               </transition-group>
@@ -328,15 +333,26 @@ const reason = ref(null)
 reason.value = "siejfskfej"
 const to_moderations = async (post_id) => {
   try {
+    const post = DraftPagePosts.value.find(p => p.post_id === post_id);
+
+    // Удаляем пост из списка
+    DraftPagePosts.value = DraftPagePosts.value.filter(p => p.post_id !== post_id);
+
+    // Добавляем его обратно с новым статусом через анимацию
+    setTimeout(() => {
+      DraftPagePosts.value.unshift({ ...post, status: 'pending' });
+    }, 300); // 300ms = длительность анимации исчезновения
+
     await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
-    // Удаляем пост из массива DraftPagePosts
-    DraftPagePosts.value = DraftPagePosts.value.filter(post => post.post_id !== post_id);
     toast.success("Пост отправлен на модерацию!");
+
   } catch (error) {
     console.error('Ошибка при отправке на модерацию:', error);
     toast.error("Не удалось отправить пост на модерацию");
   }
-}
+  const mainContent = document.querySelector('main');
+  mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+};
 const aprove = async (post_id) => {
   try {
     await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id);
@@ -393,6 +409,7 @@ const saveProfileChanges = async () => {
         {
           name: profilePage.value.name,
           surname: profilePage.value.surname,
+          login: profilePage.value.login
         },
         {
           headers: {
@@ -440,7 +457,7 @@ onMounted(async () => {
 
     // Загрузка новостей
     const allPostsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/HomePage`);
-    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status === "draft");
+    DraftPagePosts.value = allPostsRes.data.user_posts.filter(post => post.status !== "published");
 
     // Загрузка модерации (только для админов)
     if (isAdmin.value) {
@@ -466,6 +483,9 @@ onMounted(async () => {
 </script>
 
 <style>
+html {
+  scroll-behavior: smooth;
+}
 .tab-container {
   position: relative;
   overflow: hidden;
