@@ -25,7 +25,7 @@
                   <img
                       v-if="profilePage.avatar_url"
                       :src="profilePage.avatar_url"
-                      class="w-16 h-16 rounded-full"
+                      class="w-16 h-16 rounded-full object-cover"
                   />
                   <div
                       v-else
@@ -127,13 +127,16 @@
           </div>
 
           <!-- DRAFTS -->
+          <!-- DRAFTS -->
           <div v-else-if="currentPage === 'drafts'">
             <h1 class="text-2xl font-bold mb-6">Твои черновики</h1>
             <div v-if="DraftPagePosts && DraftPagePosts.length" class="space-y-6 flex flex-col items-center space-x-2">
-              <div class="w-full flex flex-col items-center " v-for="post in DraftPagePosts" :key="post.post_id">
-                <post-main :post="post"></post-main>
-                <blue-button class="mt-2" :value="post.post_id" @click="to_moderations(post.post_id)">Отправить на модерацию</blue-button>
-              </div>
+              <transition-group name="post-fade">
+                <div v-for="post in DraftPagePosts" :key="post.post_id" class="w-full flex flex-col items-center">
+                  <post-main :post="post"></post-main>
+                  <blue-button class="mt-2" :value="post.post_id" @click="to_moderations(post.post_id)">Отправить на модерацию</blue-button>
+                </div>
+              </transition-group>
             </div>
             <div v-else class="text-center mt-20">
               <h1 class="text-2xl font-bold mb-2">У вас пока нет черновиков</h1>
@@ -142,13 +145,13 @@
             </div>
           </div>
 
-
-
           <!-- NEWS -->
           <div v-else-if="currentPage === 'news'">
             <h1 class="text-2xl font-bold mb-6">Твои новости</h1>
             <div v-if="homePagePosts && homePagePosts.length" class="space-y-6 flex flex-col items-center space-x-2">
-              <post-main v-for="post in homePagePosts" :key="post.post_id" :post="post"></post-main>
+              <transition-group name="post-fade">
+                <post-main v-for="post in homePagePosts" :key="post.post_id" :post="post"></post-main>
+              </transition-group>
             </div>
             <div v-else class="text-center mt-20">
               <h1 class="text-2xl font-bold mb-2">У вас пока нет опубликованных новостей</h1>
@@ -170,13 +173,15 @@
                 <h2 class="text-lg font-semibold">Ожидают проверки</h2>
               </div>
               <div class="space-y-6">
-                <div v-for="post in moderationPagePosts" :key="post"  class="flex flex-col items-center">
-                  <post-main :post="post"></post-main>
-                  <div class="mt-2 flex flex-wrap gap-2">
-                    <button @click="aprove(post.post_id)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-2xl transition">Одобрить</button>
-                    <button @click="reject(post.post_id)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-2xl transition">Отклонить</button>
+                <transition-group name="post-fade">
+                  <div v-for="post in moderationPagePosts" :key="post.post_id" class="flex flex-col items-center">
+                    <post-main :post="post"></post-main>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      <button @click="aprove(post.post_id)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-2xl transition">Одобрить</button>
+                      <button @click="reject(post.post_id)" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-2xl transition">Отклонить</button>
+                    </div>
                   </div>
-                </div>
+                </transition-group>
               </div>
             </div>
             <div v-else class="text-center mt-20">
@@ -189,10 +194,12 @@
           <div v-else-if="currentPage === 'moderation_list'">
             <h1 class="text-2xl font-bold mb-6">Все новости</h1>
             <div v-if="allPosts && allPosts.length" class="space-y-6 flex flex-col items-center space-x-2">
-              <div class="w-full flex flex-col items-center " v-for="post in allPosts" :key="post.post_id">
-                <post-main :post="post"></post-main>
-                <button class="mt-2 hover:cursor-pointer bg-red-500 ring-4 ring-transparent hover:ring-red-700/30 hover:bg-red-600 transition ease-in rounded-2xl text-white px-3 py-2 " :value="post.post_id" @click="DeletePost(post.post_id)">Удалить новость</button>
-              </div>
+              <transition-group name="post-fade">
+                <div v-for="post in allPosts" :key="post.post_id" class="w-full flex flex-col items-center">
+                  <post-main :post="post"></post-main>
+                  <button class="mt-2 hover:cursor-pointer bg-red-500 ring-4 ring-transparent hover:ring-red-700/30 hover:bg-red-600 transition ease-in rounded-2xl text-white px-3 py-2" :value="post.post_id" @click="DeletePost(post.post_id)">Удалить новость</button>
+                </div>
+              </transition-group>
             </div>
             <div v-else class="text-center mt-20">
               <h1 class="text-2xl font-bold mb-2">Пока что нет новостей на сайте</h1>
@@ -239,6 +246,9 @@ const profilePage = ref({
   login: '',
   avatar_url: ''
 });
+
+import { useToast } from "vue-toastification"
+const toast = useToast()
 
 // Состояния
 const avatarInput = ref(null);
@@ -311,30 +321,60 @@ const handleAvatarChange = async (event) => {
     setTimeout(() => { uploadStatus.value = null; }, 3000);
   }
 };
+const deletePostById = (postId) => {
+  DraftPagePosts.value = DraftPagePosts.value.filter(post => post.id !== postId);
+};
 const reason = ref(null)
 reason.value = "siejfskfej"
 const to_moderations = async (post_id) => {
-  const mods = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
-  window.location.reload();
+  try {
+    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
+    // Удаляем пост из массива DraftPagePosts
+    DraftPagePosts.value = DraftPagePosts.value.filter(post => post.post_id !== post_id);
+    toast.success("Пост отправлен на модерацию!");
+  } catch (error) {
+    console.error('Ошибка при отправке на модерацию:', error);
+    toast.error("Не удалось отправить пост на модерацию");
+  }
 }
 const aprove = async (post_id) => {
-  const apr = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id);
-  window.location.reload();
+  try {
+    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id);
+    // Удаляем пост из массива moderationPagePosts
+    moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id);
+    toast.success("Пост одобрен!");
+  } catch (error) {
+    console.error('Ошибка при одобрении:', error);
+    toast.error("Не удалось одобрить пост");
+  }
 }
-const reject = async (post_id) => {
 
-  const rej = await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason.value},
-      {headers: {'Content-Type': 'application/json'}});
-  window.location.reload();
+const reject = async (post_id) => {
+  try {
+    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason.value},
+        {headers: {'Content-Type': 'application/json'}});
+    // Удаляем пост из массива moderationPagePosts
+    moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id);
+    toast.success("Пост отклонен!");
+  } catch (error) {
+    console.error('Ошибка при отклонении:', error);
+    toast.error("Не удалось отклонить пост");
+  }
 }
 const DeletePost = async (post_id) => {
-  const del = await jwtApi.delete(`${import.meta.env.VITE_BASE_URL}/posts/${post_id}`, {post_id: post_id},
-      {headers: {
-        'Content-Type': 'application/json'},
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      });
-
-  window.location.reload();
+  try {
+    await jwtApi.delete(`${import.meta.env.VITE_BASE_URL}/posts/${post_id}`, {post_id: post_id},
+        {headers: {
+            'Content-Type': 'application/json'},
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        });
+    // Удаляем пост из массива allPosts
+    allPosts.value = allPosts.value.filter(post => post.post_id !== post_id);
+    toast.success("Пост удален!");
+  } catch (error) {
+    console.error('Ошибка при удалении:', error);
+    toast.error("Не удалось удалить пост");
+  }
 }
 
 // Сохранение изменений профиля
@@ -446,5 +486,32 @@ onMounted(async () => {
 .fade-in-enter-to, .fade-in-leave-from {
   opacity: 1;
   transform: translateY(0);
+}
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.5s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.post-fade-move, /* применяем transition перемещения */
+.post-fade-enter-active,
+.post-fade-leave-active {
+  transition: all 0.5s ease;
+}
+
+.post-fade-enter-from,
+.post-fade-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.post-fade-leave-active {
+  position: absolute;
+  width: 100%;
 }
 </style>

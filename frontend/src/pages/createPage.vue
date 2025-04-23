@@ -460,6 +460,8 @@ const handleImageUpload = (event) => {
     postData.value.post_img = e.target.result
     imageError.value = ''
   }
+  toast.success("Картинка загружена!")
+
   reader.readAsDataURL(file)
 }
 
@@ -490,40 +492,52 @@ const validateForm = () => {
 }
 
 // Отправка формы
+import { useToast } from "vue-toastification"
+import {jwtDecode} from "jwt-decode";
+
+const toast = useToast()
+
 const submitForm = async () => {
-  if (!validateForm()) return;
+  if (!validateForm()) {
+    toast.error("Пожалуйста, исправьте ошибки в форме")
+    return
+  }
 
   try {
-    isSubmitting.value = true;
+    isSubmitting.value = true
 
     const formData = {
       ...postData.value,
       start_date: convertToTimestamp(postData.value.start_date) / 1000,
       end_date: convertToTimestamp(postData.value.end_date) / 1000,
       tags: selectedTags.value
-    };
+    }
 
-    // Основной запрос
     const response = await jwtApi.post(
-        `${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData);
-    router.push('/');
+        `${import.meta.env.VITE_BASE_URL}/posts/create/post`, formData)
+    const decoded = jwtDecode(localStorage.getItem('authToken')
+  )
+    if (decoded['is_admin']) {
+      toast.success("Новость успешно опубликована!")
+    } else {
+      toast.success("Новость успешно добавлена в черновики!")
+
+    }
+    router.push('/')
 
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      // Обработка 401 ошибки
-      // Обработка других ошибок
-      console.error('Error creating post:', error);
       const errorMessage = error.response?.data?.message ||
-          'Произошла ошибка при создании новости';
-      alert(errorMessage);
+          'Произошла ошибка при создании новости'
+      toast.error(errorMessage)
     } else {
-      console.error('Unknown error:', error);
-      alert('Произошла неизвестная ошибка');
+      console.error('Unknown error:', error)
+      toast.error('Произошла неизвестная ошибка')
     }
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 
 // Проверка авторизации
 onBeforeMount(() => {

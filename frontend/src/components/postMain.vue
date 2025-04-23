@@ -60,7 +60,7 @@
               <img
                   v-if="post.author.avatar_url"
                   :src="post.author.avatar_url"
-                  class="w-12 h-12 rounded-full"
+                  class="w-12 h-12 rounded-full object-cover"
               />
               <div
                   v-else
