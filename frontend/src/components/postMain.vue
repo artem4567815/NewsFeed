@@ -46,7 +46,7 @@
           </h2>
 
           <!-- Описание -->
-          <p class="text-base text break-words- text-gray-700 mb-6 leading-relaxed line-clamp-3">
+          <p class="text-base text break-words text-gray-700 mb-6 leading-relaxed line-clamp-3">
             {{post.short_content}}
           </p>
         </div>
@@ -85,9 +85,13 @@
           <div class="flex items-center space-x-6">
             <button
                 @click.stop="likePost"
-                class="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                class="flex items-center space-x-2 text-gray-500 hover:text-red-600 transition-colors duration-200"
             >
-              <Heart   />
+              <Heart
+                  :fill="liked ? '#eb2525' : 'none'"
+                  :stroke="liked ? '#eb2525' : 'currentColor'"
+                  class="transition-all duration-200"
+              />
               <span class="text-base font-medium">{{likesCount}}</span>
             </button>
             <button class="flex items-center text-base font-medium text-gray-600">
@@ -113,8 +117,10 @@ import {jwtDecode} from "jwt-decode";
 import router from "@/router/router.js";
 
 const props = defineProps({
-  post: Object
+  post: Object,
+  isLiked: Boolean
 });
+const liked = ref(props.isLiked);
 const card = ref(null);
 
 function timestampToDate(ts) {
@@ -158,22 +164,28 @@ import api from '@/api/axios'
 import { useRouter } from 'vue-router'
 import axios from "axios";
 import TagPill from "@/components/UI/tagPill.vue";
+import jwtApi from "@/api/jwtApi.js";
 
-const isLiked = ref(props.post.is_liked || false);
 const likesCount = ref(props.post.likes_count || 0);
 
+
 const likePost = async () => {
-  if (isLiked.value) return;
-
-  try {
-    await api.post(`/posts/${props.post.post_id}/like`, {
-      post_id: props.post.post_id,
-    }, { withCredentials: true });
-
-    isLiked.value = true;
-    likesCount.value++;
-  } catch (error) {
-    console.error('Ошибка лайка:', error);
+  if (liked.value) {
+    try {
+      await jwtApi.post(`/posts/${props.post.post_id}/unlike`, { post_id: props.post.post_id });
+      liked.value = false;
+      likesCount.value--;
+    } catch (e) {
+      console.error('Ошибка снятия лайка:', e);
+    }
+  } else {
+    try {
+      await jwtApi.post(`/posts/${props.post.post_id}/like`, { post_id: props.post.post_id });
+      liked.value = true;
+      likesCount.value++;
+    } catch (e) {
+      console.error('Ошибка лайка:', e);
+    }
   }
 };
 
@@ -219,6 +231,7 @@ function timeAgo(timestampSec) {
 
 
 onMounted(() => {
+
   if (card.value) {
     VanillaTilt.init(card.value, {
       max: 1, // Чуть больше, чтобы было естественно

@@ -468,7 +468,6 @@ onMounted(async () => {
     if (isAdmin.value) {
       const Posts = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`);
       allPosts.value = Posts.data.posts;
-      console.log(moderationPagePosts);
     }
 
     // const draftsRes = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/drafts`);
