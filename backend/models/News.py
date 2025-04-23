@@ -29,6 +29,7 @@ class News(db.Model):
     user_id = db.Column(db.UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"), nullable=False)
 
     user_history = db.relationship('UsersHistory', backref='post', uselist=True)
+    message = db.relationship('RejectMessages', backref='post', uselist=True)
 
     def as_dict(self):
         result =  {

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from methods import safe, check_jwt_access, is_valid_uuid, get_most_three_active_user, get_expired_posts_avg_conversion, get_statistics_by_posts_id
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import News
+from models import News, RejectMessages
 from schemas import QueryRequest
 from flask_pydantic import validate
 from werkzeug.exceptions import BadRequest, NotFound
@@ -52,10 +52,10 @@ def moderation_reject(post_id):
     if not is_valid_uuid(post_id):
         return BadRequest("Invalid post id")
 
-    reason = request.json.get("reason", None)
+    reasons = request.json.get("reason")
 
-    if reason is None:
-        raise BadRequest("Invalid reason")
+    if not isinstance(reasons, list) or not all(isinstance(r, str) for r in reasons) or not reasons:
+        return BadRequest("Invalid reason format. Must be a list of strings.")
 
     post = News.query.filter_by(post_id=post_id).first()
 
@@ -63,9 +63,16 @@ def moderation_reject(post_id):
         return jsonify({"Message": "Новость не найдена"}), 404
 
     post.status = "rejected"
+
+    RejectMessages.query.filter_by(post_id=post_id).delete()
+
+    user_id = get_jwt_identity()
+    reject_entries = [RejectMessages(reason=r, post_id=post_id, user_id=user_id) for r in reasons]
+    db.session.bulk_save_objects(reject_entries)
+
     db.session.commit()
 
-    return jsonify({"reason": reason}), 200
+    return jsonify({}), 204
 
 
 @admin_routes.route('/statistics', methods=['GET'])

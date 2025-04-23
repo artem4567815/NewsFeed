@@ -202,11 +202,9 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
       json:
-        reason: "Post contains inappropriate content"
+        reason: ["Post contains inappropriate content"]
     response:
-      status_code: 200
-      json:
-        reason: "Post contains inappropriate content"
+      status_code: 204
 
   - name: 11 - Verify post status after reject
     request:
@@ -235,7 +233,7 @@ stages:
       headers:
         Authorization: "Bearer {access_token}"
       json:
-        reason: "Test reason"
+        reason: ["Test reason"]
     response:
       status_code: 404
 

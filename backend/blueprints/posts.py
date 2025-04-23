@@ -5,6 +5,7 @@ from flask_pydantic import validate
 from schemas import *
 from werkzeug.exceptions import Forbidden
 from manage import minio
+from models import RejectMessages
 
 posts = Blueprint('posts', __name__)
 
@@ -27,9 +28,6 @@ def detailed_posts(post_id):
     post = find_news_by_id(post_id)
     if not post:
         return jsonify({"Message": "Новость не найдена"}), 404
-
-    # post.views += 1
-    # db.session.commit()
 
     return jsonify(post.as_dict()), 200
 
@@ -192,3 +190,17 @@ def get_filter_info():
     schools = [school[0] for school in schools_query.all()]
 
     return jsonify({"tags": tags, "schools": schools}), 200
+
+
+@posts.route("/rejected", methods=["GET"])
+@safe("blueprints/posts.py | get_rejected_posts")
+@jwt_required()
+def get_rejected_posts():
+    user_id = get_jwt_identity()
+
+    posts = News.query.filter(News.status == "reject", News.user_id == user_id).all()
+    out = []
+    for post in posts:
+        out.append({"reasons": RejectMessages.query.filter_by(post_id=post.post_id).all(), "post_id": post.post_id})
+
+    return jsonify({"reasons": out}), 200

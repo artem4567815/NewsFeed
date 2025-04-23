@@ -144,7 +144,7 @@ def get_subscribe():
         out["authors"] = subscribe.authors
     if subscribe.tags:
         out["tags"] = subscribe.tags
-    print(out)
+
     return jsonify({"subscriptions": out}), 200
 
 

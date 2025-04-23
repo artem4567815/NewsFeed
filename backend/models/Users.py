@@ -19,6 +19,7 @@ class Users(db.Model):
     news = db.relationship('News', backref='user', uselist=True)
     users_history = db.relationship('UsersHistory', backref='user', uselist=True)
     subscription = db.relationship('Subscription', backref='user', uselist=False)
+    message = db.relationship('RejectMessages', backref='user', uselist=True)
 
     def as_dict(self):
         result = {
