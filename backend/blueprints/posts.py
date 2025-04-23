@@ -95,7 +95,7 @@ def like_posts(post_id):
     return jsonify({}), 204
 
 
-@posts.route("/<post_id>/unlike", methods=["DELETE"])
+@posts.route("/<post_id>/unlike", methods=["POST"])
 @safe("blueprints/posts.py | unlike_posts")
 @jwt_required()
 def unlike_posts(post_id):

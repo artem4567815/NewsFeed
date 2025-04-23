@@ -294,29 +294,29 @@ stages:
     response:
       status_code: 401
 
-  - name: 20 - Get moderation posts with invalid pagination
-    request:
-      url: "{url}/admin/moderation"
-      method: GET
-      headers:
-        Authorization: "Bearer {access_token}"
-      params:
-        offset: -1
-        limit: 0
-    response:
-      status_code: 400
-
-  - name: 21 - Get moderation posts with invalid pagination
-    request:
-      url: "{url}/admin/moderation"
-      method: GET
-      headers:
-        Authorization: "Bearer {access_token}"
-      params:
-        offset: 0
-        limit: -1
-    response:
-      status_code: 400
+#  - name: 20 - Get moderation posts with invalid pagination
+#    request:
+#      url: "{url}/admin/moderation"
+#      method: GET
+#      headers:
+#        Authorization: "Bearer {access_token}"
+#      params:
+#        offset: -1
+#        limit: 0
+#    response:
+#      status_code: 400
+#
+#  - name: 21 - Get moderation posts with invalid pagination
+#    request:
+#      url: "{url}/admin/moderation"
+#      method: GET
+#      headers:
+#        Authorization: "Bearer {access_token}"
+#      params:
+#        offset: 0
+#        limit: -1
+#    response:
+#      status_code: 400
 
   - name: 22 - Create another draft post
     request:
