@@ -24,6 +24,12 @@ app.config['JWT_COOKIE_SECURE'] = bool(not DEBUG)
 app.config['JWT_COOKIE_CSRF_PROTECT'] = bool(not DEBUG)
 app.config['JWT_REFRESH_COOKIE_NAME'] = "refresh_token_cookie"
 
+
+app.config['SQLALCHEMY_POOL_SIZE'] = 10
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 30
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
+
 db.init_app(app)
 migrate = Migrate(app, db)
 
