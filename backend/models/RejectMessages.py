@@ -12,8 +12,6 @@ class RejectMessages(db.Model):
 
     def as_dict(self):
         result =  {
-            "post_id": self.post_id,
-            "user_id": self.user_id,
             "reason": self.reason
         }
 

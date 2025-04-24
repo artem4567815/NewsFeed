@@ -64,6 +64,6 @@ class News(db.Model):
             result['published_at'] = self.published_at.timestamp()
 
         if self.status == 'rejected':
-            result["reasons"] = RejectMessages.query.filter_by(post_id=self.post_id).all()
+            result["reasons"] = [m.as_dict() for m in self.message]
 
         return result
