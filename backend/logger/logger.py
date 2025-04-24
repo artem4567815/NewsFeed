@@ -7,11 +7,19 @@ class Logger:
         self.logger = logging.getLogger("AdvancedLogger")
         self.logger.setLevel(log_level)
 
-        log_format = logging.Formatter("%(asctime)s - [%(levelname)s] - %(message)s")
+        # log_format = logging.Formatter("%(asctime)s - [%(levelname)s] - %(message)s")
+        #
+        # console_handler = logging.StreamHandler()
+        # console_handler.setFormatter(log_format)
+        # self.logger.addHandler(console_handler)
 
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(log_format)
-        self.logger.addHandler(console_handler)
+        if not self.logger.handlers:
+            log_format = logging.Formatter("%(asctime)s - [%(levelname)s] - %(message)s")
+
+            console_handler = logging.StreamHandler()
+            console_handler.setFormatter(log_format)
+            self.logger.addHandler(console_handler)
+
 
     def log(self, level: str, message: str):
         level = level.lower()

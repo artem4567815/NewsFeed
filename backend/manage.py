@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from models import db
 from flask_migrate import Migrate
 from config import *
@@ -7,6 +7,7 @@ from logger import Logger
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
 from helpers import MinioClient
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=["http://localhost:5173", "https://edufeed.ru"])
@@ -43,3 +44,13 @@ minio = MinioClient(
     endpoint=endpoint,
     bucket=bucket,
 )
+
+@app.after_request
+def log_request(response):
+    timestamp = datetime.now().strftime("%d/%b/%Y %H:%M:%S")
+    log_line = (
+        f'{request.remote_addr} - - [{timestamp}] '
+        f'"{request.method} {request.path} HTTP/1.1" {response.status_code} -'
+    )
+    logger.log("info", log_line)
+    return response
