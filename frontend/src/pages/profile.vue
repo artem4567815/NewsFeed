@@ -430,9 +430,9 @@ const reject = async (post_id) => {
     { id: 'offensive', label: 'Оскорбительный контент' },
     { id: 'false_info', label: 'Ложная информация' },
     { id: 'copyright', label: 'Нецензурная лексика' },
-    { id: 'copyright', label: 'Некорректные теги' },
-    { id: 'copyright', label: 'Нецензурный логин' },
-    { id: 'copyright', label: 'Несуществуящая школа или корпус' },
+    { id: 'tags', label: 'Некорректные теги' },
+    { id: 'login', label: 'Нецензурный логин' },
+    { id: 'building', label: 'Несуществуящая школа или корпус' },
     { id: 'other', label: 'Другая причина' }
   ]
 
@@ -548,16 +548,16 @@ const reject = async (post_id) => {
 }
 
 const viewRejectionReason = (post) => {
+  console.log(post.reasons)
   Swal.fire({
     title: 'Причина отказа',
     html: `
-      <ul class="text-left list-disc pl-6">
-        ${post.reject_reason.map(reason => `<li>${reason}</li>`).join('')}
+      <ul class="text-left space-y-1 list-disc pl-6">
+        ${post.reasons.map(reason => `<li>${reason}</li>`).join('')}
       </ul>
     `,
     confirmButtonText: 'Закрыть',
     customClass: {
-      confirmButton: swalButtonStyles.confirm
     }
   })
 }
