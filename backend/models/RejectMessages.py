@@ -11,8 +11,4 @@ class RejectMessages(db.Model):
     reason = db.Column(db.String, nullable=False)
 
     def as_dict(self):
-        result =  {
-            "reason": self.reason
-        }
-
-        return result
+        return self.reason
