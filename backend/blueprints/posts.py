@@ -196,16 +196,16 @@ def get_filter_info():
     return jsonify({"tags": tags, "schools": schools}), 200
 
 
-@posts.route("/rejected", methods=["GET"])
-@safe("blueprints/posts.py | get_rejected_posts")
-@jwt_required()
-def get_rejected_posts():
-    user_id = get_jwt_identity()
-
-    posts = News.query.filter(News.status == "reject", News.user_id == user_id).all()
-    out = []
-    for post in posts:
-        out.append({"reasons": RejectMessages.query.filter_by(post_id=post.post_id).all(), "post_id": post.post_id})
-
-    return jsonify({"reasons": out}), 200
+# @posts.route("/rejected", methods=["GET"])
+# @safe("blueprints/posts.py | get_rejected_posts")
+# @jwt_required()
+# def get_rejected_posts():
+#     user_id = get_jwt_identity()
+#
+#     posts = News.query.filter(News.status == "reject", News.user_id == user_id).all()
+#     out = []
+#     for post in posts:
+#         out.append({"reasons": RejectMessages.query.filter_by(post_id=post.post_id).all(), "post_id": post.post_id})
+#
+#     return jsonify({"reasons": out}), 200
 

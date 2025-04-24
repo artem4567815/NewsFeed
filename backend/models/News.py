@@ -1,4 +1,4 @@
-from . import db
+from . import db, RejectMessages
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -62,5 +62,8 @@ class News(db.Model):
 
         if self.published_at is not None:
             result['published_at'] = self.published_at.timestamp()
+
+        if self.status == 'rejected':
+            result["reasons"] = RejectMessages.query.filter_by(post_id=self.post_id).all()
 
         return result
