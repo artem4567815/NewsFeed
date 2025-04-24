@@ -84,9 +84,20 @@
               <!-- Действия -->
               <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-200">
                 <div class="flex items-center gap-2">
-                  <button @click="Like" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <Heart class="w-4 h-4" />
-                    <span>{{ post.likes_count || 0 }}</span>
+                  <button
+                      @click="toggleLike"
+                      class="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all"
+                      :class="{
+      'text-red-500 bg-red-50 hover:bg-red-100': isLiked,
+      'text-gray-700 bg-gray-100 hover:bg-gray-200': !isLiked
+    }"
+                  >
+                    <Heart
+                        :fill="isLiked ? '#eb2525' : 'none'"
+                        :stroke="isLiked ? '#eb2525' : 'currentColor'"
+                        class="w-5 h-5 transition-all"
+                    />
+                    <span>{{ likesCount }}</span>
                   </button>
                 </div>
                 <div class="flex items-center gap-2">
@@ -108,7 +119,7 @@
 
 <script setup>
 import { CalendarDays, Eye, Heart, Share2 } from 'lucide-vue-next'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from "vue-router"
 import FooterMain from "@/components/footerMain.vue"
 import axios from "axios";
@@ -119,24 +130,8 @@ const post = ref(null)
 const isLoading = ref(true)
 const error = ref(null)
 
-function Like() {
-  if (!post.value) return;
-
-  const likePost = async () => {
-    try {
-      await api.post(`/posts/${post.value.post_id}/like`, {
-        post_id: post.value.post_id,
-      }, { withCredentials: true });
-      post.value.likes_count++;
-    } catch (error) {
-      console.error('Ошибка лайка:', error);
-      // Add user notification here
-    }
-  }
-
-  likePost();
-}
-import { previousRoute } from '@/router/router.js' // или откуда ты сохраняешь предыдущий путь
+import router, { previousRoute } from '@/router/router.js'
+import jwtApi from "@/api/jwtApi.js"; // или откуда ты сохраняешь предыдущий путь
 
 const fromProfile = ref(false)
 
@@ -147,28 +142,6 @@ onMounted(() => {
   }
 })
 
-const loadPost = async () => {
-  try {
-    isLoading.value = true;
-    error.value = null;
-
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts/${route.params.id}`);
-    post.value = response.data;
-
-  } catch (err) {
-    if (axios.isAxiosError(err)) {
-      error.value = err.response?.status === 404
-          ? 'Новость не найдена'
-          : 'Ошибка сервера';
-    } else {
-      error.value = 'Неизвестная ошибка';
-    }
-    console.error('Ошибка загрузки:', err);
-
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 const getStatusLabel = (status) => {
   const statuses = {
@@ -191,7 +164,79 @@ const postTypeLabel = (type) => {
 }
 
 // Загружаем данные при монтировании
-onMounted(loadPost)
+const likedPosts = ref([]) // Массив ID лайкнутых постов
+const likesCount = ref(0) // Счетчик лайков для текущего поста
+
+// Загружаем лайки пользователя
+const loadLikes = async () => {
+  try {
+    const response = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/my-likes`)
+    likedPosts.value = response.data.posts_liked_by_user || []
+  } catch (err) {
+    console.error('Ошибка загрузки лайков:', err)
+  }
+}
+
+// Проверяем, лайкнул ли пользователь текущий пост
+const isLiked = computed(() => {
+  return post.value ? likedPosts.value.includes(post.value.post_id) : false
+})
+
+// Обработчик лайка/дизлайка
+const toggleLike = async () => {
+  if (!post.value) return
+
+  // Проверка авторизации
+  if (!localStorage.getItem('authToken')) {
+    router.push('/auth')
+    return
+  }
+
+  try {
+    if (isLiked.value) {
+      // Дизлайк
+      await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/posts/${post.value.post_id}/unlike`)
+      likedPosts.value = likedPosts.value.filter(id => id !== post.value.post_id)
+      likesCount.value--
+    } else {
+      // Лайк
+      await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/posts/${post.value.post_id}/like`)
+      likedPosts.value.push(post.value.post_id)
+      likesCount.value++
+    }
+  } catch (err) {
+    console.error('Ошибка при лайке:', err)
+    toast.error('Не удалось выполнить действие')
+  }
+}
+
+// Загрузка поста
+const loadPost = async () => {
+  try {
+    isLoading.value = true
+    error.value = null
+
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts/${route.params.id}`)
+    post.value = response.data
+    likesCount.value = response.data.likes_count || 0
+
+    // Загружаем лайки после загрузки поста
+    await loadLikes()
+  } catch (err) {
+    error.value = axios.isAxiosError(err)
+        ? err.response?.status === 404
+            ? 'Новость не найдена'
+            : 'Ошибка сервера'
+        : 'Неизвестная ошибка'
+    console.error('Ошибка загрузки:', err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadPost()
+})
 
 function timestampToDate(ts) {
   const date = new Date(ts * 1000); // если timestamp в секундах

@@ -14,7 +14,9 @@
       </div>
 
       <!-- Контент -->
-      <div class="flex-1 p-2 md:p-4  flex flex-col min-h-[350px]">
+      <div class=" flex flex-col w-full min-w-0 justify-between">
+    <div>
+      <div class="flex-1 p-2 md:p-4 min-w-0  flex flex-col min-h-[350px]">
         <!-- Категория -->
         <div class="flex-1 mt-8 md:mt-6">
           <!-- Метаданные -->
@@ -41,25 +43,32 @@
 
 
           <!-- Заголовок -->
-          <h2 class="text-2xl font-bold break-words text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4 leading-tight hover:text-blue-600 transition-colors duration-200
+            line-clamp-2 break-words  max-w-full overflow-hidden">
             {{post.title}}
           </h2>
 
           <!-- Описание -->
-          <p class="text-base text break-words text-gray-700 mb-6 leading-relaxed line-clamp-3">
+          <p class="text-base text-gray-700 mb-6 leading-relaxed line-clamp-3 break-words overflow-hidden">
             {{post.short_content}}
           </p>
-        </div>
+
+          <!-- Теги -->
           <div class="flex items-center space-x-4  timeline-scroll overflow-x-auto mb-4">
-            <tag-pill v-for="tag in post.tags" :key="tag" :tag="tag" class="bg-blue-600/20 text-blue-600 text-nowrap border-blue-600/40  border-1 px-3 py-1 rounded-full text-sm font-medium ">
-              {{tag}}
+            <tag-pill
+                v-for="tag in post.tags"
+                :key="tag"
+                :tag="tag"
+                class="bg-blue-600/20 text-blue-600 text-nowrap border-blue-600/40 border-1 px-3 py-1 rounded-full text-sm font-medium  ">
+              {{ tag }}
             </tag-pill>
           </div>
-
+        </div>
 
 
         <!-- Нижняя часть -->
-        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+       <div>
+        <div class="flex items-center  justify-between pt-4 border-t border-gray-100">
           <!-- Автор -->
           <div class="flex items-center">
             <div v-if="post.author">
@@ -100,8 +109,11 @@
             </button>
           </div>
         </div>
+        </div>
       </div>
     </div>
+      </div>
+  </div>
   </div>
 </template>
 
@@ -170,6 +182,11 @@ const likesCount = ref(props.post.likes_count || 0);
 
 
 const likePost = async () => {
+  const token = localStorage.getItem('authToken')
+  if (!token) {
+    router.push('/auth')
+    return
+  }
   if (liked.value) {
     try {
       await jwtApi.post(`/posts/${props.post.post_id}/unlike`, { post_id: props.post.post_id });

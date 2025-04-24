@@ -137,9 +137,15 @@
                   >
                     <post-main :post="post" @click="$router.push(`/post/${post.post_id}`)" />
                     <!-- тут можно показывать кнопки в зависимости от статуса -->
-                    <div v-if="post.status === 'draft'" class="flex gap-2 mt-2">
+                    <div v-if="post.status === 'draft'" class="flex justify-center gap-2 mt-2">
                       <button @click="to_moderations(post.post_id)" class="bg-blue-500 text-white px-3 py-2 rounded-xl">На модерацию</button>
                     </div>
+                    <div v-if="post.status === 'rejected'" class="flex justify-center gap-2 mt-2">
+                      <button @click="viewRejectionReason(post)" class="bg-red-500 text-white px-3 py-2 rounded-xl">Причина отказа</button>
+                    </div>
+<!--                    <div v-if="post.status === 'rejected' || post.status === 'draft'">-->
+<!--                      <button @click="editPost(post)">Доработать</button>-->
+<!--                    </div>-->
                   </div>
               </transition-group>
             </div>
@@ -239,6 +245,9 @@ const profileTab = ref('personal')
 
 const isAdmin = ref(false) // Добавляем флаг администратора
 
+import Swal from 'sweetalert2'
+
+
 // Данные
 const homePagePosts = ref(null);
 const moderationPagePosts = ref(null);
@@ -332,67 +341,253 @@ const deletePostById = (postId) => {
 const reason = ref(null)
 reason.value = "siejfskfej"
 const to_moderations = async (post_id) => {
-  try {
-    const post = DraftPagePosts.value.find(p => p.post_id === post_id);
+  const result = await Swal.fire({
+    title: 'Отправить на модерацию?',
+    text: 'Вы уверены, что хотите отправить этот пост на проверку?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Да, отправить',
+    cancelButtonText: 'Отмена',
+    reverseButtons: true,
+    customClass: {
+      confirmButton: '!bg-blue-500 hover:!bg-blue-600 !text-white px-4 py-2 rounded-lg',
+      cancelButton: '!bg-gray-300 hover:!bg-gray-400 !text-gray-800 px-4 py-2 rounded-lg'
+    }
+  })
 
-    // Удаляем пост из списка
-    DraftPagePosts.value = DraftPagePosts.value.filter(p => p.post_id !== post_id);
+  if (result.isConfirmed) {
+    try {
+      const post = DraftPagePosts.value.find(p => p.post_id === post_id)
+      DraftPagePosts.value = DraftPagePosts.value.filter(p => p.post_id !== post_id)
 
-    // Добавляем его обратно с новым статусом через анимацию
-    setTimeout(() => {
-      DraftPagePosts.value.unshift({ ...post, status: 'pending' });
-    }, 300); // 300ms = длительность анимации исчезновения
+      await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id)
+      toast.success('Пост отправлен на модерацию!')
 
-    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/user/${post_id}/send/to/moderation`, post_id);
-    toast.success("Пост отправлен на модерацию!");
-
-  } catch (error) {
-    console.error('Ошибка при отправке на модерацию:', error);
-    toast.error("Не удалось отправить пост на модерацию");
+      // Задержка перед скроллом для завершения анимаций
+      setTimeout(() => {
+        smoothScrollToTop()
+      }, 300)
+    } catch (error) {
+      toast.error('Не удалось отправить пост')
+    }
   }
-  const mainContent = document.querySelector('main');
-  mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-};
+}
+
+// Вынесенная функция для плавного скролла
+const smoothScrollToTop = () => {
+  const mainContent = document.querySelector('main')
+  if (!mainContent) return
+
+  // Вариант 1: Нативный smooth-scroll (лучшая производительность)
+  mainContent.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+
+  // Вариант 2: Полифил для старых браузеров
+  if (typeof mainContent.scrollTo !== 'function') {
+    const step = -mainContent.scrollTop / 15
+    const scrollInterval = setInterval(() => {
+      if (mainContent.scrollTop > 0) {
+        mainContent.scrollBy(0, step)
+      } else {
+        clearInterval(scrollInterval)
+      }
+    }, 16)
+  }
+}
+
 const aprove = async (post_id) => {
-  try {
-    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id);
-    // Удаляем пост из массива moderationPagePosts
-    moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id);
-    toast.success("Пост одобрен!");
-  } catch (error) {
-    console.error('Ошибка при одобрении:', error);
-    toast.error("Не удалось одобрить пост");
+  const result = await Swal.fire({
+    title: 'Одобрить публикацию?',
+    text: 'Новость станет видна всем пользователям',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Да, одобрить',
+    cancelButtonText: 'Отмена',
+    reverseButtons: true,
+    customClass: {
+      confirmButton: '!bg-green-500 hover:!bg-green-600 !text-white px-4 py-2 rounded-lg',
+      cancelButton: '!bg-gray-300 hover:!bg-gray-400 !text-gray-800 px-4 py-2 rounded-lg'
+    }
+  })
+
+  if (result.isConfirmed) {
+    try {
+      await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/apply`, post_id)
+      moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id)
+      toast.success('Новость одобрена!')
+    } catch (error) {
+      toast.error('Ошибка при одобрении')
+    }
   }
 }
 
 const reject = async (post_id) => {
-  try {
-    await jwtApi.post(`${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`, {reason: reason.value},
-        {headers: {'Content-Type': 'application/json'}});
-    // Удаляем пост из массива moderationPagePosts
-    moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id);
-    toast.success("Пост отклонен!");
-  } catch (error) {
-    console.error('Ошибка при отклонении:', error);
-    toast.error("Не удалось отклонить пост");
-  }
-}
-const DeletePost = async (post_id) => {
-  try {
-    await jwtApi.delete(`${import.meta.env.VITE_BASE_URL}/posts/${post_id}`, {post_id: post_id},
-        {headers: {
-            'Content-Type': 'application/json'},
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        });
-    // Удаляем пост из массива allPosts
-    allPosts.value = allPosts.value.filter(post => post.post_id !== post_id);
-    toast.success("Пост удален!");
-  } catch (error) {
-    console.error('Ошибка при удалении:', error);
-    toast.error("Не удалось удалить пост");
+  // Список стандартных причин
+  const standardReasons = [
+    { id: 'spam', label: 'Спам' },
+    { id: 'offensive', label: 'Оскорбительный контент' },
+    { id: 'false_info', label: 'Ложная информация' },
+    { id: 'copyright', label: 'Нецензурная лексика' },
+    { id: 'copyright', label: 'Некорректные теги' },
+    { id: 'copyright', label: 'Нецензурный логин' },
+    { id: 'copyright', label: 'Несуществуящая школа или корпус' },
+    { id: 'other', label: 'Другая причина' }
+  ]
+
+  // Создаем HTML для модалки с чекбоксами
+  const { value: formValues } = await Swal.fire({
+    title: 'Причина отказа',
+    html: `
+      <div class="text-left space-y-3">
+        ${standardReasons.map(reason => `
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="${reason.id}"
+              name="rejectReason"
+              value="${reason.id}"
+              class="mr-2 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              ${reason.id === 'other' ? 'onchange="toggleCustomReason(this)"' : ''}
+            >
+            <label for="${reason.id}" class="text-gray-700">${reason.label}</label>
+          </div>
+        `).join('')}
+
+        <div id="customReasonContainer" class="mt-3 hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Укажите свою причину</label>
+          <textarea
+            id="customReason"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            rows="3"
+            placeholder="Опишите причину..."
+          ></textarea>
+        </div>
+      </div>
+    `,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Подтвердить',
+    cancelButtonText: 'Отмена',
+    preConfirm: () => {
+      const selectedReasons = []
+      standardReasons.forEach(reason => {
+        if (document.getElementById(reason.id).checked) {
+          selectedReasons.push(reason.id === 'other'
+              ? document.getElementById('customReason').value
+              : reason.label)
+        }
+      })
+
+      if (selectedReasons.length === 0) {
+        Swal.showValidationMessage('Выберите хотя бы одну причину')
+      }
+
+      if (selectedReasons.includes('other') && !document.getElementById('customReason').value.trim()) {
+        Swal.showValidationMessage('Укажите свою причину')
+      }
+
+      return selectedReasons
+    },
+    didOpen: () => {
+      // Добавляем обработчик для показа/скрытия textarea
+      window.toggleCustomReason = (checkbox) => {
+        const container = document.getElementById('customReasonContainer')
+        checkbox.checked
+            ? container.classList.remove('hidden')
+            : container.classList.add('hidden')
+      }
+    }
+  })
+
+  if (!formValues) return // Пользователь отменил
+
+  // Формируем итоговое сообщение
+  const finalReason = formValues.join('\n• ')
+
+  // Подтверждение отказа
+  const confirmResult = await Swal.fire({
+    title: 'Подтвердите отказ',
+    html: `
+      <div class="text-left">
+        <p>Вы точно хотите отклонить новость?</p>
+        <div class="mt-2 p-3 bg-gray-50 rounded-md">
+          <p class="font-medium">Причины:</p>
+          <ul class="list-disc pl-5 mt-1">
+            ${formValues.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Да, отклонить',
+    cancelButtonText: 'Отмена',
+    customClass: {
+      confirmButton: '!bg-red-500 hover:!bg-red-600 !text-white px-4 py-2 rounded-lg',
+      cancelButton: '!bg-gray-300 hover:!bg-gray-400 !text-gray-800 px-4 py-2 rounded-lg'
+    }
+  })
+
+  if (confirmResult.isConfirmed) {
+    console.log(formValues)
+    try {
+      await jwtApi.post(
+          `${import.meta.env.VITE_BASE_URL}/admin/moderation/${post_id}/reject`,
+          { reason: formValues },
+          { headers: { 'Content-Type': 'application/json' } }
+      )
+
+      moderationPagePosts.value = moderationPagePosts.value.filter(post => post.post_id !== post_id)
+      toast.success('Новость отклонена!')
+    } catch (error) {
+      toast.error('Ошибка при отклонении')
+    }
   }
 }
 
+const viewRejectionReason = (post) => {
+  Swal.fire({
+    title: 'Причина отказа',
+    html: `
+      <ul class="text-left list-disc pl-6">
+        ${post.reject_reason.map(reason => `<li>${reason}</li>`).join('')}
+      </ul>
+    `,
+    confirmButtonText: 'Закрыть',
+    customClass: {
+      confirmButton: swalButtonStyles.confirm
+    }
+  })
+}
+
+const DeletePost = async (post_id) => {
+  const result = await Swal.fire({
+    title: 'Удалить пост?',
+    text: 'Это действие нельзя отменить!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Да, удалить',
+    cancelButtonText: 'Отмена',
+    confirmButtonColor: '#d33',
+    reverseButtons: true,
+    customClass: {
+      confirmButton: 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg',
+      cancelButton: 'bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg'
+    }
+  })
+
+  if (result.isConfirmed) {
+    try {
+      await jwtApi.delete(`${import.meta.env.VITE_BASE_URL}/posts/${post_id}`)
+      allPosts.value = allPosts.value.filter(post => post.post_id !== post_id)
+      toast.success('Пост удалён!')
+    } catch (error) {
+      toast.error('Не удалось удалить пост')
+    }
+  }
+}
 // Сохранение изменений профиля
 const saveProfileChanges = async () => {
   if (!profilePage.value.name || !profilePage.value.surname || !profilePage.value.login) {
