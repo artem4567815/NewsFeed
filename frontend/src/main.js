@@ -7,6 +7,8 @@ import mitt from 'mitt'
 import axios from 'axios'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 
 axios.defaults.withCredentials = true
 
@@ -14,6 +16,9 @@ const emitter = mitt()
 
 
 const app = createApp(App)
+
+app.use(VueSweetalert2)
+
 
 app.use(Toast, {
     transition: "Vue-Toastification__bounce",
