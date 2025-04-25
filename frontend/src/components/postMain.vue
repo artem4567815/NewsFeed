@@ -93,6 +93,7 @@
           <!-- Статистика -->
           <div class="flex items-center space-x-6">
             <button
+                :disabled="$route.path == '/profile'"
                 @click.stop="likePost"
                 class="flex items-center space-x-2 text-gray-500 hover:text-red-600 transition-colors duration-200"
             >

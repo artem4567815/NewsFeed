@@ -29,13 +29,13 @@
                   <Upload class="h-6 w-6 text-blue-600" />
                 </div>
                 <p class="text-lg font-medium text-gray-700 mb-1">Загрузите изображение</p>
-                <p class="text-gray-500 mb-4">или</p>
-                <blue-button
-                    type="button"
-                    @click.stop="router.push('/Create/Cover')"
-                >
-                  Создайте свое
-                </blue-button>
+<!--                <p class="text-gray-500 mb-4">или</p>-->
+<!--                <blue-button-->
+<!--                    type="button"-->
+<!--                    @click.stop="router.push('/Create/Cover')"-->
+<!--                >-->
+<!--                  Создайте свое-->
+<!--                </blue-button>-->
               </div>
             </div>
           <div v-show="imageError" class="text-red-500 text-sm mt-1 px-6">Изображение обязательно</div>
@@ -484,7 +484,7 @@ const submitForm = async () => {
     toast.success(decoded['is_admin'] ? "Новость успешно опубликована!" : "Новость успешно добавлена в черновики!")
     localStorage.removeItem('savedPostData')
     localStorage.removeItem('savedSelectedTags')
-    router.push('/create')
+    router.push(decoded['is_admin'] ? "/" : "/profile")
   } catch (error) {
     const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || 'Произошла ошибка при создании новости'
