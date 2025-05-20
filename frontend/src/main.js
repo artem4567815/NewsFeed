@@ -7,8 +7,6 @@ import mitt from 'mitt'
 import axios from 'axios'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
-import VueSweetalert2 from 'vue-sweetalert2'
-import 'sweetalert2/dist/sweetalert2.min.css'
 
 axios.defaults.withCredentials = true
 
@@ -17,26 +15,23 @@ const emitter = mitt()
 
 const app = createApp(App)
 
-app.use(VueSweetalert2)
-
 
 app.use(Toast, {
-    transition: "Vue-Toastification__bounce",
-    maxToasts: 3,
-    newestOnTop: true,
-    position: "top-right",
-    timeout: 5000,
-    closeOnClick: true,
-    pauseOnFocusLoss: true,
-    pauseOnHover: true,
-    draggable: true,
-    draggablePercent: 0.6,
-    showCloseButtonOnHover: false,
-    hideProgressBar: false,
-    closeButton: "button",
-    icon: true,
-    rtl: false
+  position: "top-right",
+  timeout: 3000,
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: false,
+  closeButton: "button",
+  icon: true,
+  rtl: false
 })
+
+
 
 components.forEach(component => {
     app.component(component.name, component)
