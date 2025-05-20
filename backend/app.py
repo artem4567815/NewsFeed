@@ -8,7 +8,8 @@ app.register_blueprint(user_routes, url_prefix='/user')
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(posts, url_prefix='/posts')
 
-@app.route('/ping')
+
+@app.route('/ping') #Z гений
 def ping():
     return "edufeed work!", 200
 
