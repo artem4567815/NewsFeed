@@ -78,7 +78,6 @@ class MinioClient:
         parsed = urlparse(url)
         parts = parsed.path.lstrip("/").split("/", 2)
         if len(parts) < 3:
-            # raise ValueError("Invalid URL format for MinIO object.")
             print("Invalid URL format for MinIO object.")
             return False
 

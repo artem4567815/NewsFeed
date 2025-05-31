@@ -37,9 +37,9 @@ services:
     restart: always
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://127.0.0.1:8080/ping" ]
-      interval: 10s
-      retries: 30
-      timeout: 3s
+      interval: 30s
+      retries: 3
+      timeout: 5s
       start_period: 10s
     depends_on:
       db:

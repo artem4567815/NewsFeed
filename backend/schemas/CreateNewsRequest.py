@@ -3,6 +3,8 @@ from typing import Optional, List, Literal
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import re
+from urllib.parse import urlparse
+
 
 class CreateNewsRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=100)
@@ -36,15 +38,18 @@ class CreateNewsRequest(BaseModel):
     @field_validator("post_img")
     @classmethod
     def validate_post_img(cls, value):
-        if value is not None:
-            if value == "" or value == " ":
-                return None
+        if value is None or value.strip() == "":
+            return None
 
-            if not value.startswith("data:image/"):
-                raise ValueError("Некорректный формат изображения")
-
-            base64_pattern = r"^data:image\/[a-zA-Z]*;base64,[A-Za-z0-9+/=]*$"
+        if value.startswith("data:image/"):
+            base64_pattern = r"^data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=\s]+$"
             if not re.match(base64_pattern, value):
-                raise ValueError("Некорректный формат base64 для изображения")
+                raise ValueError("Некорректный формат base64 изображения")
+            return value
 
-        return value
+        parsed = urlparse(value)
+        if parsed.scheme in ('http', 'https') and bool(parsed.netloc):
+            return value
+
+
+        raise ValueError("post_img должен быть либо base64-строкой, либо URL-ссылкой")

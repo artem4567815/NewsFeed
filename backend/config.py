@@ -10,7 +10,7 @@ DB_LOGIN = os.environ.get('DB_LOGIN')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 
 APP_SECRET = os.environ.get('APP_SECRET')
-SERVER_PORT = os.getenv('SERVER_PORT', 8080)
+SERVER_PORT = os.getenv('SERVER_PORT', 8081)
 
 DEBUG = int(os.getenv("FLASK_DEBUG", "0"))
 SERVER_ADD = os.getenv('SERVER_ADD', "/api")
