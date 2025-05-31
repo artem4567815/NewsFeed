@@ -4,7 +4,8 @@ from typing import Any
 import pytest
 import requests
 
-URL = "http://localhost:8081"
+# URL = "http://localhost:8081"
+URL = "http://app:8080"
 
 
 def pytest_tavern_beta_before_every_request(request_args: MutableMapping):
