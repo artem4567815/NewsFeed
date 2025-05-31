@@ -46,54 +46,71 @@ const sidebarOpen = ref(false)
 const isAdmin = ref(false)
 const currentTabRef = ref(null)
 
-// Вычисляемое свойство для определения текущего компонента
+// Вычисляемое свойство для текущего компонента
 const currentComponent = computed(() => {
   switch (currentPage.value) {
-    case 'profile':
-      return ProfileTab
-    case 'drafts':
-      return DraftsTab
-    case 'news':
-      return NewsTab
-    case 'moderation':
-      return ModerationTab
-    case 'moderation_list':
-      return ModerationListTab
+    case 'profile': return ProfileTab
+    case 'drafts': return DraftsTab
+    case 'news': return NewsTab
+    case 'moderation': return ModerationTab
+    case 'moderation_list': return ModerationListTab
     default:
-      return null
+      currentPage.value = 'news'
+      return NewsTab
   }
 })
 
-emitter.on('toggle-sidebar', () => {
-  sidebarOpen.value = !sidebarOpen.value
+
+// Сохраняем текущую страницу в localStorage
+watch(currentPage, (val) => {
+  localStorage.setItem('currentPage', JSON.stringify(val))
 })
 
+// Загружаем страницу из localStorage
+const loadCurrentPage = () => {
+  const saved = localStorage.getItem('currentPage')
+  if (saved) {
+    try {
+      currentPage.value = JSON.parse(saved)
+    } catch (e) {
+      currentPage.value = 'news'
+    }
+  }
+}
+
+// Установка текущей вкладки
 const setPage = (page) => {
   currentPage.value = page
   sidebarOpen.value = false
 }
 
-// Проверка прав администратора при монтировании
+// Инициализация при монтировании
 onMounted(() => {
+  loadCurrentPage()
+
   const token = localStorage.getItem('authToken')
   if (!token) {
     router.push('/auth')
     return
   }
+
   try {
     const decoded = jwtDecode(token)
     if (decoded['is_admin']) {
       isAdmin.value = true
     }
   } catch (e) {
-    console.error("Token decoding failed", e)
+    console.error("Ошибка декодирования токена", e)
     router.push('/auth')
   }
 })
 
-// Следим за изменением текущей страницы и загружаем соответствующие данные
-
+// Обработчик события открытия/закрытия сайдбара
+emitter.on('toggle-sidebar', () => {
+  sidebarOpen.value = !sidebarOpen.value
+})
 </script>
+
 
 <style>
 html {

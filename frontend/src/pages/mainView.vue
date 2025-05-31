@@ -1,9 +1,39 @@
 <template>
   <div class="min-h-screen bg-pattern">
+
+    <!-- Кнопка открытия фильтра -->
+    <div class="fixed top-4 left-4 z-50 md:hidden">
+      <button @click="emitter.emit('toggle-filters')" class="bg-white p-2 rounded-lg shadow-md border text-gray-800 flex items-center space-x-2">
+        <Menu size="20" />
+        <span>Фильтры</span>
+      </button>
+    </div>
+
+    <!-- Модалка фильтра для мобильных -->
+    <transition name="fade">
+      <div
+          v-if="filterOpen"
+          @click.prevent="filterOpen = false"
+          class="fixed inset-0 z-50 bg-black/50 bg-opacity-50 flex justify-center items-center 2xl:hidden"
+      >
+        <div class="bg-white max-w-md w-full mx-4 rounded-xl shadow-xl p-6 relative" @click.stop>
+          <button
+              @click="filterOpen = false"
+              class="absolute top-1 right-2 text-gray-500 hover:text-black text-xl"
+          >
+            ✕
+          </button>
+          <filter-panel @update:filters="onFilterUpdate" />
+        </div>
+      </div>
+    </transition>
+
     <div class="relative flex justify-center">
-      <div class="flex max-w-[2000px] flex-col 2xl:flex-row w-full max-w-screen-3xl mx-auto">
-        <!-- Основной контейнер -->
-        <div class="flex-1 w-full max-w-screen-2xl px-2 sm:px-8 mx-auto">
+      <div class="flex max-w-[2000px] w-full max-w-screen-3xl mx-auto overflow-hidden min-w-0">
+
+        <!-- Контент -->
+        <div class="flex-grow min-w-0 px-2 sm:px-8 mx-auto">
+
           <!-- Заголовок -->
           <div class="bg-blue-100/40 mt-8 backdrop-blur-sm rounded-2xl p-3 text-center flex flex-col justify-center items-center shadow-sm mb-12">
             <div class="text-2xl my-3 font-semibold">Edu<span class="text-blue-500">Feed</span></div>
@@ -15,13 +45,13 @@
             </p>
           </div>
 
-          <!-- Основной контент -->
+          <!-- Посты -->
           <div class="space-y-10 w-full lg:w-95/100 justify-self-center flex flex-col items-center">
             <post-main
                 v-for="post in posts"
                 :key="post.post_id"
                 :post="post"
-                :isLiked = "isLiked(post.post_id)"
+                :isLiked="isLiked(post.post_id)"
                 @click="$router.push(`/post/${post.post_id}`); View(post.post_id)"
                 class="transform hover:scale-[1.02] transition-transform duration-300 w-full"
             />
@@ -44,9 +74,9 @@
                   @click="currentPage = page"
                   class="px-6 py-3 text-base font-medium"
                   :class="{
-    'bg-blue-600 text-white': page === currentPage,
-    'text-gray-600 hover:bg-blue-50': page !== currentPage
-  }"
+                  'bg-blue-600 text-white': page === currentPage,
+                  'text-gray-600 hover:bg-blue-50': page !== currentPage
+                }"
               >
                 {{ page }}
               </button>
@@ -62,8 +92,8 @@
           </div>
         </div>
 
-        <!-- Таймлайн (правая колонка) -->
-        <div class="hidden 2xl:block backdrop-blur-[2px] min-h-screen w-[400px]   py-8 px-4">
+        <!-- Таймлайн + фильтр на больших экранах -->
+        <div class="hidden 2xl:flex flex-col flex-shrink-0 max-w-[400px] py-8 px-4">
           <div class="top-8">
             <filter-panel class="mb-6" @update:filters="onFilterUpdate" />
             <div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
@@ -87,19 +117,20 @@
       </div>
     </div>
 
-    <footer-main></footer-main>
+    <footer-main />
   </div>
 </template>
 
 
 <script setup>
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-vue-next'
 import { ref, watch, onMounted, computed } from 'vue'
+import emitter from '@/main.js'
 import FilterPanel from "@/components/filterPanel.vue"
-import TimelineMain from "@/components/timelineMain.vue";
-import postMain from "@/components/postMain.vue";
-import axios from "axios";
-import jwtApi from "@/api/jwtApi.js";
+import TimelineMain from "@/components/timelineMain.vue"
+import postMain from "@/components/postMain.vue"
+import axios from "axios"
+import jwtApi from "@/api/jwtApi.js"
 
 const timeline = ref([])
 const posts = ref([])
@@ -110,14 +141,17 @@ const filters = ref({
   categories: [],
   tags: []
 })
-const filteredPosts = ref([])
+
+const filterOpen = ref(false)
+emitter.on('toggle-filter', () => {
+  filterOpen.value = !filterOpen.value
+})
 
 const currentPage = ref(1)
 const postsPerPage = 7
 const totalPosts = ref(0)
 
 const totalPages = computed(() => Math.ceil(totalPosts.value / postsPerPage))
-
 const visiblePages = computed(() => {
   const total = totalPages.value
   const current = currentPage.value
@@ -127,45 +161,19 @@ const visiblePages = computed(() => {
   const start = Math.max(1, current - delta)
   const end = Math.min(total, current + delta)
 
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
+  for (let i = start; i <= end; i++) pages.push(i)
 
   return pages
 })
 
-const tabs = [
-  { id: 'all', name: 'Все' },
-  { id: 'news', name: 'Новости' },
-  { id: 'newspapers', name: 'Стенгазеты' },
-  { id: 'team', name: 'Поиск команды' },
-  { id: 'tech', name: 'Технологии' },
-  { id: 'science', name: 'Наука' },
-  { id: 'culture', name: 'Культура' },
-  { id: 'sport', name: 'Спорт' }
-]
-const activeTab = ref('all')
-
-function View(id) {
-  const ViewPost = async () => {
-    try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id)
-    } catch (error) {
-      console.error('Ошибка просмотра:', error)
-    }
-  }
-
-  ViewPost()
-}
-
 function onFilterUpdate(newFilters) {
-  filters.value = { ...filters.value, ...newFilters };
-  currentPage.value = 1; // сброс страницы при изменении фильтра
-  loadPosts();           // загрузка новых постов
+  filters.value = { ...filters.value, ...newFilters }
+  currentPage.value = 1
+  loadPosts()
 }
 
 async function loadPosts() {
-  const offset = (currentPage.value - 1) * postsPerPage;
+  const offset = (currentPage.value - 1) * postsPerPage
 
   const params = {
     limit: postsPerPage,
@@ -176,72 +184,57 @@ async function loadPosts() {
     tags: filters.value.tags.length ? filters.value.tags.join(',') : undefined,
   }
 
-  console.log("🚀 Параметры запроса:", params)
-
   try {
-    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, { params });
-
-    console.log("📦 Ответ с постами:", response.data);
-
-    posts.value = response.data.posts;
-    console.log(posts)
-    totalPosts.value = response.data.posts_count;
+    const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, { params })
+    posts.value = response.data.posts
+    totalPosts.value = response.data.posts_count
   } catch (error) {
-    console.error('❌ Ошибка загрузки постов:', error);
-    if (error.response) {
-      console.error('Статус ошибки:', error.response.status);
-      console.error('Ответ:', error.response.data);
-    } else if (error.request) {
-      console.error('Нет ответа от сервера:', error.request);
-    } else {
-      console.error('Ошибка:', error.message);
-    }
+    console.error('Ошибка загрузки постов:', error)
   }
 }
+
 const likes = ref([])
 async function loadLikes() {
-  const offset = (currentPage.value - 1) * postsPerPage;
-
-
   try {
-    const response = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/my-likes`);
-    likes.value = response.data.posts_liked_by_user;
+    const response = await jwtApi.get(`${import.meta.env.VITE_BASE_URL}/user/my-likes`)
+    likes.value = response.data.posts_liked_by_user
   } catch (error) {
-    console.error('Ошибка загрузки таймлайна:', error);
+    console.error('Ошибка загрузки лайков:', error)
   }
 }
 
-const isLiked = (id) => {
-  console.log(likes.value.includes(id), id);
-  return likes.value.includes(id);
-}
+const isLiked = (id) => likes.value.includes(id)
 
 async function loadTimeline() {
   try {
     const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/posts`, {
       params: {
-        limit: totalPosts.value, // Ограничиваем количество постов для таймлайна
+        limit: totalPosts.value,
         offset: 0
       }
-    });
-    timeline.value = response.data.posts;
+    })
+    timeline.value = response.data.posts
   } catch (error) {
-    console.error('Ошибка загрузки таймлайна:', error);
+    console.error('Ошибка загрузки таймлайна:', error)
   }
+}
+
+function View(id) {
+  axios.post(`${import.meta.env.VITE_BASE_URL}/posts/${id}/view`, id).catch(e => console.error(e))
 }
 
 onMounted(async () => {
   await loadLikes()
-
   await loadPosts()
   await loadTimeline()
 })
 
 watch([currentPage, filters], () => {
-  loadPosts();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+  loadPosts()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+})
 </script>
+
 
 <style>
 /* Плавная прокрутка */

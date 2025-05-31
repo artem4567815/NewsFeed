@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
-    withCredentials: true, // ⚠️ обязательно для отправки cookie
+    withCredentials: true,
 })
 
 // Вставляем access токен из localStorage
@@ -16,7 +16,6 @@ api.interceptors.request.use(config => {
     }
     return config
 })
-// pupalcasdasd
 
 // Перехватываем 401 и отправляем refresh-запрос
 api.interceptors.response.use(
@@ -28,7 +27,6 @@ api.interceptors.response.use(
             originalRequest._retry = true
 
             try {
-                // ⚠️ НИЧЕГО НЕ ПЕРЕДАЁМ — куки пойдут сами
                 const res = await axios.post(
                     `${import.meta.env.VITE_BASE_URL}/auth/refresh`,
                     {},

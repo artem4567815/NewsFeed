@@ -33,9 +33,9 @@
           <div>
             <div class="flex items-center justify-between">
               <label for="passwordAuth" class="block text-sm/6 font-medium text-gray-900">Пароль</label>
-              <div class="text-sm">
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Забыли пароль?</a>
-              </div>
+<!--              <div class="text-sm">-->
+<!--                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Забыли пароль?</a>-->
+<!--              </div>-->
             </div>
             <div class="mt-2">
               <input

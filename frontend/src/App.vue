@@ -5,9 +5,8 @@
       name="fade-slide"
       mode="out-in"
   >
-    <router-view />
+    <router-view :key="$route.fullPath" />
   </Transition>
-
 </template>
 
 <script>

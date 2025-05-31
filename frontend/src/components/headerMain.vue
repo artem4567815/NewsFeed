@@ -36,9 +36,9 @@
         </transition>
 
         <!-- Вторая кнопка фильтра -->
-<!--        <div v-show="$route.path == '/'" class="hover:cursor-pointer block 2xl:hidden bg-gray-200 ring-4 mr-5 ring-black/0 hover:bg-gray-300 hover:ring-gray-200 transition ease-in-out rounded-2xl p-3 sm:mr-5">-->
-<!--          <Filter />-->
-<!--        </div>-->
+        <div v-show="$route.path == '/'" @click="toggleFilter" class="hover:cursor-pointer block 2xl:hidden bg-gray-200 ring-4 mr-5 ring-black/0 hover:bg-gray-300 hover:ring-gray-200 transition ease-in-out rounded-2xl p-3 sm:mr-5">
+          <Filter />
+        </div>
       </div>
     </div>
   </header>
@@ -55,6 +55,10 @@ const route = useRoute()
 
 const toggleSidebar = () => {
   emitter.emit('toggle-sidebar')
+}
+
+const toggleFilter = () => {
+  emitter.emit('toggle-filter')
 }
 
 const token = localStorage.getItem('authToken')

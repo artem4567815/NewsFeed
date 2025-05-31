@@ -100,12 +100,12 @@
                     <span>{{ likesCount }}</span>
                   </button>
                 </div>
-                <div class="flex items-center gap-2">
-                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <Share2 class="w-4 h-4" />
-                    <span>Поделиться</span>
-                  </button>
-                </div>
+<!--                <div class="flex items-center gap-2">-->
+<!--                  <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">-->
+<!--                    <Share2 class="w-4 h-4" />-->
+<!--                    <span>Поделиться</span>-->
+<!--                  </button>-->
+<!--                </div>-->
               </div>
             </div>
           </div>
@@ -222,6 +222,8 @@ const loadPost = async () => {
 
     // Загружаем лайки после загрузки поста
     await loadLikes()
+    window.scrollTo({ top: 0, behavior: 'auto' })
+
   } catch (err) {
     error.value = axios.isAxiosError(err)
         ? err.response?.status === 404
