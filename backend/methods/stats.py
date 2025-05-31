@@ -26,9 +26,8 @@ def get_most_three_active_user():
         }
         for user in result
     ]
-    print(out)
+
     out = sorted(out, key=lambda x: x["post_count"], reverse=False)
-    print(out)
 
     return out
 
@@ -83,41 +82,3 @@ def get_statistics_by_posts_id(post_id):
         "conversion": conversion,
         "joined": joins_count
     }
-
-
-
-
-# def get_daily_statistics_by_post_id(post_id):
-#     stats_query = db.session.query(
-#         cast(UsersHistory.created_at, Date).label('date'),
-#         func.sum(func.cast(UsersHistory.liked, db.Integer)).label('likes'),
-#         func.sum(func.cast(UsersHistory.joined, db.Integer)).label('joined')
-#     ).filter(
-#         UsersHistory.post_id == post_id
-#     ).group_by(
-#         cast(UsersHistory.created_at, Date)
-#     ).all()
-#
-#     stats_by_date = defaultdict(lambda: {"likes": 0, "joined": 0, "views": 0})
-#     for row in stats_query:
-#         stats_by_date[row.date]["likes"] = row.likes or 0
-#         stats_by_date[row.date]["joined"] = row.joined or 0
-#
-#     views_query = db.session.query(
-#         cast(News.created_at, Date).label('date'),
-#         func.sum(News.views).label('views')
-#     ).filter(
-#         News.post_id == post_id
-#     ).group_by(
-#         cast(News.created_at, Date)
-#     ).all()
-#
-#     for row in views_query:
-#         stats_by_date[row.date]["views"] = row.views or 0
-#
-#     for date in stats_by_date:
-#         likes = stats_by_date[date]["likes"]
-#         joined = stats_by_date[date]["joined"]
-#         stats_by_date[date]["conversion"] = joined / likes if likes > 0 else 0
-#
-#     return dict(sorted(stats_by_date.items()))

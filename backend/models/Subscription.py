@@ -11,3 +11,15 @@ class Subscription(db.Model):
     authors = db.Column(ARRAY(db.String), nullable=True)
 
     all = db.Column(db.Boolean, nullable=True, default=False)
+
+    def as_dict(self):
+        result = {
+            'user_id': self.user_id,
+        }
+
+        if self.tags:
+            result['tags'] = self.tags
+        if self.authors:
+            result['authors'] = self.authors
+
+        return result

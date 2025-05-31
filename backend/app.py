@@ -9,7 +9,7 @@ app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(posts, url_prefix='/posts')
 
 
-@app.route('/ping') #Z гений
+@app.route('/ping')
 def ping():
     return "edufeed work!", 200
 
@@ -24,11 +24,6 @@ def drop_db():
     return jsonify({"message": "Destroyed"})
 
 
-@app.route('/images/<filename>')
-def serve_image(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
-
 if __name__ == "__main__":
     logger.log(f"info", "app.py | server is starting on port:{}".format(SERVER_PORT))
     app.run(debug=True, port=SERVER_PORT, host='0.0.0.0')
-

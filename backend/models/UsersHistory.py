@@ -8,6 +8,5 @@ class UsersHistory(db.Model):
     user_id = db.Column(UUID, db.ForeignKey('users.user_id', ondelete="CASCADE"))
     post_id = db.Column(UUID, db.ForeignKey('news.post_id', ondelete="CASCADE"))
 
-    viewed = db.Column(db.Boolean, default=False)
     liked = db.Column(db.Boolean, default=False)
     joined = db.Column(db.Boolean, default=False)

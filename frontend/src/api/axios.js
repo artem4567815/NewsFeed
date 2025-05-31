@@ -16,7 +16,6 @@ api.interceptors.request.use(config => {
     }
     return config
 })
-// pupalcasdasd
 
 // Перехватываем 401 и отправляем refresh-запрос
 api.interceptors.response.use(
@@ -28,11 +27,16 @@ api.interceptors.response.use(
             originalRequest._retry = true
 
             try {
-                // ⚠️ НИЧЕГО НЕ ПЕРЕДАЁМ — куки пойдут сами
+// ⚠️ НИЧЕГО НЕ ПЕРЕДАЁМ — куки пойдут сами
                 const res = await axios.post(
                     `${import.meta.env.VITE_BASE_URL}/auth/refresh`,
                     {},
-                    {credentials: 'include'
+                    {
+                        withCredentials: true,  // Важно для отправки куки
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
                     }
                 )
 
@@ -42,7 +46,7 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newToken}`
                 return api(originalRequest)
             } catch (refreshError) {
-
+                
                 window.location.href = '/auth'
                 return Promise.reject(refreshError)
             }

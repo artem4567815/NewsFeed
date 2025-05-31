@@ -4,7 +4,7 @@ from methods import *
 from flask_pydantic import validate
 
 from schemas import PatchUserRequest, SubscribeRequest
-from models import Subscription
+from methods import UserService
 
 user_routes = Blueprint('user', __name__)
 
@@ -14,9 +14,8 @@ user_routes = Blueprint('user', __name__)
 @jwt_required()
 def get_posts_by_user_id():
     user_id = get_jwt_identity()
-    posts = find_news_by_user_id(user_id)
-    posts = [post.as_dict() for post in posts]
-    posts = sorted(posts, key=lambda news: news["created_at"], reverse=False)
+    posts = PostService.get_news_by_user_id(user_id)
+
     return jsonify({"user_posts": posts}), 200
 
 
@@ -25,11 +24,7 @@ def get_posts_by_user_id():
 @jwt_required()
 def profile():
     user_id = get_jwt_identity()
-
-    user = find_user_by_user_id(user_id)
-    if user is None:
-        return jsonify({'error': 'user not found'}), 404
-
+    user = UserService.get_user_by_user_id(user_id)
     return jsonify(user.as_dict()), 200
 
 
@@ -39,12 +34,8 @@ def profile():
 @validate()
 def patch_profile(body: PatchUserRequest):
     user_id = get_jwt_identity()
-
-    user = find_user_by_user_id(user_id)
-    if user is None:
-        return jsonify({'error': 'user not found'}), 404
-
-    user = patch_profile_method(user, body)
+    user = UserService.get_user_by_user_id(user_id)
+    user = UserService.patch_profile(user, body)
 
     return jsonify(user.as_dict()), 200
 
@@ -55,10 +46,7 @@ def patch_profile(body: PatchUserRequest):
 def my_likes():
     user_id = get_jwt_identity()
 
-    liked_post_ids = db.session.query(UsersHistory.post_id).filter_by(
-        user_id=user_id, liked=True
-    ).all()
-
+    liked_post_ids = db.session.query(UsersHistory.post_id).filter_by(user_id=user_id, liked=True).all()
     liked_post_ids_list = [str(post_id) for (post_id,) in liked_post_ids]
 
     return jsonify({"posts_liked_by_user": liked_post_ids_list}), 200
@@ -67,18 +55,10 @@ def my_likes():
 @user_routes.route("/<post_id>/send/to/moderation", methods=["POST"])
 @safe("blueprints/users.py | send_to_moderation")
 @jwt_required()
-def send_to_moderation(post_id):
-    if not is_valid_uuid(post_id):
-        raise BadRequest("post_id not valid")
-
-    user_id = get_jwt_identity()
-    post = find_news_by_id(post_id)
-
-    if not post:
-        return jsonify({"Message": "Новость не найдена"}), 404
-
-    if str(post.user_id) != str(user_id):
-        raise Forbidden("not allowed")
+@check_user_access
+def send_to_moderation(post_id, only_user=True):
+    PostService.is_valid_uuid(post_id)
+    post = PostService.get_news_by_post_id(post_id)
 
     if post.status != "pending":
         post.status = "pending"
@@ -93,36 +73,12 @@ def send_to_moderation(post_id):
 @validate()
 def subscribe(body: SubscribeRequest):
     user_id = get_jwt_identity()
-    subscriptions = Subscription.query.filter_by(user_id=user_id).first()
 
-    if subscriptions is not None:
-        db.session.delete(subscriptions)
+    SubscribeService.remove_existing_subscription(user_id)
+    valid_tags = SubscribeService.validate_tags(body.tags)
+    valid_authors = SubscribeService.validate_authors(body.authors)
 
-    found_authors = None
-
-    if body.tags:
-        valid_tags = db.session.query(db.func.unnest(News.tags)).distinct().all()
-        valid_tags = [tag[0] for tag in valid_tags]
-        invalid_tags = [tag for tag in body.tags if tag not in valid_tags]
-        if invalid_tags:
-            raise BadRequest(f"Invalid tags: {', '.join(invalid_tags)}")
-
-    if body.authors:
-        authors = Users.query.filter(Users.login.in_(body.authors)).all()
-        found_authors = [author.login for author in authors]
-        missing_authors = [a for a in body.authors if a not in found_authors]
-
-        if missing_authors:
-            raise BadRequest(f"Authors not found: {', '.join(missing_authors)}")
-
-    subscription = Subscription(
-        user_id=user_id,
-        tags=body.tags,
-        authors=found_authors
-    )
-
-    db.session.add(subscription)
-    db.session.commit()
+    SubscribeService.create_subscription(user_id, valid_tags, valid_authors)
 
     return jsonify({"message": "subscription was successful"}), 200
 
@@ -132,24 +88,16 @@ def subscribe(body: SubscribeRequest):
 @jwt_required()
 def get_subscribe():
     user_id = get_jwt_identity()
-    subscribe = Subscription.query.filter_by(user_id=user_id).first()
+    subscribe = SubscribeService.get_subscription(user_id)
 
-    if not subscribe:
-        return jsonify({"message": "subscription was not found"}), 404
-
-    out = {}
-    if subscribe.authors:
-        out["authors"] = subscribe.authors
-    if subscribe.tags:
-        out["tags"] = subscribe.tags
-
-    return jsonify({"subscriptions": out}), 200
+    return jsonify({"subscriptions": subscribe.as_dict()}), 200
 
 
 @user_routes.route('/drafts', methods=['GET'])
 @safe("blueprints/users.py | drafts")
 @jwt_required()
 def drafts():
-    posts = News.query.filter_by(status="draft").all()
+    user_id = get_jwt_identity()
+    posts = News.query.filter_by(status="draft", user_id=user_id).all()
     posts = [post.as_dict() for post in posts]
     return jsonify({"drafts": posts}), 200
